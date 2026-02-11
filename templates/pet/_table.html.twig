@@ -1,0 +1,46 @@
+<tbody>
+{% if pets|length > 0 %}
+    {% for pet in pets %}
+        <tr>
+            <td>{{ pet.name }}</td>
+            <td>{{ pet.birthDate ? pet.birthDate|date('d/m/Y') : '-' }}</td>
+            <td>{{ pet.typePet.value }}</td>
+            <td>{{ pet.breed }}</td>
+            <td>{{ pet.weight }} kg</td>
+            <td>{{ pet.description }}</td>
+            <td>{{ pet.gender.value }}</td>
+            <td class="center">{{ pet.isVacinated ? '✔️' : '—' }}</td>
+            <td class="center">{{ pet.hasContagiousDisease ? '⚠️' : '—' }}</td>
+            <td class="center">{{ pet.hasMedicalRecord ? '📁' : '—' }}</td>
+            <td class="center">{{ pet.hasCriticalCondition ? '🚨' : '—' }}</td>
+
+            <td class="actions">
+                <a href="{{ path('app_pet_edit', {'id': pet.id}) }}" class="btn-edit">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+
+                <form method="post"
+                      action="{{ path('app_pet_delete', {'id': pet.id}) }}"
+                      class="delete-form"
+                      data-pet-name="{{ pet.name }}"
+                      style="display:inline;">
+
+                    <input type="hidden"
+                           name="_token"
+                           value="{{ csrf_token('delete_pet_' ~ pet.id) }}">
+
+                    <button type="button" class="btn-delete open-delete-modal">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="12" class="empty-row">
+            🐾 Aucun animal enregistré pour le moment.
+        </td>
+    </tr>
+{% endif %}
+</tbody>
