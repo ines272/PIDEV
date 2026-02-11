@@ -6,50 +6,66 @@
 <!-- HERO -->
 <section class="hero">
     <div class="hero-content">
-        <div class="hero-icon">📦</div>
-        <h1>Track Your Parcel</h1>
-        <p>Enter your tracking number to see real-time updates</p>
+        <h1>SitMyPet</h1>
+        <p>Comme à la maison, méme loin de vous</p>
 
-        <div class="search-box">
-            <input type="text" placeholder="PKT-2847">
-            <button>Track</button>
-        </div>
+       <div class="hero-section">
+    <!-- PHOTO HERO -->
+    <div class="hero-image">
+        <img src="{{ asset('images/hommechien.png') }}" alt="Homme avec chien">
+    </div>
+
+    <!-- BARRE DE RECHERCHE -->
+   <div class="search-box">
+    <input type="text" placeholder="Rechercher un gardien...">
+    <button class="icon-btn">
+        <i class="fa fa-search"></i>
+    </button>
+</div>
+
+
+    <!-- BOUTON COMMENCER -->
+    <div class="start-btn">
+        <button>Commencer</button>
+    </div>
+</div>
+
     </div>
 </section>
 
 <!-- CONTENT -->
 <section class="content">
 
-    <!-- TIMELINE -->
+    <!-- TIMELINE GARDE -->
     <div class="card timeline">
-        <h2>Tracking: PKT-2847</h2>
-        <span class="status">In Transit</span>
+        <h2>Annonce : Garde de Luna 🐶</h2>
+        <span class="status">En cours</span>
 
         <ul>
-            <li class="done">Order Placed <small>Boston, MA</small></li>
-            <li class="done">Processing <small>Boston Facility</small></li>
-            <li class="done">In Transit <small>En route to New York</small></li>
-            <li class="done">Out for Delivery <small>New York, NY</small></li>
-            <li class="pending">Delivered <small>Expected by 6:00 PM</small></li>
+            <li class="done">Annonce publiée <small>01 Mars</small></li>
+            <li class="done">Candidatures reçues <small>3 pet-sitters intéressés</small></li>
+            <li class="done">Pet-sitter sélectionné <small>Sara B.</small></li>
+            <li class="pending">Début de la garde <small>05 Mars</small></li>
+            <li class="pending">Fin de la garde <small>10 Mars</small></li>
         </ul>
     </div>
 
     <!-- DETAILS -->
     <div class="side">
         <div class="card">
-            <h3>Parcel Details</h3>
-            <p><strong>Weight:</strong> 2.5 kg</p>
-            <p><strong>Dimensions:</strong> 30×20×15 cm</p>
-            <p><strong>From:</strong> TechStore Inc.</p>
-            <p><strong>To:</strong> John Smith</p>
+            <h3>Détails de la garde</h3>
+            <p><strong>Animal :</strong> Chien - Golden Retriever</p>
+            <p><strong>Nom :</strong> Luna</p>
+            <p><strong>Lieu :</strong> Tunis</p>
+            <p><strong>Propriétaire :</strong> Nour Ben Ali</p>
         </div>
 
         <div class="card success">
-            <h3>Estimated Delivery</h3>
-            <p>2026-02-05 by 6:00 PM</p>
+            <h3>Période de garde</h3>
+            <p>Du 05 Mars au 10 Mars</p>
         </div>
 
-        <button class="download-btn">Download Receipt</button>
+        <button class="download-btn">Télécharger la réservation</button>
     </div>
 
 </section>
