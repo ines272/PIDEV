@@ -5,54 +5,141 @@ body {
     color: #222;
 }
 
-/* NAVBAR */
+/* ===== THEME SITMYPET ===== */
+.sitmypet-theme{
+    --violet-main: #7c3aed;      /* violet principal */
+    --violet-fluo: #a855f7;      /* violet fluo */
+    --violet-pastel: #f3e8ff;    /* fond pastel */
+    --dark: #1f1f2e;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fff;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== NAVBAR ===== */ 
 .navbar {
+    background-color: #210236; /* Couleur de fond violette */
+    padding: 15px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px;
-    background: #fff;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    color: white; /* Texte blanc par défaut */
 }
 
-.navbar nav {
+/* LOGO */
+.logo {
+    font-size: 22px;
+    color: white; /* logo en blanc */
     display: flex;
-    gap: 15px;
     align-items: center;
 }
 
-.navbar nav a {
-    margin: 0 10px;
-    cursor: pointer;
-    text-decoration: none;
-    color: #222;
-    font-weight: 500;
+.logo .icon {
+    margin-right: 8px;
 }
 
-.navbar nav a.active {
-    color: #0c6cd2;
-    font-weight: bold;
+/* MENU CENTRE */
+.nav-links {
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    gap: 100px; /* augmente l'espace entre les liens */
 }
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-weight: 800; /* 🔥 beaucoup plus gras */
+    font-size: 18px;  /* optionnel mais recommandé */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: #FFD700; /* couleur au survol ou actif */
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+/* espace entre admin + icônes */
+.nav-right .admin-btn {
+    margin-right: 15px;
+}
+
+.nav-right .icon-btn {
+    margin-right: 15px;
+}
+
+/* 🔥 grand espace avant l’avatar */
+.user-avatar {
+    margin-left: 40px; /* augmente à 60px si tu veux plus */
+}
+
 
 /* ADMIN BUTTON */
 .admin-btn {
-    padding: 8px 15px;
-    border-radius: 20px;
-    border: 1px solid #0c6cd2;
-    background: #0c6cd2;
+    background: #9370DB;
     color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    padding: 6px 14px;   /* taille réduite */
+    font-size: 14px;     /* texte un peu plus petit */
+    border-radius: 18px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
 }
 
 .admin-btn:hover {
-    background: #0954a5;
-    border-color: #0954a5;
+    background: #FFD700; /* jaune au hover */
+    color: #4B0082;      /* texte violet pour contraste */
 }
+
+
+/* ICON BUTTONS (notif + dark mode) */
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #9370DB; /* violet pastel */
+    color: white; /* icônes blanches */
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.icon-btn:hover {
+    background: #FFD700; /* au survol, couleur jaune */
+    color: #4B0082;
+}
+
+/* AVATAR */
+.user-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+
+
+
 
 /* HERO */
 .hero {
-    background: linear-gradient(135deg, #0c6cd2, #609fe1);
+    background: linear-gradient(135deg, #f5f3f6, #9370DB);
     color: white;
     padding: 80px 20px;
     text-align: center;
@@ -62,27 +149,7 @@ body {
     font-size: 40px;
 }
 
-.search-box {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-}
 
-.search-box input {
-    padding: 15px;
-    width: 300px;
-    border-radius: 30px 0 0 30px;
-    border: none;
-}
-
-.search-box button {
-    padding: 15px 30px;
-    border-radius: 0 30px 30px 0;
-    border: none;
-    background: #0c6cd2;
-    color: white;
-    cursor: pointer;
-}
 
 /* CONTENT */
 .content {
@@ -112,7 +179,7 @@ body {
 }
 
 .done {
-    color: #0c6cd2;
+    color: #05b852;
 }
 
 .pending {
@@ -121,7 +188,7 @@ body {
 
 .status {
     background: #dbe9ff;
-    color: #0c6cd2;
+    color: #c18ae5;
     padding: 5px 12px;
     border-radius: 20px;
     font-size: 14px;
@@ -147,23 +214,100 @@ body {
     cursor: pointer;
 }
 
+/* PHOTO HERO */
+.hero-image img { width: 90%; max-width: 500px; border-radius: 20px; object-fit: cover; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+/* BARRE DE RECHERCHE */
+.search-box {
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.search-box input {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+}
+
+.search-box button {
+    background: var(--violet-fluo);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.search-box button:hover {
+    background: var(--violet-main);
+}
+
+/* BOUTON COMMENCER */
+.start-btn button {
+    margin-top: 10px;
+    padding: 15px 60px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(45deg, var(--violet-main), var(--violet-fluo));
+    color: white;
+    transition: 0.3s;
+}
+
+.start-btn button:hover {
+    opacity: 0.9;
+}
+
+
+
+
+/* Assure que l’icône est centrée */
+.search-box button i {
+    font-size: 16px;
+}
+
+
+
 /* FOOTER */
 footer {
-    background: white;
+    background: #210236;
     padding: 40px;
     margin-top: 40px;
 }
 
 .footer-grid {
+     color: #fffbfb;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 30px;
 }
 
 footer p {
-    color: #666;
+    color: #959090;
 }
 
 footer copyright {
     text-align: center;
 }
+
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--violet-pastel);
+    gap: 20px;
+}
+
+
+
+

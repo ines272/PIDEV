@@ -6,26 +6,68 @@
     
     {# CSS du front #}
     <link rel="stylesheet" href="{{ asset('css/front-style.css') }}">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
 
 <!-- HEADER -->
 <header class="navbar">
+
+    <!-- LEFT : LOGO -->
     <div class="logo">
-        <span class="icon">📦</span>
-        <strong>PackTrack</strong>
+        <span class="icon">🐾</span>
+        
     </div>
 
-    <nav>
-        <a href="{{ path('app_home') }}" class="{{ app.request.get('_route') == 'app_home' ? 'active' }}">Track Parcel</a>
-        <a href="#">Community</a>
-        <a href="#">Report Issue</a>
+    <!-- CENTER : MENU -->
+    <nav class="nav-links">
+        <a href="{{ path('app_home') }}" class="{{ app.request.get('_route') == 'app_home' ? 'active' }}">
+        <i class="fa-solid fa-house"></i>
+        Home
+    </a>
+
+    <a href="#">
+        <i class="fa-solid fa-compass"></i>
+        Accueil
+    </a>
+
+    <a href="#">
+        <i class="fa-solid fa-paw"></i>
+        Animaux
+    </a>
+    <a href="#">
+    <i class="fa-solid fa-envelope-open"></i>
+    Messages
+</a>
+
     </nav>
 
-    <a href="{{ path('admin_dashboard') }}" class="admin-btn">Admin Portal</a>
+    <!-- RIGHT : ACTIONS -->
+    <div class="nav-right">
+
+        <a href="{{ path('admin_dashboard') }}" class="admin-btn">Admin Portal</a>
+
+        <!-- Notification -->
+        <div class="icon-btn">
+            <i class="fa-regular fa-bell"></i>
+        </div>
+
+        <!-- Dark mode -->
+        <div class="icon-btn">
+            <i class="fa-regular fa-moon"></i>
+        </div>
+
+        <!-- User -->
+        <div class="user-avatar">
+            <img src="https://i.pravatar.cc/40" alt="user">
+        </div>
+
+    </div>
+
 </header>
+
 
 <!-- CONTENU DYNAMIQUE -->
 {% block body %}{% endblock %}
@@ -33,29 +75,47 @@
 <!-- FOOTER -->
 <footer>
     <div class="footer-grid">
+        <!-- À propos -->
         <div>
-            <strong>PackTrack</strong>
-            <p>AI-powered parcel delivery management for modern logistics.</p>
+            <strong>SITMYPET</strong>
+            <p>L'application pour gérer la garde des animaux et connecter propriétaires et gardiens facilement.</p>
         </div>
 
+        <!-- Liens rapides -->
         <div>
-            <strong>Quick Links</strong>
-            <p>Track Parcel<br>Community<br>Report Issue</p>
+            <strong>Liens rapides</strong>
+            <p>
+                Accueil<br>
+                Publier une annonce<br>
+                Voir les gardiens<br>
+                Mes annonces
+            </p>
         </div>
 
+        <!-- Support -->
         <div>
             <strong>Support</strong>
-            <p>Help Center<br>Contact Us<br>FAQs</p>
+            <p>
+                Centre d'aide<br>
+                Contactez-nous<br>
+                FAQ
+            </p>
         </div>
 
+        <!-- Contact -->
         <div>
             <strong>Contact</strong>
-            <p>support@packtrack.com<br>1-800-PACKTRACK</p>
+            <p>
+                contact@sitmypet.com<br>
+                +216 71 000 000
+            </p>
         </div>
     </div>
 
-    <p class="copyright">© 2026 PackTrack. All rights reserved.</p>
+    <p class="copyright">© 2026 SITMYPET. Tous droits réservés.</p>
 </footer>
+
+
 
 {% block javascripts %}{% endblock %}
 
