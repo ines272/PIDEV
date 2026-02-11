@@ -33,10 +33,17 @@
         Accueil
     </a>
 
-    <a href="#">
-        <i class="fa-solid fa-paw"></i>
-        Animaux
-    </a>
+    <a href="{{ path('app_pet') }}" 
+   class="{{ app.request.get('_route') == 'app_pet' ? 'active' }}">
+    <i class="fa-solid fa-paw"></i>
+    Animaux
+</a>
+
+<a href="{{ path('app_announcement') }}" 
+   class="{{ app.request.get('_route') == 'app_announcement' ? 'active' }}">
+    <i class="fa-solid fa-bullhorn"></i>
+    Announcement
+</a>
     <a href="#">
     <i class="fa-solid fa-envelope-open"></i>
     Messages
