@@ -2,29 +2,44 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}PackTrack – Track Parcel{% endblock %}</title>
+    <title>{% block title %}SitMyPet – Garde d'animaux{% endblock %}</title>
     
     {# CSS du front #}
     <link rel="stylesheet" href="{{ asset('css/front-style.css') }}">
     
     {% block stylesheets %}{% endblock %}
 </head>
-<body>
+<body class="sitmypet-theme">
 
-<!-- HEADER -->
+<!-- NAVBAR -->
 <header class="navbar">
     <div class="logo">
-        <span class="icon">📦</span>
-        <strong>PackTrack</strong>
+        <span class="icon">🐾</span>
+        <strong>SitMyPet</strong>
     </div>
 
-    <nav>
-        <a href="{{ path('app_home') }}" class="{{ app.request.get('_route') == 'app_home' ? 'active' }}">Track Parcel</a>
-        <a href="#">Community</a>
-        <a href="#">Report Issue</a>
+    <nav class="nav-links">
+        <a href="{{ path('app_home') }}" class="{{ app.request.get('_route') == 'app_home' ? 'active' : '' }}">
+            🏠 Home
+        </a>
+        <a href="#">⚡ Accueil</a>
+        <a href="#">🐾 Animaux</a>
+        <a href="{{ path('app_reclamation_index') }}" class="{{ app.request.get('_route') starts with 'app_reclamation' ? 'active' : '' }}">
+            📋 Réclamations
+        </a>
+        <a href="#">💬 Messages</a>
     </nav>
 
-    <a href="{{ path('admin_dashboard') }}" class="admin-btn">Admin Portal</a>
+    <div class="nav-right">
+        <a href="{{ path('admin_dashboard') }}" class="admin-btn">Admin Portal</a>
+        
+        <div class="icon-btn">🔔</div>
+        <div class="icon-btn">🌙</div>
+        
+        <div class="user-avatar">
+            <img src="https://via.placeholder.com/40" alt="User">
+        </div>
+    </div>
 </header>
 
 <!-- CONTENU DYNAMIQUE -->
@@ -34,27 +49,33 @@
 <footer>
     <div class="footer-grid">
         <div>
-            <strong>PackTrack</strong>
-            <p>AI-powered parcel delivery management for modern logistics.</p>
+            <strong style="color: white;">SitMyPet</strong>
+            <p>Garde d'animaux de compagnie - Comme à la maison, même loin de vous.</p>
         </div>
 
         <div>
-            <strong>Quick Links</strong>
-            <p>Track Parcel<br>Community<br>Report Issue</p>
+            <strong style="color: white;">Liens Rapides</strong>
+            <p>
+                <a href="{{ path('app_home') }}" style="color: #959090; text-decoration: none;">Accueil</a><br>
+                <a href="{{ path('app_reclamation_index') }}" style="color: #959090; text-decoration: none;">Réclamations</a><br>
+                Animaux
+            </p>
         </div>
 
         <div>
-            <strong>Support</strong>
-            <p>Help Center<br>Contact Us<br>FAQs</p>
+            <strong style="color: white;">Support</strong>
+            <p>Centre d'Aide<br>Nous Contacter<br>FAQ</p>
         </div>
 
         <div>
-            <strong>Contact</strong>
-            <p>support@packtrack.com<br>1-800-PACKTRACK</p>
+            <strong style="color: white;">Contact</strong>
+            <p>support@sitmypet.com<br>1-800-SITMYPET</p>
         </div>
     </div>
 
-    <p class="copyright">© 2026 PackTrack. All rights reserved.</p>
+    <p style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+        © 2026 SitMyPet. Tous droits réservés.
+    </p>
 </footer>
 
 {% block javascripts %}{% endblock %}

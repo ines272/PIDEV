@@ -1,22 +1,177 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reclamation{% endblock %}
+{% block title %}Réclamation #{{ reclamation.id }}{% endblock %}
 
 {% block body %}
-    <h1>Reclamation</h1>
+<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+    
+    {# EN-TÊTE #}
+    <div style="margin-bottom: 30px;">
+        <a href="{{ path('app_reclamation_index') }}" 
+           style="display: inline-block; color: #667eea; text-decoration: none; font-weight: 600; margin-bottom: 15px;">
+            ← Retour à la liste
+        </a>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="font-size: 32px; font-weight: 700; color: #1a1a1a; margin-bottom: 5px;">
+                    📋 Réclamation #{{ reclamation.id }}
+                </h1>
+                <p style="color: #666; font-size: 14px;">
+                    Créée le {{ reclamation.dateReclamation|date('d/m/Y à H:i') }}
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ path('app_reclamation_edit', {id: reclamation.id}) }}" 
+                   style="padding: 12px 20px; background: #f5a623; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    ✏️ Modifier
+                </a>
+                <form method="post" action="{{ path('app_reclamation_delete', {id: reclamation.id}) }}" style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                    <button type="submit" 
+                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réclamation ?')"
+                            style="padding: 12px 20px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                        🗑️ Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ reclamation.id }}</td>
-            </tr>
-        </tbody>
-    </table>
+    {# FLASH MESSAGES #}
+    {% for message in app.flashes('success') %}
+        <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            ✓ {{ message }}
+        </div>
+    {% endfor %}
 
-    <a href="{{ path('app_reclamation_index') }}">back to list</a>
+    {# INFORMATIONS PRINCIPALES #}
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); margin-bottom: 30px;">
+        
+        {# BADGES STATUT ET PRIORITÉ #}
+        <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+            {% if reclamation.statut == 'en_attente' %}
+                <span style="background: #fff3cd; color: #856404; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                    ⏳ En attente
+                </span>
+            {% elseif reclamation.statut == 'en_cours' %}
+                <span style="background: #d1ecf1; color: #0c5460; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                    🔄 En cours
+                </span>
+            {% else %}
+                <span style="background: #d4edda; color: #155724; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                    ✅ Résolue
+                </span>
+            {% endif %}
 
-    <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}">edit</a>
+            {% if reclamation.priorite == 'haute' %}
+                <span style="background: #f8d7da; color: #721c24; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                    🔴 Priorité Haute
+                </span>
+            {% elseif reclamation.priorite == 'moyenne' %}
+                <span style="background: #fff3cd; color: #856404; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                    🟡 Priorité Moyenne
+                </span>
+            {% else %}
+                <span style="background: #e2e3e5; color: #383d41; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                    ⚪ Priorité Basse
+                </span>
+            {% endif %}
+        </div>
 
-    {{ include('reclamation/_delete_form.html.twig') }}
+        {# SUJET #}
+        <div style="margin-bottom: 25px;">
+            <h3 style="font-size: 14px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 8px;">Sujet</h3>
+            <p style="font-size: 20px; font-weight: 600; color: #333; margin: 0;">{{ reclamation.sujet }}</p>
+        </div>
+
+        {# DESCRIPTION #}
+        <div style="margin-bottom: 25px;">
+            <h3 style="font-size: 14px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 8px;">Description</h3>
+            <p style="font-size: 16px; color: #555; line-height: 1.6; margin: 0;">{{ reclamation.description }}</p>
+        </div>
+
+        {# INFORMATIONS CLIENT #}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+            <div>
+                <h3 style="font-size: 14px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 8px;">👤 Client</h3>
+                <p style="font-size: 16px; color: #333; font-weight: 600; margin: 0;">{{ reclamation.nomClient }}</p>
+            </div>
+            <div>
+                <h3 style="font-size: 14px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 8px;">📧 Email</h3>
+                <a href="mailto:{{ reclamation.emailClient }}" style="font-size: 16px; color: #667eea; text-decoration: none; font-weight: 600;">
+                    {{ reclamation.emailClient }}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {# SECTION RÉPONSES #}
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.08);">
+        
+        {# EN-TÊTE SECTION #}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h2 style="font-size: 22px; font-weight: 700; color: #333; margin: 0;">
+                💬 Réponses 
+                <span style="background: #667eea; color: white; padding: 4px 12px; border-radius: 20px; font-size: 14px; margin-left: 10px;">
+                    {{ reclamation.reponses|length }}
+                </span>
+            </h2>
+            <a href="{{ path('app_reponse_add', {id: reclamation.id}) }}" 
+               style="padding: 12px 20px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);">
+                ➕ Ajouter une réponse
+            </a>
+        </div>
+
+        {# LISTE DES RÉPONSES #}
+        {% if reclamation.reponses|length > 0 %}
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                {% for reponse in reclamation.reponses %}
+                <div style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #667eea;">
+                    
+                    {# EN-TÊTE RÉPONSE #}
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <strong style="color: #667eea; font-size: 16px;">👨‍💼 {{ reponse.auteur }}</strong>
+                            <span style="color: #999; font-size: 13px; margin-left: 10px;">
+                                {{ reponse.dateReponse|date('d/m/Y à H:i') }}
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <a href="{{ path('app_reponse_edit', {id: reponse.id}) }}" 
+                               style="padding: 6px 12px; background: #f5a623; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                                ✏️ Modifier
+                            </a>
+                            <form method="post" action="{{ path('app_reponse_delete', {id: reponse.id}) }}" style="display: inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reponse.id) }}">
+                                <button type="submit" 
+                                        onclick="return confirm('Supprimer cette réponse ?')"
+                                        style="padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                                    🗑️ Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    {# CONTENU RÉPONSE #}
+                    <p style="color: #333; font-size: 15px; line-height: 1.6; margin: 0;">
+                        {{ reponse.contenu }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {# ÉTAT VIDE #}
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 64px; margin-bottom: 20px;">💬</div>
+                <h3 style="font-size: 20px; font-weight: 600; color: #555; margin-bottom: 10px;">Aucune réponse pour le moment</h3>
+                <p style="color: #999; font-size: 15px; margin-bottom: 25px;">Soyez le premier à répondre à cette réclamation</p>
+                <a href="{{ path('app_reponse_add', {id: reclamation.id}) }}" 
+                   style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                    ➕ Ajouter la première réponse
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
 {% endblock %}

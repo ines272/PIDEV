@@ -1,33 +1,167 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reclamation index{% endblock %}
+{% block title %}Gestion des Réclamations - SitMyPet{% endblock %}
 
 {% block body %}
-    <h1>Reclamation index</h1>
+<div class="reclamations-container">
+    
+    {# EN-TÊTE #}
+    <div class="page-header">
+        <h1>📋 Gestion des Réclamations</h1>
+        <p>Gérez et suivez toutes les réclamations clients</p>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for reclamation in reclamations %}
-            <tr>
-                <td>{{ reclamation.id }}</td>
-                <td>
-                    <a href="{{ path('app_reclamation_show', {'id': reclamation.id}) }}">show</a>
-                    <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="2">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {# FLASH MESSAGES #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            ✓ {{ message }}
+        </div>
+    {% endfor %}
 
-    <a href="{{ path('app_reclamation_new') }}">Create new</a>
+    {# STATISTIQUES #}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">TOTAL RÉCLAMATIONS</div>
+            <div class="stat-value">{{ stats.total }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">EN ATTENTE</div>
+            <div class="stat-value">
+                {% set enAttente = 0 %}
+                {% for stat in stats.byStatut %}
+                    {% if stat.statut == 'en_attente' %}
+                        {% set enAttente = stat.total %}
+                    {% endif %}
+                {% endfor %}
+                {{ enAttente }}
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">RÉSOLUES</div>
+            <div class="stat-value">
+                {% set resolues = 0 %}
+                {% for stat in stats.byStatut %}
+                    {% if stat.statut == 'resolue' %}
+                        {% set resolues = stat.total %}
+                    {% endif %}
+                {% endfor %}
+                {{ resolues }}
+            </div>
+        </div>
+    </div>
+
+    {# FILTRES #}
+    <div class="filters-card">
+        <h3>🔍 Filtres et Recherche</h3>
+        
+        <form method="get" action="{{ path('app_reclamation_index') }}">
+            <div class="filters-form">
+                <div class="form-group">
+                    <label>Rechercher</label>
+                    <input type="text" name="search" value="{{ currentSearch }}" 
+                           class="form-control" placeholder="Sujet, description, nom du client...">
+                </div>
+
+                <div class="form-group">
+                    <label>Statut</label>
+                    <select name="statut" class="form-control">
+                        <option value="">Tous</option>
+                        <option value="en_attente" {% if currentStatut == 'en_attente' %}selected{% endif %}>En attente</option>
+                        <option value="en_cours" {% if currentStatut == 'en_cours' %}selected{% endif %}>En cours</option>
+                        <option value="resolue" {% if currentStatut == 'resolue' %}selected{% endif %}>Résolue</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Priorité</label>
+                    <select name="priorite" class="form-control">
+                        <option value="">Toutes</option>
+                        <option value="basse" {% if currentPriorite == 'basse' %}selected{% endif %}>Basse</option>
+                        <option value="moyenne" {% if currentPriorite == 'moyenne' %}selected{% endif %}>Moyenne</option>
+                        <option value="haute" {% if currentPriorite == 'haute' %}selected{% endif %}>Haute</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Filtrer</button>
+            </div>
+        </form>
+    </div>
+
+    {# BOUTON NOUVELLE RÉCLAMATION #}
+    <div style="margin-bottom: 20px;">
+        <a href="{{ path('app_reclamation_new') }}" class="btn btn-success">
+            ➕ Nouvelle Réclamation
+        </a>
+    </div>
+
+    {# TABLEAU #}
+    <div class="table-card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Sujet</th>
+                    <th>Client</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Priorité</th>
+                    <th style="text-align: center;">Réponses</th>
+                    <th style="text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reclamation in reclamations %}
+                <tr>
+                    <td style="font-weight: 600;">#{{ reclamation.id }}</td>
+                    <td>{{ reclamation.sujet|slice(0, 50) }}{% if reclamation.sujet|length > 50 %}...{% endif %}</td>
+                    <td>{{ reclamation.nomClient }}</td>
+                    <td style="font-size: 13px; color: #666;">{{ reclamation.dateReclamation|date('d/m/Y H:i') }}</td>
+                    <td>
+                        {% if reclamation.statut == 'en_attente' %}
+                            <span class="badge badge-warning">⏳ En attente</span>
+                        {% elseif reclamation.statut == 'en_cours' %}
+                            <span class="badge badge-info">🔄 En cours</span>
+                        {% else %}
+                            <span class="badge badge-success">✅ Résolue</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reclamation.priorite == 'haute' %}
+                            <span class="badge badge-danger">🔴 Haute</span>
+                        {% elseif reclamation.priorite == 'moyenne' %}
+                            <span class="badge badge-warning">🟡 Moyenne</span>
+                        {% else %}
+                            <span class="badge badge-secondary">⚪ Basse</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="badge badge-primary">{{ reclamation.reponses|length }}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{{ path('app_reclamation_show', {id: reclamation.id}) }}" class="btn btn-primary btn-sm">
+                            👁️ Voir
+                        </a>
+                        <a href="{{ path('app_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-warning btn-sm">
+                            ✏️ Modifier
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div class="empty-state-title">Aucune réclamation trouvée</div>
+                            <div class="empty-state-text">Essayez de modifier vos critères de recherche</div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
 {% endblock %}

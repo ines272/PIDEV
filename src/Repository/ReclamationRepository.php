@@ -6,9 +6,6 @@ use App\Entity\Reclamation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Reclamation>
- */
 class ReclamationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +13,43 @@ class ReclamationRepository extends ServiceEntityRepository
         parent::__construct($registry, Reclamation::class);
     }
 
-    //    /**
-    //     * @return Reclamation[] Returns an array of Reclamation objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findWithFilters(?string $search, ?string $statut, ?string $priorite, string $orderBy = 'dateReclamation', string $order = 'DESC'): array
+    {
+        $qb = $this->createQueryBuilder('r');
+        
+        if ($search) {
+            $qb->andWhere('r.sujet LIKE :search OR r.description LIKE :search OR r.nomClient LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+        
+        if ($statut) {
+            $qb->andWhere('r.statut = :statut')->setParameter('statut', $statut);
+        }
+        
+        if ($priorite) {
+            $qb->andWhere('r.priorite = :priorite')->setParameter('priorite', $priorite);
+        }
+        
+        $qb->orderBy('r.' . $orderBy, $order);
+        
+        return $qb->getQuery()->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Reclamation
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function countByStatut(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r.statut, COUNT(r.id) as total')
+            ->groupBy('r.statut')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countByPriorite(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r.priorite, COUNT(r.id) as total')
+            ->groupBy('r.priorite')
+            ->getQuery()
+            ->getResult();
+    }
 }
