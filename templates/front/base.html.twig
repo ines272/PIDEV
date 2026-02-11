@@ -44,6 +44,12 @@
     <i class="fa-solid fa-bullhorn"></i>
     Announcement
 </a>
+
+<a href="{{ path('app_event') }}" 
+   class="{{ app.request.get('_route') == 'app_event' ? 'active' }}">
+    <i class="fa-solid fa-bullhorn"></i>
+    Events
+</a>
     <a href="#">
     <i class="fa-solid fa-envelope-open"></i>
     Messages

@@ -1,0 +1,88 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}
+    {{ is_edit ? 'Modifier un événement' : 'Ajouter un événement' }}
+{% endblock %}
+
+{% block body %}
+<section class="content">
+    <div class="pet-form-card">
+
+        <div class="form-header">
+            <h2>
+                {{ is_edit ? 'Modifier un événement' : 'Ajouter un événement' }}
+            </h2>
+            <a href="{{ path('app_event') }}" class="back-link">← Retour</a>
+        </div>
+
+        {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+
+        {# GLOBAL ERRORS #}
+        {% if form_errors(form) %}
+            <div class="form-global-error">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
+
+        <div class="form-grid">
+            <div class="left-column">
+
+                {# NAME #}
+                <div class="form-group {{ form.name.vars.errors|length > 0 ? 'has-error' : '' }}">
+                    <label>Nom</label>
+                    {{ form_widget(form.name, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.name) }}
+                    </div>
+                </div>
+
+                {# DATE #}
+                <div class="form-group {{ form.date.vars.errors|length > 0 ? 'has-error' : '' }}">
+                    <label>Date</label>
+                    {{ form_widget(form.date, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.date) }}
+                    </div>
+                </div>
+
+                {# HEURE #}
+                <div class="form-group {{ form.heure.vars.errors|length > 0 ? 'has-error' : '' }}">
+                    <label>Heure</label>
+                    {{ form_widget(form.heure, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.heure) }}
+                    </div>
+                </div>
+
+                {# ADRESSE #}
+                <div class="form-group {{ form.addresse.vars.errors|length > 0 ? 'has-error' : '' }}">
+                    <label>Adresse</label>
+                    {{ form_widget(form.addresse, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.addresse) }}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        {# DESCRIPTION FULL WIDTH #}
+        <div class="form-group full-width {{ form.description.vars.errors|length > 0 ? 'has-error' : '' }}">
+            <label>Description</label>
+            {{ form_widget(form.description, {'attr': {'class': 'textarea-modern'}}) }}
+            <div class="error-message">
+                {{ form_errors(form.description) }}
+            </div>
+        </div>
+
+        <div class="submit-area">
+            <button class="btn-modern">
+                {{ is_edit ? 'Mettre à jour' : 'Enregistrer' }}
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+
+    </div>
+</section>
+{% endblock %}
