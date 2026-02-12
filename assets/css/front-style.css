@@ -1360,3 +1360,9 @@ footer copyright {
     font-weight: 500;
     border: 1px solid #f5b7b1;
 }
+.logo-img {
+    width: 80px; /* ajuste la taille */
+    height: auto; /* garde les proportions */
+    display: block;
+     margin-left: -20px;
+}
