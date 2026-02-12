@@ -1,0 +1,121 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes Annonces{% endblock %}
+
+{% block body %}
+<section class="content">
+    <div class="card">
+
+        <div class="table-header">
+            <h2>📢 Mes Annonces</h2>
+            <a href="{{ path('app_announcement_new') }}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Nouvelle annonce
+            </a>
+        </div>
+
+        {% if announcements is empty %}
+            <p>Aucune annonce disponible.</p>
+        {% else %}
+            <table class="pet-table">
+                <thead>
+                    <tr>
+                        <th>Adresse</th>
+                        <th>Type</th>
+                        <th>Date début</th>
+                        <th>Date fin</th>
+                        <th>Visites</th>
+                        <th>Min</th>
+                        <th>Max</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for a in announcements %}
+                    <tr>
+                        <td>{{ a.address }}</td>
+                        <td>{{ a.careType.value }}</td>
+                        <td>{{ a.dateDebut|date('d/m/Y') }}</td>
+                        <td>{{ a.dateFin|date('d/m/Y') }}</td>
+                        <td>{{ a.visitPerDay }}</td>
+                        <td>{{ a.renumerationMin }} €</td>
+                        <td>{{ a.renumerationMax }} €</td>
+
+                        <td class="actions">
+                            <a href="{{ path('app_announcement_edit', {'id': a.id}) }}" class="action-btn edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+                            <form method="post"
+                                  action="{{ path('app_announcement_delete', {'id': a.id}) }}"
+                                  class="delete-form"
+                                  data-pet-name="Annonce {{ a.id }}"
+                                  style="display:inline;">
+
+                                <input type="hidden"
+                                       name="_token"
+                                       value="{{ csrf_token('delete_announcement_' ~ a.id) }}">
+
+                                <button type="button" class="action-btn delete open-delete-modal">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</section>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Supprimer l’animal</h3>
+        <p id="deleteMessage"></p>
+
+        <div class="modal-actions">
+            <button id="cancelDelete" class="btn-cancel">Annuler</button>
+            <button id="confirmDelete" class="btn-danger">Supprimer</button>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+    const modal = document.getElementById('deleteModal');
+    const deleteMessage = document.getElementById('deleteMessage');
+    const confirmBtn = document.getElementById('confirmDelete');
+    const cancelBtn = document.getElementById('cancelDelete');
+
+    let currentForm = null;
+
+    document.querySelectorAll('.open-delete-modal').forEach(button => {
+        button.addEventListener('click', function() {
+            currentForm = this.closest('.delete-form');
+            const petName = currentForm.dataset.petName;
+
+            deleteMessage.innerText = "Voulez-vous vraiment supprimer \"" + petName + "\" ?";
+            modal.style.display = "flex";
+        });
+    });
+
+    cancelBtn.addEventListener('click', function() {
+        modal.style.display = "none";
+        currentForm = null;
+    });
+
+    confirmBtn.addEventListener('click', function() {
+        if (currentForm) {
+            currentForm.submit();
+        }
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

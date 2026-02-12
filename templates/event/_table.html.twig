@@ -1,0 +1,40 @@
+<tbody>
+{% if events|length > 0 %}
+    {% for event in events %}
+        <tr>
+            <td>{{ event.name }}</td>
+            <td>{{ event.date ? event.date|date('d/m/Y') : '-' }}</td>
+            <td>{{ event.heure }}</td>
+            <td>{{ event.addresse }}</td>
+            <td>{{ event.description }}</td>
+
+            <td class="actions">
+                <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn-edit">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+
+                <form method="post"
+                      action="{{ path('app_event_delete', {'id': event.id}) }}"
+                      class="delete-form"
+                      data-event-name="{{ event.name }}"
+                      style="display:inline;">
+
+                    <input type="hidden"
+                           name="_token"
+                           value="{{ csrf_token('delete_event_' ~ event.id) }}">
+
+                    <button type="button" class="btn-delete open-delete-modal">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="6" class="empty-row">
+            📅 Aucun événement enregistré pour le moment.
+        </td>
+    </tr>
+{% endif %}
+</tbody>

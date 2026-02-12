@@ -10,12 +10,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 #[Route('/admin/reponse')]
 final class ReponseController extends AbstractController
 {
     #[Route('/reclamation/{id}/add', name: 'app_reponse_add', methods: ['GET', 'POST'])]
-    public function add(Request $request, Reclamation $reclamation, EntityManagerInterface $em): Response
+    public function add(Request $request, Reclamation $reclamation, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
         $reponse = new Reponse();
         $reponse->setReclamation($reclamation);
@@ -32,7 +34,24 @@ final class ReponseController extends AbstractController
             $em->persist($reponse);
             $em->flush();
 
-            $this->addFlash('success', 'Réponse ajoutée avec succès.');
+            // 🔥 ENVOI DE L'EMAIL
+            try {
+                $email = (new Email())
+                    ->from('noreply@sitmypet.com')
+                    ->to($reclamation->getEmailClient())
+                    ->subject('🐾 Nouvelle réponse à votre réclamation #' . $reclamation->getId())
+                    ->html($this->renderView('emails/nouvelle_reponse.html.twig', [
+                        'reclamation' => $reclamation,
+                        'reponse' => $reponse,
+                    ]));
+
+                $mailer->send($email);
+                
+                $this->addFlash('success', 'Réponse ajoutée avec succès et email envoyé au client !');
+            } catch (\Exception $e) {
+                $this->addFlash('warning', 'Réponse ajoutée mais l\'email n\'a pas pu être envoyé : ' . $e->getMessage());
+            }
+
             return $this->redirectToRoute('app_reclamation_show', ['id' => $reclamation->getId()]);
         }
 

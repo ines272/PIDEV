@@ -1,0 +1,179 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes Animaux{% endblock %}
+
+{% block body %}
+<section class="content">
+    <div class="card" style="width:100%;">
+
+        <!-- HEADER + ADD BUTTON -->
+        <div class="table-header">
+            <h2>🐾 Mes Animaux</h2>
+            <a href="{{ path('app_pet_new') }}" class="btn btn-primary">
+    <i class="fa-solid fa-plus"></i> Ajouter un animal
+</a>
+
+        </div>
+
+        
+
+        <form method="get" class="search-bar">
+    <input type="text" name="name" placeholder="🔍 Nom">
+
+    <select name="type">
+        <option value="">Type</option>
+        <option value="CHIEN">Chien</option>
+        <option value="CHAT">Chat</option>
+        <option value="TORTUE">Tortue</option>
+        <option value="LAPIN">Lapin</option>
+        <option value="OISEAU">Oiseau</option>
+        <option value="POISSON">Poisson</option>
+        <option value="SOURIS">Souris</option>
+    </select>
+
+    <select name="gender">
+        <option value="">Genre</option>
+        <option value="MALE">Mâle</option>
+        <option value="FEMALE">Femelle</option>
+        <option value="STERILIZED">Stérilisé</option>
+    </select>
+
+    <select name="vaccinated">
+        <option value="">Vacciné</option>
+        <option value="true">Oui</option>
+        <option value="false">Non</option>
+    </select>
+
+    <select name="critical">
+        <option value="">Critique</option>
+        <option value="true">Oui</option>
+        <option value="false">Non</option>
+    </select>
+
+    <button type="submit" class="btn-search">Rechercher</button>
+    <button type="button" id="resetFilters" class="btn-reset">
+    Réinitialiser
+</button>
+
+</form>
+
+
+            <div class="table-wrapper">
+    <table class="pet-table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Date naissance</th>
+                <th>Type</th>
+                <th>Race</th>
+                <th>Poids</th>
+                <th>Description</th>
+                <th>Genre</th>
+                <th>Vacciné</th>
+                <th>Maladie</th>
+                <th>Dossier</th>
+                <th>Critique</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        {# ONLY THIS — NO SECOND TBODY #}
+        {% include 'pet/_table.html.twig' %}
+    </table>
+</div>
+
+    </div>
+</section>
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Supprimer l’animal</h3>
+        <p id="deleteMessage"></p>
+
+        <div class="modal-actions">
+            <button id="cancelDelete" class="btn-cancel">Annuler</button>
+            <button id="confirmDelete" class="btn-danger">Supprimer</button>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+
+const searchInput = document.querySelector('input[name="name"]');
+
+if (searchInput) {
+    searchInput.addEventListener('keyup', function () {
+        fetch('/pet/filter?name=' + this.value)
+            .then(response => response.text())
+            .then(html => {
+                document.querySelector('.pet-table tbody').outerHTML = html;
+            });
+    });
+}
+
+searchInput.addEventListener('keyup', function () {
+    fetch('/pet/filter?name=' + this.value)
+        .then(response => response.text())
+        .then(html => {
+            document.querySelector('.pet-table tbody').outerHTML = html;
+        });
+});
+
+
+const resetBtn = document.getElementById('resetFilters');
+
+if (resetBtn) {
+    resetBtn.addEventListener('click', function () {
+
+        // Clear inputs
+        document.querySelectorAll('.search-bar input, .search-bar select')
+            .forEach(el => el.value = '');
+
+        // Fetch full table again
+        fetch('/pet/filter?name=')
+            .then(response => response.text())
+            .then(html => {
+                document.querySelector('.pet-table tbody').outerHTML = html;
+            });
+    });
+}
+
+
+    const modal = document.getElementById('deleteModal');
+    const deleteMessage = document.getElementById('deleteMessage');
+    const confirmBtn = document.getElementById('confirmDelete');
+    const cancelBtn = document.getElementById('cancelDelete');
+
+    let currentForm = null;
+
+    document.querySelectorAll('.open-delete-modal').forEach(button => {
+        button.addEventListener('click', function() {
+            currentForm = this.closest('.delete-form');
+            const petName = currentForm.dataset.petName;
+
+            deleteMessage.innerText = "Voulez-vous vraiment supprimer \"" + petName + "\" ?";
+            modal.style.display = "flex";
+        });
+    });
+
+    cancelBtn.addEventListener('click', function() {
+        modal.style.display = "none";
+        currentForm = null;
+    });
+
+    confirmBtn.addEventListener('click', function() {
+        if (currentForm) {
+            currentForm.submit();
+        }
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+</script>
+{% endblock %}
+
+{% endblock %}
