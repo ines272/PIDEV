@@ -83,7 +83,7 @@ CREATE TABLE utilisateurs (
 ## 🛠️ Technologies utilisées
 
 ### Backend
-- **Framework** : Symfony 7.1
+- **Framework** : Symfony 6.4
 - **Langage** : PHP 8.2+
 - **ORM** : Doctrine
 - **Sécurité** : Symfony Security Bundle
