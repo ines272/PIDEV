@@ -14,12 +14,44 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AnnouncementController extends AbstractController
 {
     #[Route('/announcement', name: 'app_announcement')]
-    public function index(AnnouncementRepository $repository): Response
-    {
-        return $this->render('announcement/index.html.twig', [
-            'announcements' => $repository->findAll(),
-        ]);
-    }
+public function index(Request $request, AnnouncementRepository $repository): Response
+{
+    $address = $request->query->get('address');
+    $dateDebut = $request->query->get('dateDebut');
+    $dateFin = $request->query->get('dateFin');
+
+    $announcements = $repository->searchByCriteria(
+        $address,
+        $dateDebut,
+        $dateFin
+    );
+
+    return $this->render('announcement/index.html.twig', [
+        'announcements' => $announcements,
+    ]);
+}
+
+
+
+#[Route('/announcement/filter', name: 'app_announcement_filter', methods: ['GET'])]
+public function filter(Request $request, AnnouncementRepository $repository): Response
+{
+    $address = $request->query->get('address');
+    $dateDebut = $request->query->get('dateDebut');
+    $dateFin = $request->query->get('dateFin');
+
+    $announcements = $repository->searchByCriteria(
+        $address,
+        $dateDebut,
+        $dateFin
+    );
+
+    return $this->render('announcement/_table.html.twig', [
+        'announcements' => $announcements,
+    ]);
+}
+
+
 
     #[Route('/announcement/new', name: 'app_announcement_new')]
     public function new(Request $request, EntityManagerInterface $em): Response
