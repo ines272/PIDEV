@@ -1,0 +1,204 @@
+{% extends 'base.html.twig' %}
+{% block title %}Connexion - SitMyPet{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #fff8e1 100%);
+        min-height: 100vh;
+    }
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .login-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+        overflow: hidden;
+        width: 100%;
+        max-width: 450px;
+    }
+    .login-header {
+        background: linear-gradient(135deg, #4f7942 0%, #2d5a27 100%);
+        padding: 40px 30px;
+        text-align: center;
+        color: white;
+    }
+    .login-header .paw-icon {
+        font-size: 3rem;
+        margin-bottom: 10px;
+    }
+    .login-body { padding: 40px 35px; }
+    .form-control {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        transition: border-color 0.3s;
+    }
+    .form-control:focus {
+        border-color: #4f7942;
+        box-shadow: 0 0 0 0.2rem rgba(79,121,66,0.15);
+    }
+    .input-group-text {
+        border-radius: 10px 0 0 10px;
+        border: 2px solid #e9ecef;
+        border-right: none;
+        background: #f8f9fa;
+        color: #4f7942;
+    }
+    .input-group .form-control {
+        border-radius: 0 10px 10px 0;
+        border-left: none;
+    }
+    .btn-login {
+        background: linear-gradient(135deg, #4f7942 0%, #2d5a27 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 13px;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s;
+    }
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(79,121,66,0.4);
+        opacity: 0.95;
+    }
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #adb5bd;
+        margin: 20px 0;
+    }
+    .divider::before, .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e9ecef;
+    }
+    .btn-register {
+        border: 2px solid #4f7942;
+        border-radius: 10px;
+        padding: 11px;
+        color: #4f7942;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-register:hover {
+        background: #4f7942;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="paw-icon">🐾</div>
+            <h3 class="fw-bold mb-1">SitMyPet</h3>
+            <p class="mb-0 opacity-75 small">La garde d'animaux en toute confiance</p>
+        </div>
+
+        <div class="login-body">
+            <h5 class="fw-bold mb-1">Bon retour !</h5>
+            <p class="text-muted small mb-4">Connectez-vous à votre compte</p>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{{ path('app_login') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Adresse email</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input type="email"
+                               name="_username"
+                               value="{{ last_username }}"
+                               class="form-control"
+                               placeholder="votre@email.com"
+                               required autofocus>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Mot de passe</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password"
+                               name="_password"
+                               id="password"
+                               class="form-control"
+                               placeholder="••••••••"
+                               required>
+                        <button class="btn btn-outline-secondary" type="button"
+                                onclick="togglePassword()"
+                                style="border-radius:0 10px 10px 0; border:2px solid #e9ecef; border-left:none;">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               name="_remember_me" id="remember_me">
+                        <label class="form-check-label small" for="remember_me">
+                            Se souvenir de moi
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-login w-100 text-white mb-3">
+                    <i class="fas fa-sign-in-alt me-2"></i> Se connecter
+                </button>
+            </form>
+
+            <div class="divider">ou</div>
+
+            <a href="{{ path('app_register') }}" class="btn btn-register w-100 text-decoration-none d-block text-center">
+                <i class="fas fa-user-plus me-2"></i> Créer un compte
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    function togglePassword() {
+        const pwd = document.getElementById('password');
+        const icon = document.getElementById('eyeIcon');
+        if (pwd.type === 'password') {
+            pwd.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            pwd.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+</script>
+{% endblock %}

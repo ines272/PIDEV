@@ -1,0 +1,108 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}Nouvel utilisateur - Admin SitMyPet{% endblock %}
+{% block page_title %}Nouvel utilisateur{% endblock %}
+
+{% block content %}
+
+{# ===== PAGE HEADER ===== #}
+<div class="page-header">
+    <h2>➕ Nouvel utilisateur</h2>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ path('app_admin_dashboard') }}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ path('app_admin_user_index') }}">Utilisateurs</a>
+            </li>
+            <li class="breadcrumb-item active">Nouveau</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="form-card">
+
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+            {# ===== INFOS PERSONNELLES ===== #}
+            <div class="form-section-title">
+                <i class="fas fa-user"></i> Informations personnelles
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Prénom *</label>
+                    {{ form_widget(form.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Prénom'}}) }}
+                    {{ form_errors(form.prenom) }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nom *</label>
+                    {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Nom'}}) }}
+                    {{ form_errors(form.nom) }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email *</label>
+                {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'email@exemple.com'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Téléphone *</label>
+                {{ form_widget(form.telephone, {'attr': {'class': 'form-control', 'placeholder': '20 123 456'}}) }}
+                {{ form_errors(form.telephone) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Adresse <span class="text-muted fw-normal">(optionnel)</span></label>
+                {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'rows': '2', 'placeholder': 'Adresse complète'}}) }}
+                {{ form_errors(form.adresse) }}
+            </div>
+
+            {# ===== ROLE & STATUT ===== #}
+            <div class="form-section-title">
+                <i class="fas fa-shield-alt"></i> Rôle &amp; Statut
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Rôle *</label>
+                    {{ form_widget(form.role, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.role) }}
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check">
+                        {{ form_widget(form.isActive, {'attr': {'class': 'form-check-input'}}) }}
+                        <label class="form-check-label fw-bold" for="{{ form.isActive.vars.id }}">
+                            Compte actif
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            {# ===== INFO MOT DE PASSE ===== #}
+            <div class="alert" style="background:#e8f5e9; border:none; border-left:4px solid #4f7942;
+                                       border-radius:10px; color:#2e7d32; font-size:0.85rem;">
+                <i class="fas fa-info-circle me-2"></i>
+                Un mot de passe temporaire sera généré automatiquement et affiché après la création.
+            </div>
+
+            {# ===== BOUTONS ===== #}
+            <div class="d-flex gap-3 mt-4">
+                <button type="submit" class="btn btn-save">
+                    <i class="fas fa-save me-2"></i> Créer l'utilisateur
+                </button>
+                <a href="{{ path('app_admin_user_index') }}" class="btn-cancel">
+                    <i class="fas fa-times me-2"></i> Annuler
+                </a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

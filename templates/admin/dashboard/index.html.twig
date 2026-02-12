@@ -1,73 +1,148 @@
 {% extends 'admin/base.html.twig' %}
+{% block title %}Dashboard - Admin SitMyPet{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
-{% block title %}Dashboard - PackTrack{% endblock %}
+{% block content %}
 
-{% block body %}
-    {# TOPBAR #}
-    <div class="topbar">
-        <input type="text" placeholder="Search parcels...">
-        <div class="user">
-            <img src="https://i.pravatar.cc/40?img=12" alt="Admin">
-            <span>Admin</span>
+{# ===== PAGE HEADER ===== #}
+<div class="page-header">
+    <h2>👋 Bonjour, {{ app.user.prenom }} !</h2>
+    <p>Voici un aperçu de l'activité de SitMyPet</p>
+</div>
+
+{# ===== STAT CARDS ===== #}
+<div class="row g-4 mb-4">
+
+    {# Total utilisateurs #}
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#e8f5e9;">👥</div>
+            <div class="stat-value" style="color:#2e7d32;">{{ total_users }}</div>
+            <div class="stat-label">Total utilisateurs</div>
         </div>
     </div>
 
-    {# STAT CARDS #}
-    <section class="cards">
-        <div class="card">
-            <i class="fa-solid fa-box"></i>
-            <p>Total Parcels</p>
-            <h2>2,847</h2>
+    {# Utilisateurs actifs #}
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#e3f2fd;">✅</div>
+            <div class="stat-value" style="color:#1565c0;">{{ active_users }}</div>
+            <div class="stat-label">Comptes actifs</div>
         </div>
-        <div class="card">
-            <i class="fa-solid fa-truck-fast"></i>
-            <p>In Transit</p>
-            <h2>1,234</h2>
-        </div>
-        <div class="card">
-            <i class="fa-solid fa-circle-check"></i>
-            <p>Delivered</p>
-            <h2>1,456</h2>
-        </div>
-        <div class="card">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            <p>Incidents</p>
-            <h2>23</h2>
-        </div>
-    </section>
+    </div>
 
-    {# RECENT PARCELS #}
-    <section class="table-section" style="margin-top:25px;">
-        <h3>Recent Parcels</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Client</th>
-                    <th>Status</th>
-                    <th>Destination</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><i class="fa-solid fa-box"></i> PKT-1001</td>
-                    <td>Ali Ben Salah</td>
-                    <td class="status transit">In Transit</td>
-                    <td>Tunis</td>
-                </tr>
-                <tr>
-                    <td><i class="fa-solid fa-box"></i> PKT-1002</td>
-                    <td>Sara Mezni</td>
-                    <td class="status delivered">Delivered</td>
-                    <td>Sfax</td>
-                </tr>
-                <tr>
-                    <td><i class="fa-solid fa-box"></i> PKT-1003</td>
-                    <td>Mohamed Trabelsi</td>
-                    <td class="status processing">Processing</td>
-                    <td>Sousse</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
+    {# Propriétaires #}
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#fff3e0;">🏠</div>
+            <div class="stat-value" style="color:#e65100;">{{ proprietaires }}</div>
+            <div class="stat-label">Propriétaires</div>
+        </div>
+    </div>
+
+    {# Gardiens #}
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#f3e5f5;">🤝</div>
+            <div class="stat-value" style="color:#6a1b9a;">{{ gardiens }}</div>
+            <div class="stat-label">Gardiens</div>
+        </div>
+    </div>
+
+</div>
+
+{# ===== DERNIERS INSCRITS ===== #}
+<div class="row g-4">
+    <div class="col-12">
+        <div class="data-card">
+            <div class="data-card-header">
+                <span class="data-card-title">
+                    <i class="fas fa-user-plus me-2" style="color:#4f7942;"></i>
+                    Derniers inscrits
+                </span>
+                <a href="{{ path('app_admin_user_index') }}"
+                   class="btn btn-sm btn-outline-secondary"
+                   style="border-radius:8px; font-size:0.8rem;">
+                    Voir tout <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                            <th>Inscrit le</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if latest_users is empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="fas fa-inbox fa-2x mb-2 d-block opacity-30"></i>
+                                Aucun utilisateur pour le moment
+                            </td>
+                        </tr>
+                        {% else %}
+                        {% for user in latest_users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="user-avatar"
+                                         style="background:{{ loop.index is odd ? '#4f7942' : '#f4a261' }};">
+                                        {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold" style="font-size:0.88rem;">
+                                            {{ user.prenom }} {{ user.nom }}
+                                        </div>
+                                        <div style="font-size:0.75rem; color:#90a4ae;">
+                                            #{{ user.id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.role == 'ROLE_ADMIN' %}
+                                    <span class="badge-role badge-admin">Admin</span>
+                                {% elseif user.role == 'ROLE_PROPRIETAIRE' %}
+                                    <span class="badge-role badge-proprietaire">Propriétaire</span>
+                                {% elseif user.role == 'ROLE_GARDIEN' %}
+                                    <span class="badge-role badge-gardien">Gardien</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.isActive %}
+                                    <span class="badge-role badge-active">Actif</span>
+                                {% else %}
+                                    <span class="badge-role badge-inactive">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td style="color:#90a4ae; font-size:0.83rem;">
+                                {{ user.createdAt ? user.createdAt|date('d/m/Y') : '-' }}
+                            </td>
+                            <td>
+                                <a href="{{ path('app_admin_user_show', {'id': user.id}) }}"
+                                   class="btn-action btn-view" title="Voir">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}"
+                                   class="btn-action btn-edit ms-1" title="Modifier">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

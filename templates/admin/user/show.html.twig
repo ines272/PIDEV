@@ -1,0 +1,228 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}{{ user.prenom }} {{ user.nom }} - Admin SitMyPet{% endblock %}
+{% block page_title %}Détails utilisateur{% endblock %}
+
+{% block content %}
+
+{# ===== PAGE HEADER ===== #}
+<div class="page-header d-flex align-items-start justify-content-between">
+    <div>
+        <h2>👤 Détails utilisateur</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{{ path('app_admin_dashboard') }}">Dashboard</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{{ path('app_admin_user_index') }}">Utilisateurs</a>
+                </li>
+                <li class="breadcrumb-item active">{{ user.prenom }} {{ user.nom }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        {% if not user.deletedAt %}
+        <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}"
+           class="btn btn-save d-flex align-items-center gap-2">
+            <i class="fas fa-pen"></i> Modifier
+        </a>
+        {% endif %}
+        <a href="{{ path('app_admin_user_index') }}" class="btn-cancel d-flex align-items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+
+    {# ===== COLONNE GAUCHE : PROFIL ===== #}
+    <div class="col-lg-4">
+        <div class="data-card text-center p-4">
+
+            {# Avatar #}
+            <div class="user-avatar mx-auto mb-3"
+                 style="width:80px; height:80px; font-size:1.8rem; border-radius:20px;
+                        background:{% if user.role == 'ROLE_ADMIN' %}#e53935{% elseif user.role == 'ROLE_PROPRIETAIRE' %}#4f7942{% else %}#1976d2{% endif %};">
+                {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+            </div>
+
+            <h5 class="fw-bold mb-1" style="color:#2d3748;">
+                {{ user.prenom }} {{ user.nom }}
+            </h5>
+            <p style="color:#90a4ae; font-size:0.85rem; margin-bottom:16px;">
+                {{ user.email }}
+            </p>
+
+            {# Badge rôle #}
+            <div class="mb-3">
+                {% if user.role == 'ROLE_ADMIN' %}
+                    <span class="badge-role badge-admin" style="font-size:0.8rem; padding:7px 16px;">
+                        <i class="fas fa-shield-alt me-1"></i> Administrateur
+                    </span>
+                {% elseif user.role == 'ROLE_PROPRIETAIRE' %}
+                    <span class="badge-role badge-proprietaire" style="font-size:0.8rem; padding:7px 16px;">
+                        <i class="fas fa-home me-1"></i> Propriétaire
+                    </span>
+                {% elseif user.role == 'ROLE_GARDIEN' %}
+                    <span class="badge-role badge-gardien" style="font-size:0.8rem; padding:7px 16px;">
+                        <i class="fas fa-hands-helping me-1"></i> Gardien
+                    </span>
+                {% endif %}
+            </div>
+
+            {# Badge statut #}
+            <div class="mb-4">
+                {% if user.deletedAt %}
+                    <span class="badge-role badge-deleted" style="font-size:0.8rem; padding:7px 16px;">
+                        <i class="fas fa-trash me-1"></i> Supprimé
+                    </span>
+                {% elseif user.isActive %}
+                    <span class="badge-role badge-active" style="font-size:0.8rem; padding:7px 16px;">
+                        <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i> Actif
+                    </span>
+                {% else %}
+                    <span class="badge-role badge-inactive" style="font-size:0.8rem; padding:7px 16px;">
+                        <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i> Inactif
+                    </span>
+                {% endif %}
+            </div>
+
+            <hr style="border-color:#f0f4f8;">
+
+            {# Dates #}
+            <div class="text-start">
+                <div class="d-flex justify-content-between mb-2">
+                    <span style="font-size:0.8rem; color:#b0bec5; font-weight:700;">Inscrit le</span>
+                    <span style="font-size:0.8rem; font-weight:700; color:#3d4a5c;">
+                        {{ user.createdAt ? user.createdAt|date('d/m/Y') : '-' }}
+                    </span>
+                </div>
+                {% if user.updatedAt %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span style="font-size:0.8rem; color:#b0bec5; font-weight:700;">Modifié le</span>
+                    <span style="font-size:0.8rem; font-weight:700; color:#3d4a5c;">
+                        {{ user.updatedAt|date('d/m/Y') }}
+                    </span>
+                </div>
+                {% endif %}
+                {% if user.deletedAt %}
+                <div class="d-flex justify-content-between">
+                    <span style="font-size:0.8rem; color:#b0bec5; font-weight:700;">Supprimé le</span>
+                    <span style="font-size:0.8rem; font-weight:700; color:#e53935;">
+                        {{ user.deletedAt|date('d/m/Y') }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ===== ACTIONS ===== #}
+        <div class="data-card mt-4 p-3">
+            <div class="data-card-title mb-3" style="font-size:0.85rem;">
+                <i class="fas fa-cog me-2" style="color:#4f7942;"></i> Actions
+            </div>
+
+            {% if not user.deletedAt %}
+                {# Supprimer #}
+                <form method="post"
+                      action="{{ path('app_admin_user_delete', {'id': user.id}) }}"
+                      onsubmit="return confirm('Supprimer cet utilisateur ?')">
+                    <input type="hidden" name="_token"
+                           value="{{ csrf_token('delete' ~ user.id) }}">
+                    <button type="submit"
+                            class="btn w-100 mb-2"
+                            style="background:#fce4e4; color:#c62828; border:none;
+                                   border-radius:10px; font-weight:700; font-size:0.85rem; padding:10px;">
+                        <i class="fas fa-trash me-2"></i> Supprimer (soft delete)
+                    </button>
+                </form>
+            {% else %}
+                {# Restaurer #}
+                <form method="post"
+                      action="{{ path('app_admin_user_restore', {'id': user.id}) }}"
+                      onsubmit="return confirm('Restaurer cet utilisateur ?')">
+                    <input type="hidden" name="_token"
+                           value="{{ csrf_token('restore' ~ user.id) }}">
+                    <button type="submit"
+                            class="btn w-100 mb-2"
+                            style="background:#e8f5e9; color:#2e7d32; border:none;
+                                   border-radius:10px; font-weight:700; font-size:0.85rem; padding:10px;">
+                        <i class="fas fa-undo me-2"></i> Restaurer
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ===== COLONNE DROITE : INFOS ===== #}
+    <div class="col-lg-8">
+        <div class="form-card">
+            <div class="form-section-title">
+                <i class="fas fa-info-circle"></i> Informations complètes
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div style="background:#f8fafc; border-radius:12px; padding:16px;">
+                        <div style="font-size:0.72rem; font-weight:800; color:#b0bec5;
+                                    text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
+                            <i class="fas fa-user me-1"></i> Prénom
+                        </div>
+                        <div class="fw-bold" style="color:#2d3748;">{{ user.prenom }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div style="background:#f8fafc; border-radius:12px; padding:16px;">
+                        <div style="font-size:0.72rem; font-weight:800; color:#b0bec5;
+                                    text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
+                            <i class="fas fa-user me-1"></i> Nom
+                        </div>
+                        <div class="fw-bold" style="color:#2d3748;">{{ user.nom }}</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div style="background:#f8fafc; border-radius:12px; padding:16px;">
+                        <div style="font-size:0.72rem; font-weight:800; color:#b0bec5;
+                                    text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
+                            <i class="fas fa-envelope me-1"></i> Email
+                        </div>
+                        <div class="fw-bold" style="color:#2d3748;">{{ user.email }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div style="background:#f8fafc; border-radius:12px; padding:16px;">
+                        <div style="font-size:0.72rem; font-weight:800; color:#b0bec5;
+                                    text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
+                            <i class="fas fa-phone me-1"></i> Téléphone
+                        </div>
+                        <div class="fw-bold" style="color:#2d3748;">
+                            {{ user.telephone ?? 'Non renseigné' }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div style="background:#f8fafc; border-radius:12px; padding:16px;">
+                        <div style="font-size:0.72rem; font-weight:800; color:#b0bec5;
+                                    text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
+                            <i class="fas fa-id-badge me-1"></i> ID
+                        </div>
+                        <div class="fw-bold" style="color:#2d3748;">#{{ user.id }}</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div style="background:#f8fafc; border-radius:12px; padding:16px;">
+                        <div style="font-size:0.72rem; font-weight:800; color:#b0bec5;
+                                    text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
+                            <i class="fas fa-map-marker-alt me-1"></i> Adresse
+                        </div>
+                        <div class="fw-bold" style="color:#2d3748;">
+                            {{ user.adresse ?? 'Non renseignée' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

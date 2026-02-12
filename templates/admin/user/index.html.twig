@@ -1,0 +1,227 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}Utilisateurs - Admin SitMyPet{% endblock %}
+{% block page_title %}Gestion des utilisateurs{% endblock %}
+
+{% block content %}
+
+{# ===== PAGE HEADER ===== #}
+<div class="page-header d-flex align-items-start justify-content-between">
+    <div>
+        <h2>👥 Utilisateurs</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{{ path('app_admin_dashboard') }}">Dashboard</a>
+                </li>
+                <li class="breadcrumb-item active">Utilisateurs</li>
+            </ol>
+        </nav>
+    </div>
+    <a href="{{ path('app_admin_user_new') }}"
+       class="btn btn-save d-flex align-items-center gap-2">
+        <i class="fas fa-plus"></i> Nouvel utilisateur
+    </a>
+</div>
+
+{# ===== FILTRES ===== #}
+<div class="data-card mb-4">
+    <div class="data-card-header">
+        <span class="data-card-title">
+            <i class="fas fa-filter me-2" style="color:#4f7942;"></i>
+            Recherche &amp; Filtres
+        </span>
+        {% if search or role or status %}
+            <a href="{{ path('app_admin_user_index') }}"
+               class="btn btn-sm btn-outline-secondary" style="border-radius:8px;font-size:0.8rem;">
+                <i class="fas fa-times me-1"></i> Réinitialiser
+            </a>
+        {% endif %}
+    </div>
+    <div class="p-3">
+        <form method="GET" action="{{ path('app_admin_user_index') }}">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Recherche</label>
+                    <div class="search-bar">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" name="search" value="{{ search }}"
+                               class="form-control"
+                               placeholder="Nom, prénom ou email...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Rôle</label>
+                    <select name="role" class="form-select">
+                        <option value="">Tous les rôles</option>
+                        <option value="ROLE_ADMIN"        {{ role == 'ROLE_ADMIN'        ? 'selected' : '' }}>Administrateur</option>
+                        <option value="ROLE_PROPRIETAIRE" {{ role == 'ROLE_PROPRIETAIRE' ? 'selected' : '' }}>Propriétaire</option>
+                        <option value="ROLE_GARDIEN"      {{ role == 'ROLE_GARDIEN'      ? 'selected' : '' }}>Gardien</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Statut</label>
+                    <select name="status" class="form-select">
+                        <option value="">Tous</option>
+                        <option value="active"   {{ status == 'active'   ? 'selected' : '' }}>Actifs</option>
+                        <option value="inactive" {{ status == 'inactive' ? 'selected' : '' }}>Inactifs</option>
+                        <option value="deleted"  {{ status == 'deleted'  ? 'selected' : '' }}>Supprimés</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-save w-100">
+                        <i class="fas fa-search me-1"></i> Filtrer
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# ===== TABLEAU UTILISATEURS ===== #}
+<div class="data-card">
+    <div class="data-card-header">
+        <span class="data-card-title">
+            <i class="fas fa-list me-2" style="color:#4f7942;"></i>
+            {{ users|length }} utilisateur{{ users|length > 1 ? 's' : '' }} trouvé{{ users|length > 1 ? 's' : '' }}
+        </span>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Utilisateur</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Rôle</th>
+                    <th>Statut</th>
+                    <th>Inscrit le</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if users is empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-5 text-muted">
+                        <div style="font-size:3rem; opacity:0.2; margin-bottom:12px;">👥</div>
+                        <div class="fw-bold">Aucun utilisateur trouvé</div>
+                        {% if search or role or status %}
+                            <div class="small mt-1">Essayez de modifier vos filtres</div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                {% for user in users %}
+                <tr>
+                    <td style="color:#b0bec5; font-size:0.8rem; font-weight:700;">
+                        #{{ user.id }}
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="user-avatar"
+                                 style="background:{% if user.role == 'ROLE_ADMIN' %}#e53935{% elseif user.role == 'ROLE_PROPRIETAIRE' %}#4f7942{% else %}#1976d2{% endif %};">
+                                {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+                            </div>
+                            <div>
+                                <div class="fw-bold" style="font-size:0.88rem; color:#2d3748;">
+                                    {{ user.prenom }} {{ user.nom }}
+                                </div>
+                                {% if user.adresse %}
+                                <div style="font-size:0.75rem; color:#b0bec5;">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    {{ user.adresse|slice(0, 25) }}{% if user.adresse|length > 25 %}...{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-size:0.85rem;">{{ user.email }}</td>
+                    <td style="font-size:0.85rem;">{{ user.telephone ?? '-' }}</td>
+                    <td>
+                        {% if user.role == 'ROLE_ADMIN' %}
+                            <span class="badge-role badge-admin">
+                                <i class="fas fa-shield-alt me-1"></i>Admin
+                            </span>
+                        {% elseif user.role == 'ROLE_PROPRIETAIRE' %}
+                            <span class="badge-role badge-proprietaire">
+                                <i class="fas fa-home me-1"></i>Propriétaire
+                            </span>
+                        {% elseif user.role == 'ROLE_GARDIEN' %}
+                            <span class="badge-role badge-gardien">
+                                <i class="fas fa-hands-helping me-1"></i>Gardien
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.deletedAt %}
+                            <span class="badge-role badge-deleted">
+                                <i class="fas fa-trash me-1"></i>Supprimé
+                            </span>
+                        {% elseif user.isActive %}
+                            <span class="badge-role badge-active">
+                                <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i>Actif
+                            </span>
+                        {% else %}
+                            <span class="badge-role badge-inactive">
+                                <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i>Inactif
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td style="color:#90a4ae; font-size:0.82rem;">
+                        {{ user.createdAt ? user.createdAt|date('d/m/Y') : '-' }}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            {# Voir #}
+                            <a href="{{ path('app_admin_user_show', {'id': user.id}) }}"
+                               class="btn-action btn-view" title="Voir les détails">
+                                <i class="fas fa-eye"></i>
+                            </a>
+
+                            {# Modifier #}
+                            {% if not user.deletedAt %}
+                            <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}"
+                               class="btn-action btn-edit" title="Modifier">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            {% endif %}
+
+                            {# Supprimer ou Restaurer #}
+                            {% if user.deletedAt %}
+                                {# Restaurer #}
+                                <form method="post"
+                                      action="{{ path('app_admin_user_restore', {'id': user.id}) }}"
+                                      style="display:inline;">
+                                    <input type="hidden" name="_token"
+                                           value="{{ csrf_token('restore' ~ user.id) }}">
+                                    <button type="submit" class="btn-action btn-restore"
+                                            title="Restaurer"
+                                            onclick="return confirm('Restaurer cet utilisateur ?')">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </form>
+                            {% else %}
+                                {# Supprimer #}
+                                <form method="post"
+                                      action="{{ path('app_admin_user_delete', {'id': user.id}) }}"
+                                      style="display:inline;">
+                                    <input type="hidden" name="_token"
+                                           value="{{ csrf_token('delete' ~ user.id) }}">
+                                    <button type="submit" class="btn-action btn-delete"
+                                            title="Supprimer"
+                                            onclick="return confirm('Supprimer cet utilisateur ?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
