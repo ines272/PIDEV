@@ -1,0 +1,90 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}
+    {{ is_edit ? 'Modifier une annonce' : 'Créer une annonce' }}
+{% endblock %}
+
+{% block body %}
+<section class="content">
+    <div class="pet-form-card">
+
+        <div class="form-header">
+            <h2>
+                {{ is_edit ? 'Modifier une annonce' : 'Créer une annonce' }}
+            </h2>
+            <a href="{{ path('app_announcement') }}" class="back-link">← Retour</a>
+        </div>
+
+        {{ form_start(form) }}
+
+        <div class="form-grid">
+
+            <div>
+                <div class="form-group">
+                    <label>Adresse</label>
+                    {{ form_widget(form.address, {'attr': {'class': 'input-modern'}}) }}
+                </div>
+
+                <div class="form-group">
+                    <label>Longitude</label>
+                    {{ form_widget(form.longitude, {'attr': {'class': 'input-modern'}}) }}
+                </div>
+
+                <div class="form-group">
+                    <label>Altitude</label>
+                    {{ form_widget(form.altitude, {'attr': {'class': 'input-modern'}}) }}
+                </div>
+
+                <div class="form-group">
+                    <label>Visites / jour</label>
+                    {{ form_widget(form.visitPerDay, {'attr': {'class': 'input-modern'}}) }}
+                </div>
+            </div>
+
+            <div>
+                <label class="section-label">Type de garde</label>
+                <div class="type-grid">
+                    {% for child in form.careType %}
+                        <label class="type-card">
+                            {{ form_widget(child) }}
+                            {{ child.vars.label }}
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label>Date début</label>
+                    {{ form_widget(form.dateDebut, {'attr': {'class': 'input-modern'}}) }}
+                </div>
+
+                <div class="form-group">
+                    <label>Date fin</label>
+                    {{ form_widget(form.dateFin, {'attr': {'class': 'input-modern'}}) }}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-grid" style="margin-top:30px;">
+            <div class="form-group">
+                <label>Rémunération min</label>
+                {{ form_widget(form.renumerationMin, {'attr': {'class': 'input-modern'}}) }}
+            </div>
+
+            <div class="form-group">
+                <label>Rémunération max</label>
+                {{ form_widget(form.renumerationMax, {'attr': {'class': 'input-modern'}}) }}
+            </div>
+        </div>
+
+        <div class="submit-area">
+            <button class="btn-modern">
+                {{ is_edit ? 'Mettre à jour' : 'Créer' }}
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+
+    </div>
+</section>
+{% endblock %}
