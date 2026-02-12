@@ -1,0 +1,145 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une Réponse{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
+    
+    {# EN-TÊTE #}
+    <div style="margin-bottom: 30px;">
+        <a href="{{ path('app_reclamation_show', {id: reponse.reclamation.id}) }}" 
+           style="display: inline-block; color: #667eea; text-decoration: none; font-weight: 600; margin-bottom: 15px;">
+            ← Retour aux détails
+        </a>
+        <h1 style="font-size: 32px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px;">
+            ✏️ Modifier une Réponse
+        </h1>
+        <p style="color: #666; font-size: 16px;">Modifiez votre réponse à la réclamation #{{ reponse.reclamation.id }}</p>
+    </div>
+
+    {# FLASH MESSAGES #}
+    {% for message in app.flashes('success') %}
+        <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            ✓ {{ message }}
+        </div>
+    {% endfor %}
+
+    {# CONTEXTE - RÉCLAMATION ORIGINALE #}
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid #667eea;">
+        <div style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px;">
+            📋 Réclamation concernée
+        </div>
+        <h3 style="font-size: 18px; font-weight: 700; color: #333; margin-bottom: 8px;">
+            {{ reponse.reclamation.sujet }}
+        </h3>
+        <p style="color: #666; font-size: 14px; line-height: 1.5;">
+            {{ reponse.reclamation.description|slice(0, 150) }}{% if reponse.reclamation.description|length > 150 %}...{% endif %}
+        </p>
+        <div style="margin-top: 12px; font-size: 13px; color: #888;">
+            Par <strong>{{ reponse.reclamation.nomClient }}</strong> le {{ reponse.reclamation.dateReclamation|date('d/m/Y') }}
+        </div>
+    </div>
+
+    {# INFO RÉPONSE ACTUELLE #}
+    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #ffc107;">
+        <div style="display: flex; align-items: start; gap: 10px;">
+            <span style="font-size: 20px;">📅</span>
+            <div>
+                <strong style="color: #856404; display: block; margin-bottom: 5px;">Réponse originale</strong>
+                <p style="color: #856404; font-size: 13px; margin: 0;">
+                    Créée par <strong>{{ reponse.auteur }}</strong> le {{ reponse.dateReponse|date('d/m/Y à H:i') }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {# FORMULAIRE DE MODIFICATION #}
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.1);">
+        
+        <h2 style="font-size: 22px; font-weight: 700; color: #333; margin-bottom: 25px;">
+            ✍️ Modifier la Réponse
+        </h2>
+
+        {{ form_start(form) }}
+
+        {# AFFICHAGE DES ERREURS #}
+        {% if not form.vars.valid %}
+            <div style="background: #f8d7da; border: 2px solid #f5c6cb; color: #721c24; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                <h4 style="margin: 0 0 10px 0; font-size: 16px;">⚠️ Erreurs de validation :</h4>
+                <ul style="margin: 0; padding-left: 20px;">
+                    {% for child in form.children %}
+                        {% for error in child.vars.errors %}
+                            <li><strong>{{ child.vars.label }}:</strong> {{ error.message }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {# AUTEUR #}
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px;">
+                👨‍💼 Auteur de la réponse <span style="color: #e74c3c;">*</span>
+            </label>
+            {{ form_widget(form.auteur, {'attr': {'style': 'width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;'}}) }}
+        </div>
+
+        {# CONTENU #}
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px;">
+                💬 Contenu de la réponse <span style="color: #e74c3c;">*</span>
+            </label>
+            {{ form_widget(form.contenu, {'attr': {'style': 'width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; min-height: 150px;'}}) }}
+            <small style="color: #999; font-size: 12px; display: block; margin-top: 5px;">
+                Minimum 10 caractères
+            </small>
+        </div>
+
+        {# BOUTONS #}
+        <div style="display: flex; gap: 15px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+            <button type="submit" 
+                    style="flex: 1; padding: 15px 30px; background: linear-gradient(135deg, #f5a623 0%, #f76b1c 100%); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 166, 35, 0.4); transition: transform 0.2s;">
+                💾 Enregistrer les Modifications
+            </button>
+            
+            <a href="{{ path('app_reclamation_show', {id: reponse.reclamation.id}) }}" 
+               style="flex: 0.3; padding: 15px 30px; background: #e0e0e0; color: #555; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center;">
+                Annuler
+            </a>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+
+    {# DANGER ZONE - SUPPRESSION #}
+    <div style="background: white; padding: 30px; border-radius: 12px; margin-top: 30px; border: 2px solid #e74c3c;">
+        <h3 style="font-size: 18px; font-weight: 700; color: #e74c3c; margin-bottom: 15px;">
+            🗑️ Zone de Danger
+        </h3>
+        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+            La suppression de cette réponse est définitive et irréversible.
+        </p>
+        <form method="post" action="{{ path('app_reponse_delete', {id: reponse.id}) }}" style="display: inline;">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reponse.id) }}">
+            <button type="submit" 
+                    onclick="return confirm('⚠️ Êtes-vous sûr de vouloir supprimer définitivement cette réponse ?')"
+                    style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                🗑️ Supprimer cette Réponse
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: #f5a623 !important;
+        box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+    }
+
+    button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 166, 35, 0.5);
+    }
+</style>
+{% endblock %}
