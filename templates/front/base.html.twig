@@ -15,11 +15,10 @@
 <!-- HEADER -->
 <header class="navbar">
 
-    <!-- LEFT : LOGO -->
-    <div class="logo">
-        <span class="icon">🐾</span>
-        
-    </div>
+   <!-- LEFT : LOGO -->
+<div class="logo">
+    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-img">
+</div>
 
     <!-- CENTER : MENU -->
     <nav class="nav-links">
@@ -28,10 +27,7 @@
         Home
     </a>
 
-    <a href="#">
-        <i class="fa-solid fa-compass"></i>
-        Accueil
-    </a>
+   
 
     <a href="{{ path('app_pet') }}" 
    class="{{ app.request.get('_route') == 'app_pet' ? 'active' }}">
@@ -47,9 +43,10 @@
 
 <a href="{{ path('app_event') }}" 
    class="{{ app.request.get('_route') == 'app_event' ? 'active' }}">
-    <i class="fa-solid fa-bullhorn"></i>
+    <i class="fa-solid fa-calendar-days"></i>
     Events
 </a>
+
     <a href="#">
     <i class="fa-solid fa-envelope-open"></i>
     Messages

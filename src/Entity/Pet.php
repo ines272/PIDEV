@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\Gender;
 use App\Enum\PetType;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 
@@ -19,25 +20,37 @@ class Pet
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
+    #[Assert\Length(min: 2, minMessage: "Le nom doit contenir au moins {{ limit }} caractères.")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "La date de naissance est obligatoire.")]
+    #[Assert\LessThan("today", message: "La date doit être dans le passé.")]
     private ?\DateTime $birthDate = null;
 
     #[ORM\Column(enumType: PetType::class)]
+    #[Assert\NotNull(message: "Veuillez sélectionner un type d'animal.")]
     private ?PetType $typePet = null;
 
 
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "La race est obligatoire.")]
     private ?string $breed = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le poids est obligatoire.")]
+    #[Assert\Positive(message: "Le poids doit être positif.")]
     private ?float $weight = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
+    #[Assert\Length(min: 5, minMessage: "La description doit contenir au moins {{ limit }} caractères.")]
     private ?string $description = null;
 
     #[ORM\Column(enumType: Gender::class)]
+    #[Assert\NotNull(message: "Veuillez sélectionner un genre.")]
     private ?Gender $gender = null;
 
 
@@ -75,7 +88,7 @@ class Pet
         return $this->birthDate;
     }
 
-    public function setBirthDate(\DateTime $birthDate): static
+    public function setBirthDate(?\DateTime $birthDate): static
     {
         $this->birthDate = $birthDate;
 
