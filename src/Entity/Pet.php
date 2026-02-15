@@ -3,8 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\PetRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\Gender;
+use App\Enum\PetType;
 use Symfony\Component\Validator\Constraints as Assert;
+
+
 
 #[ORM\Entity(repositoryClass: PetRepository::class)]
 class Pet
@@ -15,46 +20,51 @@ class Pet
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le nom de l'animal est obligatoire")]
+    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
+    #[Assert\Length(min: 2, minMessage: "Le nom doit contenir au moins {{ limit }} caractères.")]
     private ?string $name = null;
 
-    #[ORM\Column(type: 'date')]
-    #[Assert\NotBlank(message: "La date de naissance est obligatoire")]
-    private ?\DateTimeInterface $birth_date = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "La date de naissance est obligatoire.")]
+    #[Assert\LessThan("today", message: "La date doit être dans le passé.")]
+    private ?\DateTime $birthDate = null;
+
+    #[ORM\Column(enumType: PetType::class)]
+    #[Assert\NotNull(message: "Veuillez sélectionner un type d'animal.")]
+    private ?PetType $typePet = null;
+
+
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le type d'animal est obligatoire")]
-    private ?string $type_pet = null;
-
-    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "La race est obligatoire.")]
     private ?string $breed = null;
 
-    #[ORM\Column(type: 'float')]
-    #[Assert\Positive(message: "Le poids doit être positif")]
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "Le poids est obligatoire.")]
+    #[Assert\Positive(message: "Le poids doit être positif.")]
     private ?float $weight = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
+    #[Assert\Length(min: 5, minMessage: "La description doit contenir au moins {{ limit }} caractères.")]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $gender = null;
+    #[ORM\Column(enumType: Gender::class)]
+    #[Assert\NotNull(message: "Veuillez sélectionner un genre.")]
+    private ?Gender $gender = null;
 
-    #[ORM\Column(type: 'boolean')]
-    private ?bool $is_vaccinated = false;
 
-    #[ORM\Column(type: 'boolean')]
-    private ?bool $has_contagious_disease = false;
+    #[ORM\Column]
+    private ?bool $isVacinated = null;
 
-    #[ORM\Column(type: 'boolean')]
-    private ?bool $has_medical_record = false;
+    #[ORM\Column]
+    private ?bool $hasContagiousDisease = null;
 
-    #[ORM\Column(type: 'boolean')]
-    private ?bool $has_critical_condition = false;
+    #[ORM\Column]
+    private ?bool $hasMedicalRecord = null;
 
-    // ============ RELATION AVEC USER ============
-    #[ORM\ManyToOne(inversedBy: 'pets')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    #[ORM\Column]
+    private ?bool $hasCriticalCondition = null;
 
     public function getId(): ?int
     {
@@ -69,28 +79,30 @@ class Pet
     public function setName(string $name): static
     {
         $this->name = $name;
+
         return $this;
     }
 
-    public function getBirthDate(): ?\DateTimeInterface
+    public function getBirthDate(): ?\DateTime
     {
-        return $this->birth_date;
+        return $this->birthDate;
     }
 
-    public function setBirthDate(\DateTimeInterface $birth_date): static
+    public function setBirthDate(?\DateTime $birthDate): static
     {
-        $this->birth_date = $birth_date;
+        $this->birthDate = $birthDate;
+
         return $this;
     }
 
-    public function getTypePet(): ?string
+    public function getTypePet(): ?PetType
     {
-        return $this->type_pet;
+        return $this->typePet;
     }
 
-    public function setTypePet(string $type_pet): static
+    public function setTypePet(?PetType $typePet): static
     {
-        $this->type_pet = $type_pet;
+        $this->typePet = $typePet;
         return $this;
     }
 
@@ -102,8 +114,10 @@ class Pet
     public function setBreed(string $breed): static
     {
         $this->breed = $breed;
+
         return $this;
     }
+
 
     public function getWeight(): ?float
     {
@@ -113,6 +127,7 @@ class Pet
     public function setWeight(float $weight): static
     {
         $this->weight = $weight;
+
         return $this;
     }
 
@@ -124,73 +139,66 @@ class Pet
     public function setDescription(string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
-    public function getGender(): ?string
+    public function getGender(): ?Gender
     {
         return $this->gender;
     }
 
-    public function setGender(string $gender): static
+    public function setGender(?Gender $gender): static
     {
         $this->gender = $gender;
         return $this;
     }
 
-    public function isVaccinated(): ?bool
+    public function isVacinated(): ?bool
     {
-        return $this->is_vaccinated;
+        return $this->isVacinated;
     }
 
-    public function setIsVaccinated(bool $is_vaccinated): static
+    public function setIsVacinated(bool $isVacinated): static
     {
-        $this->is_vaccinated = $is_vaccinated;
+        $this->isVacinated = $isVacinated;
+
         return $this;
     }
 
     public function hasContagiousDisease(): ?bool
     {
-        return $this->has_contagious_disease;
+        return $this->hasContagiousDisease;
     }
 
-    public function setHasContagiousDisease(bool $has_contagious_disease): static
+    public function setHasContagiousDisease(bool $hasContagiousDisease): static
     {
-        $this->has_contagious_disease = $has_contagious_disease;
+        $this->hasContagiousDisease = $hasContagiousDisease;
+
         return $this;
     }
 
     public function hasMedicalRecord(): ?bool
     {
-        return $this->has_medical_record;
+        return $this->hasMedicalRecord;
     }
 
-    public function setHasMedicalRecord(bool $has_medical_record): static
+    public function setHasMedicalRecord(bool $hasMedicalRecord): static
     {
-        $this->has_medical_record = $has_medical_record;
+        $this->hasMedicalRecord = $hasMedicalRecord;
+
         return $this;
     }
 
     public function hasCriticalCondition(): ?bool
     {
-        return $this->has_critical_condition;
+        return $this->hasCriticalCondition;
     }
 
-    public function setHasCriticalCondition(bool $has_critical_condition): static
+    public function setHasCriticalCondition(bool $hasCriticalCondition): static
     {
-        $this->has_critical_condition = $has_critical_condition;
-        return $this;
-    }
+        $this->hasCriticalCondition = $hasCriticalCondition;
 
-    // ============ GETTERS/SETTERS POUR LA RELATION ============
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
         return $this;
     }
 }

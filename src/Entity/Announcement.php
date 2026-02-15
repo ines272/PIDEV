@@ -3,8 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\AnnouncementRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\TypeGuard;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: AnnouncementRepository::class)]
 class Announcement
@@ -15,40 +18,73 @@ class Announcement
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L'adresse est obligatoire.")]
+    #[Assert\Length(min: 5, minMessage: "L'adresse doit contenir au moins {{ limit }} caractères.")]
     private ?string $address = null;
 
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "La longitude est obligatoire.")]
+    #[Assert\Range(
+        min: -180,
+        max: 180,
+        notInRangeMessage: "La longitude doit être entre -180 et 180."
+    )]
     private ?float $longitude = null;
 
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "L'altitude est obligatoire.")]
     private ?float $altitude = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $care_type = null;
+    #[ORM\Column(enumType: TypeGuard::class)]
+    #[Assert\NotNull(message: "Veuillez sélectionner un type de garde.")]
+    private ?TypeGuard $careType = null;
 
-    #[ORM\Column(type: 'date')]
-    private ?\DateTimeInterface $date_debut = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "La date de début est obligatoire.")]
+    #[Assert\GreaterThanOrEqual("today", message: "La date début doit être aujourd'hui ou future.")]
+    private ?\DateTime $dateDebut = null;
 
-    #[ORM\Column(type: 'date')]
-    private ?\DateTimeInterface $date_fin = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "La date de fin est obligatoire.")]
+    private ?\DateTime $dateFin = null;
 
-    #[ORM\Column(type: 'integer')]
-    private ?int $visit_per_day = null;
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "Le nombre de visites est obligatoire.")]
+    #[Assert\Positive(message: "Le nombre de visites doit être positif.")]
+    private ?int $visitPerDay = null;
 
-    #[ORM\Column(type: 'float')]
-    private ?float $renumeration_min = null;
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "La rémunération minimale est obligatoire.")]
+    #[Assert\Positive(message: "La rémunération minimale doit être positive.")]
+    private ?float $renumerationMin = null;
 
-    #[ORM\Column(type: 'float')]
-    private ?float $renumeration_max = null;
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "La rémunération maximale est obligatoire.")]
+    #[Assert\Positive(message: "La rémunération maximale doit être positive.")]
+    private ?float $renumerationMax = null;
 
-    // ============ RELATIONS ============
-    #[ORM\ManyToOne(inversedBy: 'announcements')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    /**
+     * VALIDATION PERSONNALISÉE
+     */
+    #[Assert\Callback]
+    public function validate(ExecutionContextInterface $context): void
+    {
+        if ($this->dateDebut && $this->dateFin) {
+            if ($this->dateFin < $this->dateDebut) {
+                $context->buildViolation("La date de fin doit être après la date de début.")
+                    ->atPath('dateFin')
+                    ->addViolation();
+            }
+        }
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Pet $pet = null;
+        if ($this->renumerationMin && $this->renumerationMax) {
+            if ($this->renumerationMax < $this->renumerationMin) {
+                $context->buildViolation("La rémunération maximale doit être supérieure à la minimale.")
+                    ->atPath('renumerationMax')
+                    ->addViolation();
+            }
+        }
+    }
 
     public function getId(): ?int
     {
@@ -63,6 +99,7 @@ class Announcement
     public function setAddress(string $address): static
     {
         $this->address = $address;
+
         return $this;
     }
 
@@ -74,6 +111,7 @@ class Announcement
     public function setLongitude(float $longitude): static
     {
         $this->longitude = $longitude;
+
         return $this;
     }
 
@@ -85,95 +123,80 @@ class Announcement
     public function setAltitude(float $altitude): static
     {
         $this->altitude = $altitude;
+
         return $this;
     }
 
-    public function getCareType(): ?string
+    public function getCareType(): ?TypeGuard
     {
-        return $this->care_type;
+        return $this->careType;
     }
 
-    public function setCareType(string $care_type): static
+    public function setCareType(?TypeGuard $careType): static
     {
-        $this->care_type = $care_type;
+        $this->careType = $careType;
+
         return $this;
     }
 
-    public function getDateDebut(): ?\DateTimeInterface
+
+    public function getDateDebut(): ?\DateTime
     {
-        return $this->date_debut;
+        return $this->dateDebut;
     }
 
-    public function setDateDebut(\DateTimeInterface $date_debut): static
+    public function setDateDebut(?\DateTime $dateDebut): static
     {
-        $this->date_debut = $date_debut;
+        $this->dateDebut = $dateDebut;
+
         return $this;
     }
 
-    public function getDateFin(): ?\DateTimeInterface
+    public function getDateFin(): ?\DateTime
     {
-        return $this->date_fin;
+        return $this->dateFin;
     }
 
-    public function setDateFin(\DateTimeInterface $date_fin): static
+    public function setDateFin(?\DateTime $dateFin): static
     {
-        $this->date_fin = $date_fin;
+        $this->dateFin = $dateFin;
+
         return $this;
     }
 
     public function getVisitPerDay(): ?int
     {
-        return $this->visit_per_day;
+        return $this->visitPerDay;
     }
 
-    public function setVisitPerDay(int $visit_per_day): static
+    public function setVisitPerDay(int $visitPerDay): static
     {
-        $this->visit_per_day = $visit_per_day;
+        $this->visitPerDay = $visitPerDay;
+
         return $this;
     }
 
     public function getRenumerationMin(): ?float
     {
-        return $this->renumeration_min;
+        return $this->renumerationMin;
     }
 
-    public function setRenumerationMin(float $renumeration_min): static
+    public function setRenumerationMin(float $renumerationMin): static
     {
-        $this->renumeration_min = $renumeration_min;
+        $this->renumerationMin = $renumerationMin;
+
         return $this;
     }
 
     public function getRenumerationMax(): ?float
     {
-        return $this->renumeration_max;
+        return $this->renumerationMax;
     }
 
-    public function setRenumerationMax(float $renumeration_max): static
+    public function setRenumerationMax(float $renumerationMax): static
     {
-        $this->renumeration_max = $renumeration_max;
-        return $this;
-    }
+        $this->renumerationMax = $renumerationMax;
 
-    // ============ GETTERS/SETTERS POUR LES RELATIONS ============
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
-        return $this;
-    }
-
-    public function getPet(): ?Pet
-    {
-        return $this->pet;
-    }
-
-    public function setPet(?Pet $pet): static
-    {
-        $this->pet = $pet;
         return $this;
     }
 }

@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une Réponse{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
+    
+    {# EN-TÊTE #}
+    <div style="margin-bottom: 30px;">
+        <a href="{{ path('app_reclamation_show', {id: reclamation.id}) }}" 
+           style="display: inline-block; color: #667eea; text-decoration: none; font-weight: 600; margin-bottom: 15px;">
+            ← Retour aux détails
+        </a>
+        <h1 style="font-size: 32px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px;">
+            💬 Ajouter une Réponse
+        </h1>
+        <p style="color: #666; font-size: 16px;">Répondez à la réclamation #{{ reclamation.id }}</p>
+    </div>
+
+    {# CONTEXTE DE LA RÉCLAMATION #}
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; margin-bottom: 30px; color: white; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);">
+        
+        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 15px;">
+            <div style="flex: 1;">
+                <div style="font-size: 12px; opacity: 0.9; text-transform: uppercase; margin-bottom: 5px;">Réclamation</div>
+                <h3 style="font-size: 20px; font-weight: 700; margin: 0;">{{ reclamation.sujet }}</h3>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                {% if reclamation.statut == 'en_attente' %}
+                    <span style="background: rgba(255,255,255,0.3); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                        ⏳ En attente
+                    </span>
+                {% elseif reclamation.statut == 'en_cours' %}
+                    <span style="background: rgba(255,255,255,0.3); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                        🔄 En cours
+                    </span>
+                {% else %}
+                    <span style="background: rgba(255,255,255,0.3); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                        ✅ Résolue
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <p style="opacity: 0.95; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">
+            {{ reclamation.description }}
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <div>
+                <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">CLIENT</div>
+                <div style="font-weight: 600; font-size: 14px;">{{ reclamation.nomClient }}</div>
+            </div>
+            <div>
+                <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">EMAIL</div>
+                <div style="font-weight: 600; font-size: 14px;">{{ reclamation.emailClient }}</div>
+            </div>
+            <div>
+                <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">DATE</div>
+                <div style="font-weight: 600; font-size: 14px;">{{ reclamation.dateReclamation|date('d/m/Y') }}</div>
+            </div>
+        </div>
+    </div>
+
+    {# FORMULAIRE DE RÉPONSE #}
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.1);">
+        
+        <h2 style="font-size: 22px; font-weight: 700; color: #333; margin-bottom: 25px;">
+            ✍️ Votre Réponse
+        </h2>
+
+        {{ form_start(form) }}
+
+        {# AFFICHAGE DES ERREURS #}
+        {% if not form.vars.valid %}
+            <div style="background: #f8d7da; border: 2px solid #f5c6cb; color: #721c24; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                <h4 style="margin: 0 0 10px 0; font-size: 16px;">⚠️ Erreurs de validation :</h4>
+                <ul style="margin: 0; padding-left: 20px;">
+                    {% for child in form.children %}
+                        {% for error in child.vars.errors %}
+                            <li><strong>{{ child.vars.label }}:</strong> {{ error.message }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {# AUTEUR #}
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px;">
+                👨‍💼 Votre nom (auteur de la réponse) <span style="color: #e74c3c;">*</span>
+            </label>
+            {{ form_widget(form.auteur, {'attr': {'style': 'width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;', 'placeholder': 'Ex: Service Support'}}) }}
+            <small style="color: #999; font-size: 12px; display: block; margin-top: 5px;">
+                Ce nom sera visible par le client
+            </small>
+        </div>
+
+        {# CONTENU #}
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px;">
+                💬 Contenu de la réponse <span style="color: #e74c3c;">*</span>
+            </label>
+            {{ form_widget(form.contenu, {'attr': {'style': 'width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; min-height: 150px;', 'placeholder': 'Rédigez votre réponse détaillée au client...'}}) }}
+            <small style="color: #999; font-size: 12px; display: block; margin-top: 5px;">
+                Minimum 10 caractères - Soyez clair et professionnel
+            </small>
+        </div>
+
+        {# BOUTONS #}
+        <div style="display: flex; gap: 15px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+            <button type="submit" 
+                    style="flex: 1; padding: 15px 30px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4); transition: transform 0.2s;">
+                📤 Envoyer la Réponse
+            </button>
+            
+            <a href="{{ path('app_reclamation_show', {id: reclamation.id}) }}" 
+               style="flex: 0.3; padding: 15px 30px; background: #e0e0e0; color: #555; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center;">
+                Annuler
+            </a>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+
+    {# INFO AUTOMATIQUE #}
+    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #ffc107;">
+        <div style="display: flex; align-items: start; gap: 10px;">
+            <span style="font-size: 20px;">ℹ️</span>
+            <div>
+                <strong style="color: #856404; display: block; margin-bottom: 5px;">Note importante</strong>
+                <p style="color: #856404; font-size: 14px; line-height: 1.6; margin: 0;">
+                    {% if reclamation.statut == 'en_attente' %}
+                        Le statut de cette réclamation passera automatiquement à <strong>"En cours"</strong> après l'envoi de votre réponse.
+                    {% else %}
+                        Cette réponse sera ajoutée à l'historique de la réclamation.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: #11998e !important;
+        box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+    }
+
+    button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.5);
+    }
+</style>
+{% endblock %}

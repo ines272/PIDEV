@@ -15,66 +15,110 @@
             <a href="{{ path('app_announcement') }}" class="back-link">← Retour</a>
         </div>
 
-        {{ form_start(form) }}
+        {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+
+        {# GLOBAL ERRORS #}
+        {% if form_errors(form) %}
+            <div class="form-global-error">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
 
         <div class="form-grid">
 
-            <div>
-                <div class="form-group">
+            <!-- LEFT COLUMN -->
+            <div class="left-column">
+
+                <div class="form-group {{ form.address.vars.errors|length > 0 ? 'has-error' : '' }}">
                     <label>Adresse</label>
                     {{ form_widget(form.address, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.address) }}
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group {{ form.longitude.vars.errors|length > 0 ? 'has-error' : '' }}">
                     <label>Longitude</label>
                     {{ form_widget(form.longitude, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.longitude) }}
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group {{ form.altitude.vars.errors|length > 0 ? 'has-error' : '' }}">
                     <label>Altitude</label>
                     {{ form_widget(form.altitude, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.altitude) }}
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group {{ form.visitPerDay.vars.errors|length > 0 ? 'has-error' : '' }}">
                     <label>Visites / jour</label>
                     {{ form_widget(form.visitPerDay, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.visitPerDay) }}
+                    </div>
                 </div>
+
             </div>
 
-            <div>
-                <label class="section-label">Type de garde</label>
-                <div class="type-grid">
-                    {% for child in form.careType %}
-                        <label class="type-card">
-                            {{ form_widget(child) }}
-                            {{ child.vars.label }}
-                        </label>
-                    {% endfor %}
+            <!-- RIGHT COLUMN -->
+            <div class="right-column">
+
+                <div class="{{ form.careType.vars.errors|length > 0 ? 'has-error' : '' }}">
+                    <label class="section-label">Type de garde</label>
+                    <div class="type-grid">
+                        {% for child in form.careType %}
+                            <label class="type-card">
+                                {{ form_widget(child) }}
+                                {{ child.vars.label }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                    <div class="error-message">
+                        {{ form_errors(form.careType) }}
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group {{ form.dateDebut.vars.errors|length > 0 ? 'has-error' : '' }}">
                     <label>Date début</label>
                     {{ form_widget(form.dateDebut, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.dateDebut) }}
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group {{ form.dateFin.vars.errors|length > 0 ? 'has-error' : '' }}">
                     <label>Date fin</label>
                     {{ form_widget(form.dateFin, {'attr': {'class': 'input-modern'}}) }}
+                    <div class="error-message">
+                        {{ form_errors(form.dateFin) }}
+                    </div>
                 </div>
+
             </div>
 
         </div>
 
         <div class="form-grid" style="margin-top:30px;">
-            <div class="form-group">
+
+            <div class="form-group {{ form.renumerationMin.vars.errors|length > 0 ? 'has-error' : '' }}">
                 <label>Rémunération min</label>
                 {{ form_widget(form.renumerationMin, {'attr': {'class': 'input-modern'}}) }}
+                <div class="error-message">
+                    {{ form_errors(form.renumerationMin) }}
+                </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group {{ form.renumerationMax.vars.errors|length > 0 ? 'has-error' : '' }}">
                 <label>Rémunération max</label>
                 {{ form_widget(form.renumerationMax, {'attr': {'class': 'input-modern'}}) }}
+                <div class="error-message">
+                    {{ form_errors(form.renumerationMax) }}
+                </div>
             </div>
+
         </div>
 
         <div class="submit-area">
