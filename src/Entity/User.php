@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -104,10 +106,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private ?string $plainPassword = null;
 
+    // ============ RELATIONS ============
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Pet::class)]
+    private Collection $pets;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Announcement::class)]
+    private Collection $announcements;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Event::class)]
+    private Collection $events;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->isActive = true;
+        $this->pets = new ArrayCollection();
+        $this->announcements = new ArrayCollection();
+        $this->events = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -171,59 +186,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->plainPassword = null;
     }
 
-    // ============ GESTION DE LA SÉRIALISATION POUR LA SESSION ============
-    /**
-     * Sérialisation pour la session - EXCLUT imageFile !
-     */
-    public function __serialize(): array
-    {
-        return [
-            'id' => $this->id,
-            'email' => $this->email,
-            'password' => $this->password,
-            'nom' => $this->nom,
-            'prenom' => $this->prenom,
-            'telephone' => $this->telephone,
-            'adresse' => $this->adresse,
-            'role' => $this->role,
-            'roles' => $this->roles,
-            'isActive' => $this->isActive,
-            'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt,
-            'deletedAt' => $this->deletedAt,
-            'imageName' => $this->imageName,
-            'imageSize' => $this->imageSize,
-            "\0".self::class."\0password" => hash('crc32c', $this->password ?? ''),
-        ];
-    }
-
-    /**
-     * Désérialisation depuis la session
-     */
-    public function __unserialize(array $data): void
-    {
-        $this->id = $data['id'] ?? null;
-        $this->email = $data['email'] ?? null;
-        $this->password = $data['password'] ?? null;
-        $this->nom = $data['nom'] ?? null;
-        $this->prenom = $data['prenom'] ?? null;
-        $this->telephone = $data['telephone'] ?? null;
-        $this->adresse = $data['adresse'] ?? null;
-        $this->role = $data['role'] ?? null;
-        $this->roles = $data['roles'] ?? [];
-        $this->isActive = $data['isActive'] ?? true;
-        $this->createdAt = $data['createdAt'] ?? null;
-        $this->updatedAt = $data['updatedAt'] ?? null;
-        $this->deletedAt = $data['deletedAt'] ?? null;
-        $this->imageName = $data['imageName'] ?? null;
-        $this->imageSize = $data['imageSize'] ?? null;
-        
-        // Réinitialiser les propriétés non sérialisées
-        $this->imageFile = null;
-        $this->plainPassword = null;
-    }
-
-    // ============ GETTERS/SETTERS POUR nom ============
     public function getNom(): ?string
     {
         return $this->nom;
@@ -235,7 +197,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR prenom ============
     public function getPrenom(): ?string
     {
         return $this->prenom;
@@ -247,7 +208,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR telephone ============
     public function getTelephone(): ?string
     {
         return $this->telephone;
@@ -259,7 +219,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR adresse ============
     public function getAdresse(): ?string
     {
         return $this->adresse;
@@ -271,7 +230,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR role ============
     public function getRole(): ?string
     {
         return $this->role;
@@ -283,7 +241,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR isActive ============
     public function getIsActive(): ?bool
     {
         return $this->isActive;
@@ -295,7 +252,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR deletedAt ============
     public function getDeletedAt(): ?\DateTimeImmutable
     {
         return $this->deletedAt;
@@ -307,7 +263,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR createdAt ============
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -319,7 +274,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR updatedAt ============
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
@@ -331,7 +285,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR plainPassword ============
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
@@ -343,7 +296,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ============ GETTERS/SETTERS POUR IMAGE ============
+    // ============ MÉTHODES POUR IMAGE ============
     public function setImageFile(?File $imageFile = null): void
     {
         $this->imageFile = $imageFile;
@@ -376,6 +329,88 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getImageSize(): ?int
     {
         return $this->imageSize;
+    }
+
+    // ============ MÉTHODES POUR LES RELATIONS ============
+    /**
+     * @return Collection<int, Pet>
+     */
+    public function getPets(): Collection
+    {
+        return $this->pets;
+    }
+
+    public function addPet(Pet $pet): static
+    {
+        if (!$this->pets->contains($pet)) {
+            $this->pets->add($pet);
+            $pet->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removePet(Pet $pet): static
+    {
+        if ($this->pets->removeElement($pet)) {
+            if ($pet->getUser() === $this) {
+                $pet->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Announcement>
+     */
+    public function getAnnouncements(): Collection
+    {
+        return $this->announcements;
+    }
+
+    public function addAnnouncement(Announcement $announcement): static
+    {
+        if (!$this->announcements->contains($announcement)) {
+            $this->announcements->add($announcement);
+            $announcement->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeAnnouncement(Announcement $announcement): static
+    {
+        if ($this->announcements->removeElement($announcement)) {
+            if ($announcement->getUser() === $this) {
+                $announcement->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(Event $event): static
+    {
+        if (!$this->events->contains($event)) {
+            $this->events->add($event);
+            $event->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeEvent(Event $event): static
+    {
+        if ($this->events->removeElement($event)) {
+            if ($event->getUser() === $this) {
+                $event->setUser(null);
+            }
+        }
+        return $this;
     }
 
     // ============ MÉTHODES UTILITAIRES ============

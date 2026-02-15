@@ -3,10 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AnnouncementRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Enum\TypeGuard;
-
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AnnouncementRepository::class)]
 class Announcement
@@ -19,30 +17,38 @@ class Announcement
     #[ORM\Column(length: 255)]
     private ?string $address = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'float')]
     private ?float $longitude = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'float')]
     private ?float $altitude = null;
 
-    #[ORM\Column(enumType: TypeGuard::class)]
-    private ?TypeGuard $careType = null;
+    #[ORM\Column(length: 255)]
+    private ?string $care_type = null;
 
+    #[ORM\Column(type: 'date')]
+    private ?\DateTimeInterface $date_debut = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $dateDebut = null;
+    #[ORM\Column(type: 'date')]
+    private ?\DateTimeInterface $date_fin = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $dateFin = null;
+    #[ORM\Column(type: 'integer')]
+    private ?int $visit_per_day = null;
 
-    #[ORM\Column]
-    private ?int $visitPerDay = null;
+    #[ORM\Column(type: 'float')]
+    private ?float $renumeration_min = null;
 
-    #[ORM\Column]
-    private ?float $renumerationMin = null;
+    #[ORM\Column(type: 'float')]
+    private ?float $renumeration_max = null;
 
-    #[ORM\Column]
-    private ?float $renumerationMax = null;
+    // ============ RELATIONS ============
+    #[ORM\ManyToOne(inversedBy: 'announcements')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Pet $pet = null;
 
     public function getId(): ?int
     {
@@ -57,7 +63,6 @@ class Announcement
     public function setAddress(string $address): static
     {
         $this->address = $address;
-
         return $this;
     }
 
@@ -69,7 +74,6 @@ class Announcement
     public function setLongitude(float $longitude): static
     {
         $this->longitude = $longitude;
-
         return $this;
     }
 
@@ -81,80 +85,95 @@ class Announcement
     public function setAltitude(float $altitude): static
     {
         $this->altitude = $altitude;
-
         return $this;
     }
 
-    public function getCareType(): ?TypeGuard
+    public function getCareType(): ?string
     {
-        return $this->careType;
+        return $this->care_type;
     }
 
-    public function setCareType(?TypeGuard $careType): static
+    public function setCareType(string $care_type): static
     {
-        $this->careType = $careType;
-
+        $this->care_type = $care_type;
         return $this;
     }
 
-
-    public function getDateDebut(): ?\DateTime
+    public function getDateDebut(): ?\DateTimeInterface
     {
-        return $this->dateDebut;
+        return $this->date_debut;
     }
 
-    public function setDateDebut(\DateTime $dateDebut): static
+    public function setDateDebut(\DateTimeInterface $date_debut): static
     {
-        $this->dateDebut = $dateDebut;
-
+        $this->date_debut = $date_debut;
         return $this;
     }
 
-    public function getDateFin(): ?\DateTime
+    public function getDateFin(): ?\DateTimeInterface
     {
-        return $this->dateFin;
+        return $this->date_fin;
     }
 
-    public function setDateFin(\DateTime $dateFin): static
+    public function setDateFin(\DateTimeInterface $date_fin): static
     {
-        $this->dateFin = $dateFin;
-
+        $this->date_fin = $date_fin;
         return $this;
     }
 
     public function getVisitPerDay(): ?int
     {
-        return $this->visitPerDay;
+        return $this->visit_per_day;
     }
 
-    public function setVisitPerDay(int $visitPerDay): static
+    public function setVisitPerDay(int $visit_per_day): static
     {
-        $this->visitPerDay = $visitPerDay;
-
+        $this->visit_per_day = $visit_per_day;
         return $this;
     }
 
     public function getRenumerationMin(): ?float
     {
-        return $this->renumerationMin;
+        return $this->renumeration_min;
     }
 
-    public function setRenumerationMin(float $renumerationMin): static
+    public function setRenumerationMin(float $renumeration_min): static
     {
-        $this->renumerationMin = $renumerationMin;
-
+        $this->renumeration_min = $renumeration_min;
         return $this;
     }
 
     public function getRenumerationMax(): ?float
     {
-        return $this->renumerationMax;
+        return $this->renumeration_max;
     }
 
-    public function setRenumerationMax(float $renumerationMax): static
+    public function setRenumerationMax(float $renumeration_max): static
     {
-        $this->renumerationMax = $renumerationMax;
+        $this->renumeration_max = $renumeration_max;
+        return $this;
+    }
 
+    // ============ GETTERS/SETTERS POUR LES RELATIONS ============
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getPet(): ?Pet
+    {
+        return $this->pet;
+    }
+
+    public function setPet(?Pet $pet): static
+    {
+        $this->pet = $pet;
         return $this;
     }
 }
