@@ -3,22 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SitMyPet{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <title>{% block title %}SitMyPet – Garde d'animaux{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{{ asset('css/front-style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    {% if block('use_bootstrap') is defined and block('use_bootstrap') == 'true' %}
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% endif %}
+    
     <style>
-        :root {
-            --primary: #4f7942;
-            --secondary: #f4a261;
-            --accent: #e76f51;
+        /* Menu dropdown utilisateur */
+        .user-menu {
+            position: relative;
         }
-        body { font-family: 'Segoe UI', sans-serif; }
+        
+        .user-avatar {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+        
+        .dropdown-menu-user {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+            min-width: 220px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .dropdown-menu-user.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-header {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+        }
+        
+        .dropdown-header strong {
+            display: block;
+            font-size: 16px;
+        }
+        
+        .dropdown-header small {
+            opacity: 0.9;
+            font-size: 13px;
+        }
+        
+        .dropdown-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            color: #8B5CF6;
+        }
+        
+        .dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .dropdown-item.logout i {
+            color: #dc3545;
+        }
+        
+        /* Modal de confirmation */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-icon {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .modal-text {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+        }
+        
+        .btn-cancel {
+            background: #f1f3f5;
+            color: #495057;
+        }
+        
+        .btn-cancel:hover {
+            background: #e9ecef;
+        }
+        
+        .btn-confirm {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+        }
+        
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
     </style>
+    
     {% block stylesheets %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
+
+{% if block('show_navbar') is not defined or block('show_navbar') != 'false' %}
+<header class="navbar">
+    <div class="logo">
+        <img src="{{ asset('images/logo.png') }}" alt="SitMyPet Logo" class="logo-img">
+    </div>
+
+    <nav class="nav-links">
+        <a href="{{ path('app_home') }}" class="{{ app.request.get('_route') == 'app_home' ? 'active' }}">
+            <i class="fa-solid fa-house"></i> Home
+        </a>
+        <a href="{{ path('app_pet') }}" class="{{ app.request.get('_route') == 'app_pet' ? 'active' }}">
+            <i class="fa-solid fa-paw"></i> Animaux
+        </a>
+        <a href="{{ path('app_announcement') }}" class="{{ app.request.get('_route') == 'app_announcement' ? 'active' }}">
+            <i class="fa-solid fa-bullhorn"></i> Annonces
+        </a>
+        <a href="{{ path('app_event') }}" class="{{ app.request.get('_route') == 'app_event' ? 'active' }}">
+            <i class="fa-solid fa-calendar-days"></i> Événements
+        </a>
+        <a href="{{ path('app_reclamation_index') }}" class="{{ app.request.get('_route') starts with 'app_reclamation' ? 'active' }}">
+            <i class="fa-solid fa-envelope-open"></i> Réclamations
+        </a>
+        {% block extra_nav_links %}{% endblock %}
+    </nav>
+
+    <div class="nav-right">
+        <a href="{{ path('app_admin_dashboard') }}" class="admin-btn">Admin Portal</a>
+        
+        <div class="icon-btn">
+            <i class="fa-regular fa-bell"></i>
+        </div>
+        <div class="icon-btn">
+            <i class="fa-regular fa-moon"></i>
+        </div>
+        
+        <!-- Menu utilisateur avec dropdown -->
+        <div class="user-menu">
+            <div class="user-avatar" id="userMenuBtn">
+                <img src="https://i.pravatar.cc/40" alt="Utilisateur">
+            </div>
+            
+            <div class="dropdown-menu-user" id="userDropdown">
+                <div class="dropdown-header">
+                    <strong>{{ app.user ? app.user.email : 'Utilisateur' }}</strong>
+                    <small>Membre depuis 2024</small>
+                </div>
+                <a href="#" class="dropdown-item">
+                    <i class="fa-solid fa-user"></i>
+                    Mon Profil
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fa-solid fa-gear"></i>
+                    Paramètres
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fa-solid fa-heart"></i>
+                    Mes Favoris
+                </a>
+                <div class="dropdown-item logout" id="logoutBtn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Déconnexion
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+{% endif %}
+
+<!-- Modal de confirmation de déconnexion -->
+<div class="modal-overlay" id="logoutModal">
+    <div class="modal-content">
+        <div class="modal-icon">👋</div>
+        <h3 class="modal-title">Déconnexion</h3>
+        <p class="modal-text">
+            Êtes-vous sûr de vouloir vous déconnecter ?<br>
+            À bientôt sur SitMyPet !
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn btn-cancel" id="cancelLogout">
+                Annuler
+            </button>
+            <button class="modal-btn btn-confirm" id="confirmLogout">
+                Se déconnecter
+            </button>
+        </div>
+    </div>
+</div>
+
+<main class="{% block main_class %}{% endblock %}">
     {% block body %}{% endblock %}
+</main>
+
+{% if block('show_footer') is not defined or block('show_footer') != 'false' %}
+<footer>
+    <div class="footer-grid">
+        <div>
+            <strong>SITMYPET</strong>
+            <p>L'application pour gérer la garde des animaux et connecter propriétaires et gardiens facilement.</p>
+        </div>
+        <div>
+            <strong>Liens rapides</strong>
+            <p>
+                <a href="{{ path('app_home') }}">Accueil</a><br>
+                <a href="{{ path('app_announcement') }}">Publier une annonce</a><br>
+                <a href="{{ path('app_pet') }}">Voir les animaux</a><br>
+                <a href="{{ path('app_reclamation_index') }}">Réclamations</a>
+            </p>
+        </div>
+        <div>
+            <strong>Support</strong>
+            <p>
+                Centre d'aide<br>
+                <a href="{{ path('app_reclamation_new') }}">Contactez-nous</a><br>
+                FAQ
+            </p>
+        </div>
+        <div>
+            <strong>Contact</strong>
+            <p>
+                contact@sitmypet.com<br>
+                +216 71 000 000
+            </p>
+        </div>
+    </div>
+    <p class="copyright">© 2026 SITMYPET. Tous droits réservés.</p>
+</footer>
+{% endif %}
+
+{% if block('use_bootstrap') is defined and block('use_bootstrap') == 'true' %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block javascripts %}{% endblock %}
+{% endif %}
+
+<script>
+    // Gestion du menu dropdown
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    const userDropdown = document.getElementById('userDropdown');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutModal = document.getElementById('logoutModal');
+    const cancelLogout = document.getElementById('cancelLogout');
+    const confirmLogout = document.getElementById('confirmLogout');
+
+    // Toggle dropdown
+    userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('show');
+    });
+
+    // Fermer dropdown si on clique ailleurs
+    document.addEventListener('click', (e) => {
+        if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+            userDropdown.classList.remove('show');
+        }
+    });
+
+    // Ouvrir modal de déconnexion
+    logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        userDropdown.classList.remove('show');
+        logoutModal.classList.add('show');
+    });
+
+    // Annuler la déconnexion
+    cancelLogout.addEventListener('click', () => {
+        logoutModal.classList.remove('show');
+    });
+
+    // Fermer modal en cliquant sur l'overlay
+    logoutModal.addEventListener('click', (e) => {
+        if (e.target === logoutModal) {
+            logoutModal.classList.remove('show');
+        }
+    });
+
+    // Confirmer la déconnexion
+    confirmLogout.addEventListener('click', () => {
+        window.location.href = "{{ path('app_logout') }}";
+    });
+</script>
+
+{% block javascripts %}{% endblock %}
+
 </body>
 </html>
