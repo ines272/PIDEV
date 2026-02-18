@@ -10,19 +10,19 @@
     <style>
         :root {
             --sidebar-width: 260px;
-            --primary: #4f7942;
-            --primary-dark: #2d5a27;
-            --primary-light: #e8f5e9;
-            --accent: #f4a261;
+            --primary: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --primary-light: #FAF5FF;
+            --accent: #A78BFA;
             --danger: #e53935;
-            --sidebar-bg: #1a2e1a;
+            --sidebar-bg: #2D1B4E;
             --sidebar-text: rgba(255,255,255,0.75);
-            --sidebar-active: rgba(255,255,255,0.12);
+            --sidebar-active: rgba(139, 92, 246, 0.2);
         }
         * { box-sizing: border-box; }
         body {
             font-family: 'Nunito', sans-serif;
-            background: #f4f6f8;
+            background: #f8f5ff;
             margin: 0;
         }
 
@@ -32,11 +32,12 @@
             top: 0; left: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            background: var(--sidebar-bg);
+            background: linear-gradient(180deg, #2D1B4E 0%, #1F1338 100%);
             display: flex;
             flex-direction: column;
             z-index: 1000;
             overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(139, 92, 246, 0.1);
         }
         .sidebar-brand {
             padding: 24px 20px 20px;
@@ -46,7 +47,9 @@
             font-family: 'Poppins', sans-serif;
             font-size: 1.2rem;
             font-weight: 700;
-            color: white;
+            background: linear-gradient(135deg, #A78BFA 0%, #C4B5FD 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .sidebar-brand .brand-sub {
             font-size: 0.72rem;
@@ -81,9 +84,9 @@
             color: white;
         }
         .sidebar-nav .nav-link.active {
-            background: var(--primary);
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(79,121,66,0.4);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
         }
         .sidebar-nav .nav-link i {
             width: 18px;
@@ -92,10 +95,11 @@
         }
         .sidebar-nav .nav-link .badge-count {
             margin-left: auto;
-            background: rgba(255,255,255,0.15);
+            background: rgba(167, 139, 250, 0.2);
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 0.7rem;
+            color: #C4B5FD;
         }
         .sidebar-footer {
             padding: 16px 14px;
@@ -109,7 +113,7 @@
         }
         .sidebar-footer .admin-avatar {
             width: 36px; height: 36px;
-            background: var(--primary);
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 1rem;
@@ -160,13 +164,15 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.04);
         }
         .topbar-title {
             font-family: 'Poppins', sans-serif;
             font-size: 1.1rem;
             font-weight: 700;
-            color: #2d3748;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .topbar-right { display: flex; align-items: center; gap: 16px; }
         .topbar-date {
@@ -201,12 +207,12 @@
             background: white;
             border-radius: 16px;
             padding: 22px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.06);
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .stat-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
         }
         .stat-icon {
             width: 52px; height: 52px;
@@ -215,12 +221,17 @@
             font-size: 1.4rem;
             margin-bottom: 14px;
         }
+        .stat-icon.purple { background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%); }
+        .stat-icon.blue { background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); }
+        .stat-icon.green { background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); }
+        .stat-icon.orange { background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%); }
         .stat-value {
             font-family: 'Poppins', sans-serif;
             font-size: 2rem;
             font-weight: 700;
             line-height: 1;
             margin-bottom: 4px;
+            color: #8B5CF6;
         }
         .stat-label { font-size: 0.82rem; color: #90a4ae; font-weight: 600; }
 
@@ -228,7 +239,7 @@
         .data-card {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.06);
             overflow: hidden;
         }
         .data-card-header {
@@ -246,14 +257,14 @@
         }
         .table { margin: 0; }
         .table thead th {
-            background: #f8fafc;
+            background: #FAF5FF;
             border: none;
             padding: 12px 18px;
             font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            color: #90a4ae;
+            color: #8B5CF6;
         }
         .table tbody td {
             padding: 14px 18px;
@@ -263,7 +274,7 @@
             color: #3d4a5c;
         }
         .table tbody tr:last-child td { border-bottom: none; }
-        .table tbody tr:hover { background: #fafcff; }
+        .table tbody tr:hover { background: #FAF5FF; }
 
         /* ===== BADGES ===== */
         .badge-role {
@@ -272,12 +283,12 @@
             font-size: 0.72rem;
             font-weight: 700;
         }
-        .badge-admin        { background: #fce4e4; color: #c62828; }
-        .badge-proprietaire { background: #e8f5e9; color: #2e7d32; }
-        .badge-gardien      { background: #e3f2fd; color: #1565c0; }
-        .badge-active       { background: #e8f5e9; color: #2e7d32; }
-        .badge-inactive     { background: #fff3e0; color: #e65100; }
-        .badge-deleted      { background: #fce4e4; color: #c62828; }
+        .badge-admin        { background: #FEE2E2; color: #991B1B; }
+        .badge-proprietaire { background: #FAF5FF; color: #7C3AED; }
+        .badge-gardien      { background: #DBEAFE; color: #1E40AF; }
+        .badge-active       { background: #D1FAE5; color: #065F46; }
+        .badge-inactive     { background: #FEF3C7; color: #92400E; }
+        .badge-deleted      { background: #FEE2E2; color: #991B1B; }
 
         /* ===== BOUTONS ACTION ===== */
         .btn-action {
@@ -292,17 +303,17 @@
             transition: all 0.2s;
             text-decoration: none;
         }
-        .btn-view   { background: #e3f2fd; color: #1565c0; }
-        .btn-edit   { background: #fff3e0; color: #e65100; }
-        .btn-delete { background: #fce4e4; color: #c62828; }
-        .btn-restore{ background: #e8f5e9; color: #2e7d32; }
+        .btn-view   { background: #DBEAFE; color: #1E40AF; }
+        .btn-edit   { background: #FAF5FF; color: #7C3AED; }
+        .btn-delete { background: #FEE2E2; color: #991B1B; }
+        .btn-restore{ background: #D1FAE5; color: #065F46; }
         .btn-action:hover { transform: scale(1.15); }
 
         /* ===== FORMULAIRES ===== */
         .form-card {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.06);
             padding: 28px;
         }
         .form-section-title {
@@ -332,10 +343,10 @@
         }
         .form-control:focus, .form-select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79,121,66,0.12);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
         }
         .btn-save {
-            background: linear-gradient(135deg, #4f7942, #2d5a27);
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
             border: none;
             border-radius: 10px;
             padding: 11px 28px;
@@ -345,7 +356,7 @@
         }
         .btn-save:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(79,121,66,0.35);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
             color: white;
         }
         .btn-cancel {
@@ -370,6 +381,7 @@
             font-weight: 700;
             font-size: 0.85rem;
             color: white;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
         }
 
         /* ===== SEARCH BAR ===== */
@@ -384,7 +396,7 @@
         }
         .search-bar input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79,121,66,0.1);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
         }
         .search-bar .search-icon {
             position: absolute;
@@ -402,13 +414,31 @@
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
             font-size: 1.5rem;
-            color: #2d3748;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 4px;
         }
         .page-header p { color: #90a4ae; font-size: 0.87rem; margin: 0; }
         .breadcrumb { background: none; padding: 0; margin: 0; font-size: 0.8rem; }
         .breadcrumb-item a { color: var(--primary); text-decoration: none; font-weight: 600; }
         .breadcrumb-item.active { color: #90a4ae; }
+        
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+            color: white;
+        }
     </style>
     {% block stylesheets %}{% endblock %}
 </head>
@@ -427,41 +457,42 @@
     <nav class="sidebar-nav">
         <div class="sidebar-section">Principal</div>
 
-        <a href="{{ path('app_admin_dashboard') }}"
-           class="nav-link {{ app.request.attributes.get('_route') == 'app_admin_dashboard' ? 'active' : '' }}">
+        <a href="{{ path('app_user_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') == 'app_user_index' ? 'active' : '' }}">
             <i class="fas fa-chart-pie"></i> Dashboard
         </a>
 
-        <div class="sidebar-section">Utilisateurs</div>
+        <div class="sidebar-section">Gestion</div>
 
-        <a href="{{ path('app_admin_user_index') }}"
-           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_user' ? 'active' : '' }}">
-            <i class="fas fa-users"></i> Tous les utilisateurs
+        <a href="{{ path('app_user_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">
+            <i class="fas fa-users"></i> Utilisateurs
         </a>
 
-        <a href="{{ path('app_admin_user_index') }}?role=ROLE_PROPRIETAIRE"
-           class="nav-link">
-            <i class="fas fa-home"></i> Propriétaires
+        <a href="{{ path('app_pet') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_pet' ? 'active' : '' }}">
+            <i class="fas fa-paw"></i> Animaux
         </a>
 
-        <a href="{{ path('app_admin_user_index') }}?role=ROLE_GARDIEN"
-           class="nav-link">
-            <i class="fas fa-hands-helping"></i> Gardiens
-        </a>
-
-        <div class="sidebar-section">Application</div>
-
-        <a href="#" class="nav-link">
-            <i class="fas fa-dog"></i> Animaux
-            <span class="badge-count">Soon</span>
-        </a>
-        <a href="#" class="nav-link">
+        <a href="{{ path('app_announcement') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_announcement' ? 'active' : '' }}">
             <i class="fas fa-bullhorn"></i> Annonces
-            <span class="badge-count">Soon</span>
         </a>
-        <a href="#" class="nav-link">
-            <i class="fas fa-file-invoice"></i> Factures
-            <span class="badge-count">Soon</span>
+
+        <a href="{{ path('app_event') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_event' ? 'active' : '' }}">
+            <i class="fas fa-calendar-days"></i> Événements
+        </a>
+
+        <a href="{{ path('app_reclamation_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_reclamation' ? 'active' : '' }}">
+            <i class="fas fa-envelope-open"></i> Réclamations
+        </a>
+
+        <div class="sidebar-section">Interface Publique</div>
+
+        <a href="{{ path('app_home') }}" class="nav-link" target="_blank">
+            <i class="fas fa-external-link-alt"></i> Voir le site
         </a>
     </nav>
 
@@ -496,7 +527,7 @@
             </span>
             {% if app.user %}
             <div class="d-flex align-items-center gap-2">
-                <div style="width:32px;height:32px;background:#4f7942;border-radius:8px;
+                <div style="width:32px;height:32px;background:linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);border-radius:8px;
                             display:flex;align-items:center;justify-content:center;
                             color:white;font-weight:700;font-size:0.8rem;">
                     {{ app.user.prenom|first|upper }}

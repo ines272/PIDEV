@@ -22,7 +22,7 @@
         max-width: 450px;
     }
     .login-header {
-        background: linear-gradient(135deg, #4f7942 0%, #2d5a27 100%);
+        background: linear-gradient(135deg, #cd77d5ff 0%, #c31ee0ff 100%);
         padding: 40px 30px;
         text-align: center;
         color: white;
@@ -40,7 +40,7 @@
         transition: border-color 0.3s;
     }
     .form-control:focus {
-        border-color: #4f7942;
+        border-color: #9b30adff;
         box-shadow: 0 0 0 0.2rem rgba(79,121,66,0.15);
     }
     .input-group-text {
@@ -48,14 +48,14 @@
         border: 2px solid #e9ecef;
         border-right: none;
         background: #f8f9fa;
-        color: #4f7942;
+        color: #9d3895ff;
     }
     .input-group .form-control {
         border-radius: 0 10px 10px 0;
         border-left: none;
     }
     .btn-login {
-        background: linear-gradient(135deg, #4f7942 0%, #2d5a27 100%);
+        background: linear-gradient(135deg, #a254aeff 0%, #a047aaff 100%);
         border: none;
         border-radius: 10px;
         padding: 13px;
@@ -66,7 +66,7 @@
     }
     .btn-login:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(79,121,66,0.4);
+        box-shadow: 0 8px 25px rgba(215, 146, 240, 0.29);
         opacity: 0.95;
     }
     .divider {
@@ -83,17 +83,32 @@
         background: #e9ecef;
     }
     .btn-register {
-        border: 2px solid #4f7942;
+        border: 2px solid #efc9f8ff;
         border-radius: 10px;
         padding: 11px;
-        color: #4f7942;
+        color: #9b5babff;
         font-weight: 600;
         transition: all 0.3s;
     }
     .btn-register:hover {
-        background: #4f7942;
+        background: #9a03f8ff;
         color: white;
     }
+    body {
+            background: #f8f5ff !important;
+            min-height: 100vh;
+        }
+        
+        /* Alternative avec dégradé subtil */
+        /* body {
+            background: linear-gradient(135deg, #f8f5ff 0%, #faf6ff 50%, #f3ebff 100%) !important;
+            min-height: 100vh;
+        } */
+        
+        /* Menu dropdown utilisateur */
+        .user-menu {
+            position: relative;
+        }
 </style>
 {% endblock %}
 

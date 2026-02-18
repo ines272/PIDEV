@@ -25,7 +25,8 @@ class PetRepository extends ServiceEntityRepository
     ?PetType $type,
     ?Gender $gender,
     ?bool $vaccinated,
-    ?bool $critical
+    ?bool $critical,
+    ?User $owner = null
 ): array {
     $qb = $this->createQueryBuilder('p');
 

@@ -66,6 +66,13 @@ class Pet
     #[ORM\Column]
     private ?bool $hasCriticalCondition = null;
 
+    #[ORM\Column]
+    private ?bool $isVaccinated = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -199,6 +206,28 @@ class Pet
     {
         $this->hasCriticalCondition = $hasCriticalCondition;
 
+        return $this;
+    }
+
+    public function isVaccinated(): ?bool
+    {
+        return $this->isVaccinated;
+    }
+
+    public function setIsVaccinated(bool $isVaccinated): static
+    {
+        $this->isVaccinated = $isVaccinated;
+
+        return $this;
+    }
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
         return $this;
     }
 }
