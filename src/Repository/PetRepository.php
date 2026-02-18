@@ -45,7 +45,7 @@ class PetRepository extends ServiceEntityRepository
     }
 
     if ($vaccinated !== null) {
-        $qb->andWhere('p.isVacinated = :vaccinated')
+        $qb->andWhere('p.isVaccinated = :vaccinated')
            ->setParameter('vaccinated', $vaccinated);
     }
 

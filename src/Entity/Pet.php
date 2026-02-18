@@ -55,7 +55,7 @@ class Pet
 
 
     #[ORM\Column]
-    private ?bool $isVacinated = null;
+    private ?bool $isVaccinated = null;
 
     #[ORM\Column]
     private ?bool $hasContagiousDisease = null;
@@ -154,14 +154,14 @@ class Pet
         return $this;
     }
 
-    public function isVacinated(): ?bool
+    public function isVaccinated(): ?bool
     {
-        return $this->isVacinated;
+        return $this->isVaccinated;
     }
 
-    public function setIsVacinated(bool $isVacinated): static
+    public function setIsVaccinated(bool $isVaccinated): static
     {
-        $this->isVacinated = $isVacinated;
+        $this->isVaccinated = $isVaccinated;
 
         return $this;
     }
