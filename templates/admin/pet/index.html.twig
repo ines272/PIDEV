@@ -1,0 +1,233 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block page_title %}Gestion des Animaux{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>Tous les Animaux</h2>
+    <p>Liste complète des animaux enregistrés sur la plateforme.</p>
+</div>
+
+<div class="data-card">
+    <div class="data-card-header">
+        <div class="data-card-title">
+            <i class="fas fa-paw me-2"></i>Liste des animaux
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Genre</th>
+                    <th>Propriétaire</th>
+                    <th>Vacciné</th>
+                    <th>Critique</th>
+                        <th class="text-center">Actions</th>
+
+                </tr>
+            </thead>
+            <tbody>
+            {% for pet in pets %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="user-avatar">
+                                {{ pet.name|first|upper }}
+                            </div>
+                            {{ pet.name }}
+                        </div>
+                    </td>
+<td>{{ pet.typePet.value }}</td>
+                    <td>{{ pet.gender.value }}</td>
+                    <td>
+                        {{ pet.owner.prenom }} {{ pet.owner.nom }}
+                    </td>
+                    <td>
+                        {% if pet.vaccinated %}
+                            <span class="badge badge-active">Oui</span>
+                        {% else %}
+                            <span class="badge badge-inactive">Non</span>
+                        {% endif %}
+                    </td>
+                    <td>
+{% if pet.criticalCondition %}
+                            <span class="badge badge-deleted">Oui</span>
+                        {% else %}
+                            <span class="badge badge-active">Non</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center d-flex justify-content-center gap-2">
+
+    <!-- EDIT -->
+    <button class="btn-action btn-edit"
+            data-bs-toggle="modal"
+            data-bs-target="#editModal{{ pet.id }}">
+        <i class="fas fa-pen"></i>
+    </button>
+
+    <!-- DELETE -->
+    <button class="btn-action btn-delete"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal{{ pet.id }}">
+        <i class="fas fa-trash"></i>
+    </button>
+
+</td>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal{{ pet.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;">
+            
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmation de suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body pt-2">
+                Êtes-vous sûr de vouloir supprimer 
+                <strong>{{ pet.name }}</strong> ?
+                <br><br>
+                <small class="text-muted">
+                    Cette action est irréversible.
+                </small>
+            </div>
+
+            <div class="modal-footer border-0">
+                <button type="button"
+                        class="btn-cancel"
+                        data-bs-dismiss="modal">
+                    Annuler
+                </button>
+
+                <form method="post"
+                      action="{{ path('app_pet_delete', {id: pet.id}) }}">
+                    
+                    <input type="hidden"
+                           name="_token"
+                           value="{{ csrf_token('delete_pet_' ~ pet.id) }}">
+                    
+                    <button class="btn-save"
+                            style="background:linear-gradient(135deg,#e53935,#c62828);">
+                        Supprimer
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal{{ pet.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;">
+
+            <form method="post"
+                  action="{{ path('app_admin_pet_edit', {id: pet.id}) }}">
+
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold text-primary">
+                        <i class="fas fa-pen me-2"></i>Modifier {{ pet.name }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Nom</label>
+                            <input type="text"
+                                   name="name"
+                                   value="{{ pet.name }}"
+                                   class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Race</label>
+                            <input type="text"
+                                   name="breed"
+                                   value="{{ pet.breed }}"
+                                   class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Poids</label>
+                            <input type="number"
+                                   step="0.1"
+                                   name="weight"
+                                   value="{{ pet.weight }}"
+                                   class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Description</label>
+                            <input type="text"
+                                   name="description"
+                                   value="{{ pet.description }}"
+                                   class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Vacciné</label>
+                            <select name="isVaccinated" class="form-select">
+                                <option value="1" {{ pet.vaccinated ? 'selected' : '' }}>Oui</option>
+                                <option value="0" {{ not pet.vaccinated ? 'selected' : '' }}>Non</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Condition Critique</label>
+                            <select name="hasCriticalCondition" class="form-select">
+                                <option value="1" {{ pet.criticalCondition ? 'selected' : '' }}>Oui</option>
+                                <option value="0" {{ not pet.criticalCondition ? 'selected' : '' }}>Non</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer border-0">
+                    <button type="button"
+                            class="btn-cancel"
+                            data-bs-dismiss="modal">
+                        Annuler
+                    </button>
+
+                    <button class="btn-save">
+                        Enregistrer
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        Aucun animal trouvé.
+                    </td>
+                </tr>
+                
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

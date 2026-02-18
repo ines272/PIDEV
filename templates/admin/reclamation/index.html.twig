@@ -1,0 +1,239 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block page_title %}Gestion des Réclamations{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>Toutes les Réclamations</h2>
+    <p>Liste complète des réclamations enregistrées.</p>
+</div>
+
+<div class="data-card">
+    <div class="data-card-header">
+        <div class="data-card-title">
+            <i class="fas fa-triangle-exclamation me-2"></i>Liste des réclamations
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Sujet</th>
+                    <th>Client</th>
+                    <th>Email</th>
+                    <th>Priorité</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            {% for reclamation in reclamations %}
+
+                {% set hasResponse = reclamation.reponses|length > 0 %}
+                {% if hasResponse %}
+                    {% set reponse = reclamation.reponses|first %}
+                {% endif %}
+
+                <tr>
+                    <td>{{ reclamation.sujet }}</td>
+                    <td>{{ reclamation.nomClient }}</td>
+                    <td>{{ reclamation.emailClient }}</td>
+
+                    <td>
+                        <span class="badge bg-warning text-dark">
+                            {{ reclamation.priorite }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if reclamation.statut == 'resolu' %}
+                            <span class="badge bg-success">Résolu</span>
+                        {% elseif reclamation.statut == 'en_cours' %}
+                            <span class="badge bg-info">En cours</span>
+                        {% else %}
+                            <span class="badge bg-secondary">En attente</span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ reclamation.dateReclamation|date('d/m/Y H:i') }}</td>
+
+                    <td class="text-center d-flex justify-content-center gap-2">
+
+                        <!-- RESPONSE BUTTON -->
+                        <button class="btn-action btn-edit"
+                                data-bs-toggle="modal"
+                                data-bs-target="#responseModal{{ reclamation.id }}">
+                            <i class="fas {{ hasResponse ? 'fa-eye' : 'fa-reply' }}"></i>
+                        </button>
+
+                        <!-- DELETE -->
+                        <button class="btn-action btn-delete"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ reclamation.id }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+
+                    </td>
+                </tr>
+
+                {# ================= DELETE MODAL ================= #}
+                <div class="modal fade" id="deleteModal{{ reclamation.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content" style="border-radius:16px;">
+
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title fw-bold text-danger">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Confirmation de suppression
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body pt-2">
+                                Êtes-vous sûr de vouloir supprimer :
+                                <br><br>
+                                <strong>{{ reclamation.sujet }}</strong>
+                            </div>
+
+                            <div class="modal-footer border-0">
+                                <button type="button"
+                                        class="btn-cancel"
+                                        data-bs-dismiss="modal">
+                                    Annuler
+                                </button>
+
+                                <form method="post"
+                                      action="{{ path('app_reclamation_delete_admin', {id: reclamation.id}) }}">
+
+                                    <input type="hidden"
+                                           name="_token"
+                                           value="{{ csrf_token('delete' ~ reclamation.id) }}">
+
+                                    <button class="btn-save"
+                                            style="background:linear-gradient(135deg,#e53935,#c62828);">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {# ================= END DELETE MODAL ================= #}
+
+
+                {# ================= RESPONSE MODAL ================= #}
+                <div class="modal fade" id="responseModal{{ reclamation.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content" style="border-radius:16px;">
+
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title fw-bold text-primary">
+                                    <i class="fas {{ hasResponse ? 'fa-eye' : 'fa-reply' }} me-2"></i>
+                                    {{ hasResponse ? 'Réponse envoyée' : 'Répondre à la Réclamation' }}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-12">
+                                        <label class="form-label">Sujet</label>
+                                        <input type="text"
+                                               value="{{ reclamation.sujet }}"
+                                               class="form-control"
+                                               disabled>
+                                    </div>
+
+                                    {% if hasResponse %}
+
+                                        <div class="col-12">
+                                            <label class="form-label">Réponse</label>
+                                            <textarea class="form-control"
+                                                      rows="4"
+                                                      disabled>{{ reponse.contenu }}</textarea>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Auteur</label>
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value="{{ reponse.auteur }}"
+                                                   disabled>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Date Réponse</label>
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value="{{ reponse.dateReponse|date('d/m/Y H:i') }}"
+                                                   disabled>
+                                        </div>
+
+                                    {% else %}
+
+                                        <form method="post"
+                                              action="{{ path('app_reponse_add', {id: reclamation.id}) }}">
+
+                                            <div class="col-12">
+                                                <label class="form-label">Contenu de la réponse</label>
+                                                <textarea name="contenu"
+                                                          class="form-control"
+                                                          rows="4"
+                                                          required></textarea>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Auteur</label>
+                                                <input type="text"
+                                                       name="auteur"
+                                                       class="form-control"
+                                                       value="Admin"
+                                                       required>
+                                            </div>
+
+                                            <div class="modal-footer border-0 mt-3">
+                                                <button type="button"
+                                                        class="btn-cancel"
+                                                        data-bs-dismiss="modal">
+                                                    Annuler
+                                                </button>
+
+                                                <button class="btn-save">
+                                                    Envoyer la réponse
+                                                </button>
+                                            </div>
+
+                                        </form>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {# ================= END RESPONSE MODAL ================= #}
+
+            {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        Aucune réclamation trouvée.
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

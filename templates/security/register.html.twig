@@ -7,7 +7,7 @@
     * { box-sizing: border-box; }
 
     body {
-        background: #f0f7ee;
+        background: #f8f5ff;
         min-height: 100vh;
         padding: 30px 0;
         font-family: 'Nunito', sans-serif;
@@ -17,7 +17,7 @@
     .register-card {
         background: white;
         border-radius: 24px;
-        box-shadow: 0 25px 70px rgba(0,0,0,0.10);
+        box-shadow: 0 25px 70px rgba(139, 92, 246, 0.15);
         overflow: hidden;
         max-width: 620px;
         margin: 0 auto;
@@ -25,7 +25,7 @@
 
     /* ===== HEADER ===== */
     .register-header {
-        background: linear-gradient(135deg, #f4a261 0%, #e76f51 60%, #c1440e 100%);
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 60%, #6D28D9 100%);
         padding: 38px 30px 32px;
         text-align: center;
         color: white;
@@ -88,7 +88,7 @@
         height: 1px;
         background: #eceff1;
     }
-    .section-title i { color: #e76f51; }
+    .section-title i { color: #8B5CF6; }
 
     /* ===== CARDS DE RÔLE ===== */
     .role-option {
@@ -109,22 +109,22 @@
         width: 0; height: 0;
     }
     .role-option:hover {
-        border-color: #f4a261;
-        background: #fffaf5;
+        border-color: #A78BFA;
+        background: #FAF5FF;
         transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(244,162,97,0.15);
+        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15);
     }
     .role-option.selected {
-        border-color: #e76f51;
-        background: linear-gradient(135deg, #fff8f2 0%, #ffeedd 100%);
-        box-shadow: 0 8px 25px rgba(231,111,81,0.2);
+        border-color: #8B5CF6;
+        background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%);
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
         transform: translateY(-3px);
     }
     .role-option.selected::after {
         content: '✓';
         position: absolute;
         top: 8px; right: 10px;
-        background: #e76f51;
+        background: #8B5CF6;
         color: white;
         width: 20px; height: 20px;
         border-radius: 50%;
@@ -150,11 +150,11 @@
         margin-bottom: 6px;
     }
     .input-group-text {
-        background: #f8fafb;
+        background: #FAF5FF;
         border: 2px solid #e9ecef;
         border-right: none;
         border-radius: 12px 0 0 12px;
-        color: #e76f51;
+        color: #8B5CF6;
         padding: 0 14px;
         font-size: 0.9rem;
     }
@@ -171,8 +171,8 @@
     }
     .form-control:focus,
     .form-select:focus {
-        border-color: #e76f51;
-        box-shadow: 0 0 0 3px rgba(231,111,81,0.12);
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
         outline: none;
     }
     .form-control.no-group {
@@ -181,21 +181,21 @@
         padding: 11px 15px;
     }
     .form-control.no-group:focus {
-        border-color: #e76f51;
-        box-shadow: 0 0 0 3px rgba(231,111,81,0.12);
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
     }
     /* Bouton œil dans le input-group */
     .btn-eye {
         border: 2px solid #e9ecef;
         border-left: none;
         border-radius: 0 12px 12px 0;
-        background: #f8fafb;
+        background: #FAF5FF;
         color: #90a4ae;
         padding: 0 14px;
         cursor: pointer;
         transition: color 0.2s;
     }
-    .btn-eye:hover { color: #e76f51; }
+    .btn-eye:hover { color: #8B5CF6; }
 
     /* Erreurs Symfony */
     .form-error-wrapper ul {
@@ -231,7 +231,7 @@
 
     /* ===== BOUTON SUBMIT ===== */
     .btn-submit {
-        background: linear-gradient(135deg, #f4a261 0%, #e76f51 100%);
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
         border: none;
         border-radius: 12px;
         padding: 14px;
@@ -245,7 +245,7 @@
     }
     .btn-submit:hover {
         transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(231,111,81,0.4);
+        box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
         opacity: 0.95;
     }
     .btn-submit:active { transform: translateY(0); }
@@ -258,12 +258,12 @@
         color: #78909c;
     }
     .login-link a {
-        color: #4f7942;
+        color: #8B5CF6;
         font-weight: 700;
         text-decoration: none;
         transition: color 0.2s;
     }
-    .login-link a:hover { color: #2d5a27; text-decoration: underline; }
+    .login-link a:hover { color: #7C3AED; text-decoration: underline; }
 
     /* ===== ALERT ERREUR ===== */
     .alert-danger {
@@ -282,6 +282,21 @@
         .register-body { padding: 25px 20px 30px; }
         .register-card { margin: 0 10px; }
     }
+    body {
+            background: #f8f5ff !important;
+            min-height: 100vh;
+        }
+        
+        /* Alternative avec dégradé subtil */
+        /* body {
+            background: linear-gradient(135deg, #f8f5ff 0%, #faf6ff 50%, #f3ebff 100%) !important;
+            min-height: 100vh;
+        } */
+        
+        /* Menu dropdown utilisateur */
+        .user-menu {
+            position: relative;
+        }
 </style>
 {% endblock %}
 
@@ -601,8 +616,8 @@
             { pct: '20%',  color: '#e53935', text: '😟 Très faible' },
             { pct: '40%',  color: '#fb8c00', text: '😐 Faible'      },
             { pct: '65%',  color: '#fdd835', text: '🙂 Moyen'        },
-            { pct: '85%',  color: '#43a047', text: '😊 Fort'         },
-            { pct: '100%', color: '#00897b', text: '🔒 Très fort ✓'  }
+            { pct: '85%',  color: '#8B5CF6', text: '😊 Fort'         },
+            { pct: '100%', color: '#7C3AED', text: '🔒 Très fort ✓'  }
         ];
 
         const level = levels[score] || levels[0];

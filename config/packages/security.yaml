@@ -50,9 +50,16 @@ security:
 
         # Backend admin uniquement
         - { path: ^/admin,    roles: ROLE_ADMIN }
+        - { path: ^/user,    roles: ROLE_ADMIN }
+
+
 
         # Front propriétaire
         - { path: ^/proprietaire, roles: ROLE_PROPRIETAIRE }
+        - { path: ^/pet, roles: ROLE_PROPRIETAIRE }
+        - { path: ^/announcement, roles: ROLE_PROPRIETAIRE }
+
+
 
         # Front gardien
         - { path: ^/gardien,  roles: ROLE_GARDIEN }

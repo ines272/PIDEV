@@ -53,10 +53,6 @@ class Pet
     #[Assert\NotNull(message: "Veuillez sélectionner un genre.")]
     private ?Gender $gender = null;
 
-
-    #[ORM\Column]
-    private ?bool $isVaccinated = null;
-
     #[ORM\Column]
     private ?bool $hasContagiousDisease = null;
 
@@ -65,6 +61,13 @@ class Pet
 
     #[ORM\Column]
     private ?bool $hasCriticalCondition = null;
+
+    #[ORM\Column]
+    private ?bool $isVaccinated = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function getId(): ?int
     {
@@ -199,6 +202,17 @@ class Pet
     {
         $this->hasCriticalCondition = $hasCriticalCondition;
 
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
         return $this;
     }
 }

@@ -53,6 +53,23 @@ class Reclamation
     #[ORM\OneToMany(targetEntity: Reponse::class, mappedBy: 'reclamation', orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $reponses;
 
+    // ============ RELATION AVEC USER ============
+#[ORM\ManyToOne]
+#[ORM\JoinColumn(nullable: false)]
+private ?User $user = null;
+
+public function getUser(): ?User
+{
+    return $this->user;
+}
+
+public function setUser(?User $user): static
+{
+    $this->user = $user;
+    return $this;
+}
+
+
     public function __construct()
     {
         $this->reponses = new ArrayCollection();
