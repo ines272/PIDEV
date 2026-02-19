@@ -104,16 +104,32 @@ public function index(Request $request, EventRepository $eventRepository): Respo
         return $this->redirectToRoute('app_admin_event_index');
     }
 
-   #[Route('/event/filter', name: 'app_event_filter', methods: ['GET'])]
+  #[Route('/event/filter', name: 'app_event_filter', methods: ['GET'])]
 public function filter(Request $request, EventRepository $eventRepository): Response
 {
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+    $user = $this->getUser();
+
     $name = $request->query->get('name');
     $dateParam = $request->query->get('date');
     $heure = $request->query->get('heure');
 
-    $date = $dateParam ? new \DateTime($dateParam) : null;
+    $date = null;
+    if ($dateParam) {
+        try {
+            $date = new \DateTime($dateParam);
+        } catch (\Exception $e) {
+            $date = null;
+        }
+    }
 
-    $events = $eventRepository->searchByCriteria($name, $date, $heure);
+    $events = $eventRepository->searchByCriteriaForUser(
+        $user,
+        $name,
+        $date,
+        $heure
+    );
 
     return $this->render('event/_table.html.twig', [
         'events' => $events,

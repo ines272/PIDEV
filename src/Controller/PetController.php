@@ -114,20 +114,40 @@ public function index(Request $request, PetRepository $petRepository): Response
 
 
     #[Route('/pet/filter', name: 'app_pet_filter', methods: ['GET'])]
-    public function filter(Request $request, PetRepository $petRepository): Response
-    {
-        $name = $request->query->get('name');
+public function filter(Request $request, PetRepository $petRepository): Response
+{
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $pets = $petRepository->createQueryBuilder('p')
-            ->andWhere('p.name LIKE :name')
-            ->setParameter('name', '%' . $name . '%')
-            ->getQuery()
-            ->getResult();
+    $name = $request->query->get('name');
+    $type = $request->query->get('type');
+    $gender = $request->query->get('gender');
+    $vaccinated = $request->query->get('vaccinated');
+    $critical = $request->query->get('critical');
 
-        return $this->render('pet/_table.html.twig', [
-            'pets' => $pets,
-        ]);
-    }
+    $typeEnum = $type ? \App\Enum\PetType::from($type) : null;
+    $genderEnum = $gender ? \App\Enum\Gender::from($gender) : null;
+
+    $vaccinatedBool = $vaccinated !== null && $vaccinated !== ''
+        ? filter_var($vaccinated, FILTER_VALIDATE_BOOLEAN)
+        : null;
+
+    $criticalBool = $critical !== null && $critical !== ''
+        ? filter_var($critical, FILTER_VALIDATE_BOOLEAN)
+        : null;
+
+    $pets = $petRepository->searchByCriteria(
+        $name,
+        $typeEnum,
+        $genderEnum,
+        $vaccinatedBool,
+        $criticalBool,
+        $this->getUser()
+    );
+
+    return $this->render('pet/_table.html.twig', [
+        'pets' => $pets,
+    ]);
+}
 
 
     #[Route('/admin/pets', name: 'app_admin_pet_index')]
