@@ -38,7 +38,7 @@ class PetType extends AbstractType
                 'expanded' => true,
                 'multiple' => false,
             ])
-            ->add('isVacinated', CheckboxType::class, [
+            ->add('isVaccinated', CheckboxType::class, [
                 'required' => false
             ])
             ->add('hasContagiousDisease', CheckboxType::class, [

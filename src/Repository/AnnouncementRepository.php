@@ -40,4 +40,69 @@ class AnnouncementRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+     public function search(array $filters): array
+    {
+        $qb = $this->createQueryBuilder('a');
+
+        // Filtrer par date début
+        if (!empty($filters['dateDebut'])) {
+            $qb->andWhere('a.dateDebut >= :dateDebut')
+               ->setParameter('dateDebut', new \DateTime($filters['dateDebut']));
+        }
+
+        // Filtrer par date fin
+        if (!empty($filters['dateFin'])) {
+            $qb->andWhere('a.dateFin <= :dateFin')
+               ->setParameter('dateFin', new \DateTime($filters['dateFin']));
+        }
+
+        // Filtrer par visites par jour
+        if (!empty($filters['visitPerDay'])) {
+            $qb->andWhere('a.visitPerDay = :visitPerDay')
+               ->setParameter('visitPerDay', $filters['visitPerDay']);
+        }
+
+        // Filtrer par prix minimum
+        if (!empty($filters['minPrice'])) {
+            $qb->andWhere('a.renumerationMin >= :minPrice')
+               ->setParameter('minPrice', $filters['minPrice']);
+        }
+
+        // Filtrer par prix maximum
+        if (!empty($filters['maxPrice'])) {
+            $qb->andWhere('a.renumerationMax <= :maxPrice')
+               ->setParameter('maxPrice', $filters['maxPrice']);
+        }
+
+        return $qb->orderBy('a.dateDebut', 'DESC')
+                  ->getQuery()
+                  ->getResult();
+    }
+
+
+    public function searchByCriteria(
+    ?string $address,
+    ?string $dateDebut,
+    ?string $dateFin
+): array
+{
+    $qb = $this->createQueryBuilder('a');
+
+    if ($address) {
+        $qb->andWhere('a.address LIKE :address')
+           ->setParameter('address', '%' . $address . '%');
+    }
+
+    if ($dateDebut) {
+        $qb->andWhere('a.dateDebut >= :dateDebut')
+           ->setParameter('dateDebut', new \DateTime($dateDebut));
+    }
+
+    if ($dateFin) {
+        $qb->andWhere('a.dateFin <= :dateFin')
+           ->setParameter('dateFin', new \DateTime($dateFin));
+    }
+
+    return $qb->getQuery()->getResult();
+}
 }

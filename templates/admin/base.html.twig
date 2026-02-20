@@ -1,63 +1,574 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}PackTrack - Admin{% endblock %}</title>
-    
-    {# CSS du backoffice #}
-    <link rel="stylesheet" href="{{ asset('css/back-style.css') }}">
-    
-    {# Font Awesome #}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
+    <title>{% block title %}Admin - SitMyPet{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --primary-light: #FAF5FF;
+            --accent: #A78BFA;
+            --danger: #e53935;
+            --sidebar-bg: #2D1B4E;
+            --sidebar-text: rgba(255,255,255,0.75);
+            --sidebar-active: rgba(139, 92, 246, 0.2);
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #f8f5ff;
+            margin: 0;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, #2D1B4E 0%, #1F1338 100%);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(139, 92, 246, 0.1);
+        }
+        .sidebar-brand {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-brand .brand-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #A78BFA 0%, #C4B5FD 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sidebar-brand .brand-sub {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .sidebar-section {
+            padding: 18px 14px 6px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.3);
+        }
+        .sidebar-nav { padding: 0 10px; flex: 1; }
+        .sidebar-nav .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+            transition: all 0.2s;
+        }
+        .sidebar-nav .nav-link:hover {
+            background: var(--sidebar-active);
+            color: white;
+        }
+        .sidebar-nav .nav-link.active {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+        .sidebar-nav .nav-link i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .sidebar-nav .nav-link .badge-count {
+            margin-left: auto;
+            background: rgba(167, 139, 250, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            color: #C4B5FD;
+        }
+        .sidebar-footer {
+            padding: 16px 14px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-footer .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .sidebar-footer .admin-avatar {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            color: white;
+            font-weight: 700;
+        }
+        .sidebar-footer .admin-name {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: white;
+        }
+        .sidebar-footer .admin-role {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+        }
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 9px 14px;
+            background: rgba(229,57,53,0.15);
+            border: 1px solid rgba(229,57,53,0.3);
+            border-radius: 10px;
+            color: #ef9a9a;
+            font-size: 0.83rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover {
+            background: rgba(229,57,53,0.3);
+            color: #ffcdd2;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        .topbar {
+            background: white;
+            padding: 14px 28px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.04);
+        }
+        .topbar-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .topbar-date {
+            font-size: 0.8rem;
+            color: #90a4ae;
+            font-weight: 600;
+        }
+        .content-area { padding: 28px; }
+
+        /* ===== FLASH MESSAGES ===== */
+        .flash-container {
+            position: fixed;
+            top: 80px; right: 20px;
+            z-index: 9999;
+            width: 320px;
+        }
+        .flash-container .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            font-size: 0.87rem;
+            font-weight: 600;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
+        }
+
+        /* ===== STAT CARDS ===== */
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+        }
+        .stat-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 14px;
+        }
+        .stat-icon.purple { background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%); }
+        .stat-icon.blue { background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); }
+        .stat-icon.green { background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); }
+        .stat-icon.orange { background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%); }
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+            color: #8B5CF6;
+        }
+        .stat-label { font-size: 0.82rem; color: #90a4ae; font-weight: 600; }
+
+        /* ===== DATA TABLE ===== */
+        .data-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.06);
+            overflow: hidden;
+        }
+        .data-card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #f0f4f8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .data-card-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        .table { margin: 0; }
+        .table thead th {
+            background: #FAF5FF;
+            border: none;
+            padding: 12px 18px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #8B5CF6;
+        }
+        .table tbody td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #f0f4f8;
+            vertical-align: middle;
+            font-size: 0.88rem;
+            color: #3d4a5c;
+        }
+        .table tbody tr:last-child td { border-bottom: none; }
+        .table tbody tr:hover { background: #FAF5FF; }
+
+        /* ===== BADGES ===== */
+        .badge-role {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+        .badge-admin        { background: #FEE2E2; color: #991B1B; }
+        .badge-proprietaire { background: #FAF5FF; color: #7C3AED; }
+        .badge-gardien      { background: #DBEAFE; color: #1E40AF; }
+        .badge-active       { background: #D1FAE5; color: #065F46; }
+        .badge-inactive     { background: #FEF3C7; color: #92400E; }
+        .badge-deleted      { background: #FEE2E2; color: #991B1B; }
+
+        /* ===== BOUTONS ACTION ===== */
+        .btn-action {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-view   { background: #DBEAFE; color: #1E40AF; }
+        .btn-edit   { background: #FAF5FF; color: #7C3AED; }
+        .btn-delete { background: #FEE2E2; color: #991B1B; }
+        .btn-restore{ background: #D1FAE5; color: #065F46; }
+        .btn-action:hover { transform: scale(1.15); }
+
+        /* ===== FORMULAIRES ===== */
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.06);
+            padding: 28px;
+        }
+        .form-section-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #b0bec5;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f4f8;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .form-section-title i { color: var(--primary); }
+        .form-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #546e7a;
+            margin-bottom: 6px;
+        }
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            border: none;
+            border-radius: 10px;
+            padding: 11px 28px;
+            font-weight: 700;
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+            color: white;
+        }
+        .btn-cancel {
+            background: #f0f4f8;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 22px;
+            font-weight: 700;
+            color: #546e7a;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-cancel:hover { background: #e2e8f0; color: #2d3748; }
+
+        /* ===== AVATAR ===== */
+        .user-avatar {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: white;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        }
+
+        /* ===== SEARCH BAR ===== */
+        .search-bar {
+            position: relative;
+        }
+        .search-bar input {
+            padding-left: 38px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.87rem;
+        }
+        .search-bar input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        .search-bar .search-icon {
+            position: absolute;
+            left: 12px; top: 50%;
+            transform: translateY(-50%);
+            color: #b0bec5;
+            font-size: 0.85rem;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            margin-bottom: 24px;
+        }
+        .page-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .page-header p { color: #90a4ae; font-size: 0.87rem; margin: 0; }
+        .breadcrumb { background: none; padding: 0; margin: 0; font-size: 0.8rem; }
+        .breadcrumb-item a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .breadcrumb-item.active { color: #90a4ae; }
+        
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+            color: white;
+        }
+    </style>
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
-    <div class="layout">
-        {# SIDEBAR #}
-        <aside class="sidebar">
-            <h2>📦 PackTrack</h2>
-            <ul>
-                <li class="{{ app.request.get('_route') == 'admin_dashboard' ? 'active' }}">
-                    <a href="{{ path('admin_dashboard') }}">
-                        <i class="fa-solid fa-chart-line"></i> Dashboard
-                    </a>
-                </li>
-                <li class="{{ app.request.get('_route') starts with 'admin_parcels' ? 'active' }}">
-                    <a href="{{ path('admin_parcels') }}">
-                        <i class="fa-solid fa-box"></i> Parcels
-                    </a>
-                </li>
-                <li class="{{ app.request.get('_route') starts with 'admin_invoices' ? 'active' }}">
-                    <a href="{{ path('admin_invoices') }}">
-                        <i class="fa-solid fa-file-invoice"></i> Invoices
-                    </a>
-                </li>
-                <li class="{{ app.request.get('_route') starts with 'admin_vehicles' ? 'active' }}">
-                    <a href="{{ path('admin_vehicles') }}">
-                        <i class="fa-solid fa-truck"></i> Vehicles
-                    </a>
-                </li>
-                <li class="{{ app.request.get('_route') starts with 'admin_forum' ? 'active' }}">
-                    <a href="{{ path('admin_forum') }}">
-                        <i class="fa-solid fa-comments"></i> Forum
-                    </a>
-                </li>
-                <li class="{{ app.request.get('_route') starts with 'admin_incidents' ? 'active' }}">
-                    <a href="{{ path('admin_incidents') }}">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Incidents
-                    </a>
-                </li>
-            </ul>
-        </aside>
 
-        {# MAIN CONTENT #}
-        <main class="main">
-            {% block body %}{% endblock %}
-        </main>
+{# ===== SIDEBAR ===== #}
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span style="font-size:1.5rem;">🐾</span>
+            <span class="brand-name">SitMyPet</span>
+        </div>
+        <div class="brand-sub">Panneau Admin</div>
     </div>
 
-    {% block javascripts %}{% endblock %}
+    <nav class="sidebar-nav">
+        <div class="sidebar-section">Principal</div>
+
+        <a href="{{ path('app_user_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') == 'app_user_index' ? 'active' : '' }}">
+            <i class="fas fa-chart-pie"></i> Dashboard
+        </a>
+
+        <div class="sidebar-section">Gestion</div>
+
+        <a href="{{ path('app_user_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">
+            <i class="fas fa-users"></i> Utilisateurs
+        </a>
+
+        <a href="{{ path('app_pet') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_pet' ? 'active' : '' }}">
+            <i class="fas fa-paw"></i> Animaux
+        </a>
+
+        <a href="{{ path('app_announcement') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_announcement' ? 'active' : '' }}">
+            <i class="fas fa-bullhorn"></i> Annonces
+        </a>
+
+        <a href="{{ path('app_event') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_event' ? 'active' : '' }}">
+            <i class="fas fa-calendar-days"></i> Événements
+        </a>
+
+        <a href="{{ path('app_reclamation_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_reclamation' ? 'active' : '' }}">
+            <i class="fas fa-envelope-open"></i> Réclamations
+        </a>
+
+        <div class="sidebar-section">Interface Publique</div>
+
+        <a href="{{ path('app_home') }}" class="nav-link" target="_blank">
+            <i class="fas fa-external-link-alt"></i> Voir le site
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        {% if app.user %}
+        <div class="admin-info">
+            <div class="admin-avatar">
+                {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+            </div>
+            <div>
+                <div class="admin-name">{{ app.user.prenom }} {{ app.user.nom }}</div>
+                <div class="admin-role">Administrateur</div>
+            </div>
+        </div>
+        {% endif %}
+        <a href="{{ path('app_logout') }}" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </div>
+</div>
+
+{# ===== MAIN CONTENT ===== #}
+<div class="main-content">
+
+    {# TOPBAR #}
+    <div class="topbar">
+        <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+        <div class="topbar-right">
+            <span class="topbar-date">
+                <i class="fas fa-calendar me-1"></i>
+                {{ "now"|date("d/m/Y") }}
+            </span>
+            {% if app.user %}
+            <div class="d-flex align-items-center gap-2">
+                <div style="width:32px;height:32px;background:linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);border-radius:8px;
+                            display:flex;align-items:center;justify-content:center;
+                            color:white;font-weight:700;font-size:0.8rem;">
+                    {{ app.user.prenom|first|upper }}
+                </div>
+                <span style="font-size:0.85rem;font-weight:700;color:#3d4a5c;">
+                    {{ app.user.prenom }}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# FLASH MESSAGES #}
+    <div class="flash-container">
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    </div>
+
+    {# PAGE CONTENT #}
+    <div class="content-area">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block javascripts %}{% endblock %}
 </body>
 </html>

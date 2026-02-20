@@ -4,8 +4,9 @@
 
 {% block body %}
 <section class="content">
-    <div class="card">
+    <div class="card" style="width:100%;">
 
+        <!-- HEADER -->
         <div class="table-header">
             <h2>📢 Mes Annonces</h2>
             <a href="{{ path('app_announcement_new') }}" class="btn btn-primary">
@@ -13,9 +14,22 @@
             </a>
         </div>
 
-        {% if announcements is empty %}
-            <p>Aucune annonce disponible.</p>
-        {% else %}
+        <!-- SEARCH BAR -->
+        <form method="get" class="search-bar" id="filterForm">
+            <input type="text" name="address" placeholder="🔍 Adresse">
+
+            <input type="date" name="dateDebut">
+            <input type="date" name="dateFin">
+
+            <button type="submit" class="btn-search">Rechercher</button>
+
+            <button type="button" id="resetFilters" class="btn-reset">
+                Réinitialiser
+            </button>
+        </form>
+
+        <!-- TABLE -->
+        <div class="table-wrapper">
             <table class="pet-table">
                 <thead>
                     <tr>
@@ -29,49 +43,18 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                {% for a in announcements %}
-                    <tr>
-                        <td>{{ a.address }}</td>
-                        <td>{{ a.careType.value }}</td>
-                        <td>{{ a.dateDebut|date('d/m/Y') }}</td>
-                        <td>{{ a.dateFin|date('d/m/Y') }}</td>
-                        <td>{{ a.visitPerDay }}</td>
-                        <td>{{ a.renumerationMin }} €</td>
-                        <td>{{ a.renumerationMax }} €</td>
 
-                        <td class="actions">
-                            <a href="{{ path('app_announcement_edit', {'id': a.id}) }}" class="action-btn edit">
-                                <i class="fa-solid fa-pen"></i>
-                            </a>
-
-                            <form method="post"
-                                  action="{{ path('app_announcement_delete', {'id': a.id}) }}"
-                                  class="delete-form"
-                                  data-pet-name="Annonce {{ a.id }}"
-                                  style="display:inline;">
-
-                                <input type="hidden"
-                                       name="_token"
-                                       value="{{ csrf_token('delete_announcement_' ~ a.id) }}">
-
-                                <button type="button" class="action-btn delete open-delete-modal">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
+                {% include 'announcement/_table.html.twig' %}
             </table>
-        {% endif %}
+        </div>
+
     </div>
 </section>
 
 <!-- DELETE MODAL -->
 <div id="deleteModal" class="modal-overlay">
     <div class="modal-box">
-        <h3>Supprimer l’animal</h3>
+        <h3>Supprimer l’annonce</h3>
         <p id="deleteMessage"></p>
 
         <div class="modal-actions">
@@ -83,6 +66,50 @@
 
 {% block javascripts %}
 <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const form = document.getElementById('filterForm');
+    const resetBtn = document.getElementById('resetFilters');
+    const tableBodySelector = '.pet-table tbody';
+
+    /* =========================
+       AJAX FILTER FUNCTION
+    ========================== */
+    function fetchFilteredData() {
+
+        const params = new URLSearchParams(new FormData(form));
+
+        fetch('/announcement/filter?' + params.toString())
+            .then(response => response.text())
+            .then(html => {
+                document.querySelector(tableBodySelector).outerHTML = html;
+                attachDeleteEvents();
+            });
+    }
+
+    /* =========================
+       LIVE FILTER ON INPUT CHANGE
+    ========================== */
+    form.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', fetchFilteredData);
+        input.addEventListener('keyup', fetchFilteredData);
+    });
+
+    /* =========================
+       RESET FILTERS
+    ========================== */
+    resetBtn.addEventListener('click', function () {
+
+        form.querySelectorAll('input').forEach(el => el.value = '');
+
+        fetchFilteredData();
+    });
+
+    /* =========================
+       DELETE MODAL LOGIC
+    ========================== */
+
     const modal = document.getElementById('deleteModal');
     const deleteMessage = document.getElementById('deleteMessage');
     const confirmBtn = document.getElementById('confirmDelete');
@@ -90,15 +117,22 @@
 
     let currentForm = null;
 
-    document.querySelectorAll('.open-delete-modal').forEach(button => {
-        button.addEventListener('click', function() {
-            currentForm = this.closest('.delete-form');
-            const petName = currentForm.dataset.petName;
+    function attachDeleteEvents() {
+        document.querySelectorAll('.open-delete-modal').forEach(button => {
+            button.addEventListener('click', function() {
 
-            deleteMessage.innerText = "Voulez-vous vraiment supprimer \"" + petName + "\" ?";
-            modal.style.display = "flex";
+                currentForm = this.closest('.delete-form');
+                const itemName = currentForm.dataset.itemName;
+
+                deleteMessage.innerText =
+                    'Voulez-vous vraiment supprimer "' + itemName + '" ?';
+
+                modal.style.display = "flex";
+            });
         });
-    });
+    }
+
+    attachDeleteEvents();
 
     cancelBtn.addEventListener('click', function() {
         modal.style.display = "none";
@@ -116,6 +150,9 @@
             modal.style.display = "none";
         }
     });
+
+});
 </script>
 {% endblock %}
+
 {% endblock %}

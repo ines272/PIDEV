@@ -1,0 +1,42 @@
+<tbody>
+{% if announcements|length > 0 %}
+    {% for a in announcements %}
+        <tr>
+            <td>{{ a.address }}</td>
+            <td>{{ a.careType.value }}</td>
+            <td>{{ a.dateDebut|date('d/m/Y') }}</td>
+            <td>{{ a.dateFin|date('d/m/Y') }}</td>
+            <td>{{ a.visitPerDay }}</td>
+            <td>{{ a.renumerationMin }} €</td>
+            <td>{{ a.renumerationMax }} €</td>
+
+            <td class="actions">
+                <a href="{{ path('app_announcement_edit', {'id': a.id}) }}" class="btn-edit">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+
+                <form method="post"
+                      action="{{ path('app_announcement_delete', {'id': a.id}) }}"
+                      class="delete-form"
+                      data-item-name="Annonce {{ a.id }}"
+                      style="display:inline;">
+
+                    <input type="hidden"
+                           name="_token"
+                           value="{{ csrf_token('delete_announcement_' ~ a.id) }}">
+
+                    <button type="button" class="btn-delete open-delete-modal">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="8" class="empty-row">
+            📢 Aucune annonce disponible pour le moment.
+        </td>
+    </tr>
+{% endif %}
+</tbody>

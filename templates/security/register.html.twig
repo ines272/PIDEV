@@ -1,0 +1,630 @@
+{% extends 'base.html.twig' %}
+{% block title %}Inscription - SitMyPet{% endblock %}
+
+{% block stylesheets %}
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        background: #f8f5ff;
+        min-height: 100vh;
+        padding: 30px 0;
+        font-family: 'Nunito', sans-serif;
+    }
+
+    /* ===== CARD PRINCIPALE ===== */
+    .register-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 25px 70px rgba(139, 92, 246, 0.15);
+        overflow: hidden;
+        max-width: 620px;
+        margin: 0 auto;
+    }
+
+    /* ===== HEADER ===== */
+    .register-header {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 60%, #6D28D9 100%);
+        padding: 38px 30px 32px;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    .register-header::before {
+        content: '';
+        position: absolute;
+        top: -30px; right: -30px;
+        width: 120px; height: 120px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 50%;
+    }
+    .register-header::after {
+        content: '';
+        position: absolute;
+        bottom: -40px; left: -20px;
+        width: 150px; height: 150px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 50%;
+    }
+    .header-icon {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        display: block;
+        animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+    .register-header h3 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 1.6rem;
+        margin-bottom: 4px;
+    }
+    .register-header p { opacity: 0.85; font-size: 0.9rem; margin: 0; }
+
+    /* ===== BODY ===== */
+    .register-body { padding: 35px 40px 40px; }
+
+    /* ===== SECTION TITLE ===== */
+    .section-title {
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #b0bec5;
+        margin-bottom: 14px;
+        margin-top: 22px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .section-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #eceff1;
+    }
+    .section-title i { color: #8B5CF6; }
+
+    /* ===== CARDS DE RÔLE ===== */
+    .role-option {
+        border: 2px solid #e9ecef;
+        border-radius: 16px;
+        padding: 18px 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        display: block;
+        user-select: none;
+        position: relative;
+        overflow: hidden;
+    }
+    .role-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0; height: 0;
+    }
+    .role-option:hover {
+        border-color: #A78BFA;
+        background: #FAF5FF;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15);
+    }
+    .role-option.selected {
+        border-color: #8B5CF6;
+        background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%);
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        transform: translateY(-3px);
+    }
+    .role-option.selected::after {
+        content: '✓';
+        position: absolute;
+        top: 8px; right: 10px;
+        background: #8B5CF6;
+        color: white;
+        width: 20px; height: 20px;
+        border-radius: 50%;
+        font-size: 0.65rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    .role-icon { font-size: 2.2rem; margin-bottom: 8px; display: block; }
+    .role-option .fw-bold {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.95rem;
+        color: #2d3748;
+    }
+    .role-option small { color: #90a4ae; font-size: 0.78rem; }
+
+    /* ===== CHAMPS FORMULAIRE ===== */
+    .form-label {
+        font-weight: 700;
+        font-size: 0.82rem;
+        color: #546e7a;
+        margin-bottom: 6px;
+    }
+    .input-group-text {
+        background: #FAF5FF;
+        border: 2px solid #e9ecef;
+        border-right: none;
+        border-radius: 12px 0 0 12px;
+        color: #8B5CF6;
+        padding: 0 14px;
+        font-size: 0.9rem;
+    }
+    .form-control,
+    .form-select {
+        border: 2px solid #e9ecef;
+        border-left: none;
+        border-radius: 0 12px 12px 0;
+        padding: 11px 15px;
+        font-size: 0.92rem;
+        font-family: 'Nunito', sans-serif;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        color: #37474f;
+    }
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        outline: none;
+    }
+    .form-control.no-group {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 11px 15px;
+    }
+    .form-control.no-group:focus {
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    }
+    /* Bouton œil dans le input-group */
+    .btn-eye {
+        border: 2px solid #e9ecef;
+        border-left: none;
+        border-radius: 0 12px 12px 0;
+        background: #FAF5FF;
+        color: #90a4ae;
+        padding: 0 14px;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .btn-eye:hover { color: #8B5CF6; }
+
+    /* Erreurs Symfony */
+    .form-error-wrapper ul {
+        list-style: none;
+        padding: 0;
+        margin: 4px 0 0;
+    }
+    .form-error-wrapper ul li {
+        color: #e53935;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    /* ===== FORCE DU MOT DE PASSE ===== */
+    .strength-bar-container {
+        height: 5px;
+        background: #eceff1;
+        border-radius: 3px;
+        margin-top: 8px;
+        overflow: hidden;
+    }
+    .strength-bar {
+        height: 100%;
+        width: 0;
+        border-radius: 3px;
+        transition: width 0.4s, background 0.4s;
+    }
+    .strength-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+
+    /* ===== BOUTON SUBMIT ===== */
+    .btn-submit {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: 'Poppins', sans-serif;
+        letter-spacing: 0.3px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
+        opacity: 0.95;
+    }
+    .btn-submit:active { transform: translateY(0); }
+
+    /* ===== LIEN CONNEXION ===== */
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #78909c;
+    }
+    .login-link a {
+        color: #8B5CF6;
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .login-link a:hover { color: #7C3AED; text-decoration: underline; }
+
+    /* ===== ALERT ERREUR ===== */
+    .alert-danger {
+        background: #fce4e4;
+        border: none;
+        border-left: 4px solid #e53935;
+        border-radius: 10px;
+        color: #c62828;
+        font-size: 0.88rem;
+        padding: 12px 15px;
+        margin-bottom: 20px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 576px) {
+        .register-body { padding: 25px 20px 30px; }
+        .register-card { margin: 0 10px; }
+    }
+    body {
+            background: #f8f5ff !important;
+            min-height: 100vh;
+        }
+        
+        /* Alternative avec dégradé subtil */
+        /* body {
+            background: linear-gradient(135deg, #f8f5ff 0%, #faf6ff 50%, #f3ebff 100%) !important;
+            min-height: 100vh;
+        } */
+        
+        /* Menu dropdown utilisateur */
+        .user-menu {
+            position: relative;
+        }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="register-card">
+
+        {# ===== HEADER ===== #}
+        <div class="register-header">
+            <span class="header-icon">🐾</span>
+            <h3>Rejoindre SitMyPet</h3>
+            <p>Créez votre compte en quelques secondes</p>
+        </div>
+
+        {# ===== BODY ===== #}
+        <div class="register-body">
+
+            {# Messages d'erreur flash #}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                </div>
+            {% endfor %}
+
+            {{ form_start(registrationForm, {
+                'attr': {
+                    'id': 'registerForm',
+                    'novalidate': 'novalidate'
+                }
+            }) }}
+
+            {# ===================== #}
+            {# SECTION 1 : RÔLE      #}
+            {# ===================== #}
+            <div class="section-title">
+                <i class="fas fa-user-tag"></i> Je suis
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="role-option" id="label-proprietaire" for="role_proprietaire">
+                        <input
+                            type="radio"
+                            name="{{ registrationForm.role.vars.full_name }}"
+                            id="role_proprietaire"
+                            value="ROLE_PROPRIETAIRE"
+                            {% if registrationForm.role.vars.data == 'ROLE_PROPRIETAIRE' %}checked{% endif %}
+                        >
+                        <span class="role-icon">🏠</span>
+                        <div class="fw-bold">Propriétaire</div>
+                        <small>J'ai un animal à faire garder</small>
+                    </label>
+                </div>
+                <div class="col-6">
+                    <label class="role-option" id="label-gardien" for="role_gardien">
+                        <input
+                            type="radio"
+                            name="{{ registrationForm.role.vars.full_name }}"
+                            id="role_gardien"
+                            value="ROLE_GARDIEN"
+                            {% if registrationForm.role.vars.data == 'ROLE_GARDIEN' %}checked{% endif %}
+                        >
+                        <span class="role-icon">🤝</span>
+                        <div class="fw-bold">Gardien</div>
+                        <small>Je garde les animaux des autres</small>
+                    </label>
+                </div>
+            </div>
+
+            {# Erreurs rôle #}
+            <div class="form-error-wrapper">
+                {{ form_errors(registrationForm.role) }}
+            </div>
+
+            {# ============================= #}
+            {# SECTION 2 : INFOS PERSONNELLES #}
+            {# ============================= #}
+            <div class="section-title">
+                <i class="fas fa-user"></i> Informations personnelles
+            </div>
+
+            {# Prénom + Nom #}
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Prénom *</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        {{ form_widget(registrationForm.prenom, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Votre prénom'
+                            }
+                        }) }}
+                    </div>
+                    <div class="form-error-wrapper">
+                        {{ form_errors(registrationForm.prenom) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nom *</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        {{ form_widget(registrationForm.nom, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Votre nom'
+                            }
+                        }) }}
+                    </div>
+                    <div class="form-error-wrapper">
+                        {{ form_errors(registrationForm.nom) }}
+                    </div>
+                </div>
+            </div>
+
+            {# Email #}
+            <div class="mb-3">
+                <label class="form-label">Adresse email *</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                    {{ form_widget(registrationForm.email, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'exemple@email.com'
+                        }
+                    }) }}
+                </div>
+                <div class="form-error-wrapper">
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+            </div>
+
+            {# Téléphone #}
+            <div class="mb-3">
+                <label class="form-label">Téléphone *</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-phone"></i>
+                    </span>
+                    {{ form_widget(registrationForm.telephone, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': '20 123 456'
+                        }
+                    }) }}
+                </div>
+                <div class="form-error-wrapper">
+                    {{ form_errors(registrationForm.telephone) }}
+                </div>
+            </div>
+
+            {# Adresse #}
+            <div class="mb-3">
+                <label class="form-label">
+                    Adresse
+                    <span class="text-muted fw-normal">(optionnel)</span>
+                </label>
+                {{ form_widget(registrationForm.adresse, {
+                    'attr': {
+                        'class': 'form-control no-group',
+                        'rows': '2',
+                        'placeholder': 'Votre adresse complète'
+                    }
+                }) }}
+                <div class="form-error-wrapper">
+                    {{ form_errors(registrationForm.adresse) }}
+                </div>
+            </div>
+
+            {# =================== #}
+            {# SECTION 3 : SECURITE #}
+            {# =================== #}
+            <div class="section-title">
+                <i class="fas fa-shield-alt"></i> Sécurité
+            </div>
+
+            {# Mot de passe #}
+            <div class="mb-3">
+                <label class="form-label">Mot de passe *</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    {{ form_widget(registrationForm.plainPassword.first, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'Minimum 8 caractères',
+                            'id': 'pwd1',
+                            'oninput': 'checkStrength(this.value)'
+                        }
+                    }) }}
+                    <button class="btn-eye" type="button" onclick="togglePwd('pwd1','eye1')">
+                        <i class="fas fa-eye" id="eye1"></i>
+                    </button>
+                </div>
+                {# Barre de force #}
+                <div class="strength-bar-container">
+                    <div class="strength-bar" id="strengthBar"></div>
+                </div>
+                <div class="strength-label" id="strengthLabel"></div>
+                <div class="form-error-wrapper">
+                    {{ form_errors(registrationForm.plainPassword.first) }}
+                </div>
+            </div>
+
+            {# Confirmer mot de passe #}
+            <div class="mb-4">
+                <label class="form-label">Confirmer le mot de passe *</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    {{ form_widget(registrationForm.plainPassword.second, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'Retapez votre mot de passe',
+                            'id': 'pwd2'
+                        }
+                    }) }}
+                    <button class="btn-eye" type="button" onclick="togglePwd('pwd2','eye2')">
+                        <i class="fas fa-eye" id="eye2"></i>
+                    </button>
+                </div>
+                <div class="form-error-wrapper">
+                    {{ form_errors(registrationForm.plainPassword.second) }}
+                </div>
+            </div>
+
+            {# ===== BOUTON SUBMIT ===== #}
+            <button type="submit" class="btn btn-submit w-100 text-white">
+                <i class="fas fa-user-plus me-2"></i> Créer mon compte
+            </button>
+
+            {{ form_end(registrationForm) }}
+
+            {# ===== LIEN CONNEXION ===== #}
+            <div class="login-link">
+                Déjà inscrit ?
+                <a href="{{ path('app_login') }}">
+                    <i class="fas fa-sign-in-alt me-1"></i>Se connecter
+                </a>
+            </div>
+
+        </div>{# fin register-body #}
+    </div>{# fin register-card #}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    // ===== AFFICHER / MASQUER MOT DE PASSE =====
+    function togglePwd(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon  = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+
+    // ===== SÉLECTION VISUELLE DU RÔLE =====
+    function selectRole(input) {
+        document.querySelectorAll('.role-option').forEach(function(el) {
+            el.classList.remove('selected');
+        });
+        input.closest('.role-option').classList.add('selected');
+    }
+
+    // Appliquer la sélection au chargement si déjà coché
+    document.querySelectorAll('.role-option input[type="radio"]').forEach(function(input) {
+        if (input.checked) {
+            input.closest('.role-option').classList.add('selected');
+        }
+        input.addEventListener('change', function() {
+            selectRole(this);
+        });
+    });
+
+    // Cliquer sur la card sélectionne le radio
+    document.querySelectorAll('.role-option').forEach(function(card) {
+        card.addEventListener('click', function() {
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                selectRole(radio);
+            }
+        });
+    });
+
+    // ===== INDICATEUR DE FORCE DU MOT DE PASSE =====
+    function checkStrength(password) {
+        const bar   = document.getElementById('strengthBar');
+        const label = document.getElementById('strengthLabel');
+
+        if (!password) {
+            bar.style.width = '0';
+            label.textContent = '';
+            return;
+        }
+
+        let score = 0;
+        if (password.length >= 8)              score++;
+        if (/[A-Z]/.test(password))            score++;
+        if (/[0-9]/.test(password))            score++;
+        if (/[^A-Za-z0-9]/.test(password))    score++;
+
+        const levels = [
+            { pct: '20%',  color: '#e53935', text: '😟 Très faible' },
+            { pct: '40%',  color: '#fb8c00', text: '😐 Faible'      },
+            { pct: '65%',  color: '#fdd835', text: '🙂 Moyen'        },
+            { pct: '85%',  color: '#8B5CF6', text: '😊 Fort'         },
+            { pct: '100%', color: '#7C3AED', text: '🔒 Très fort ✓'  }
+        ];
+
+        const level = levels[score] || levels[0];
+        bar.style.width      = level.pct;
+        bar.style.background = level.color;
+        label.textContent    = level.text;
+        label.style.color    = level.color;
+    }
+</script>
+{% endblock %}

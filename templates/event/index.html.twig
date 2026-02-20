@@ -1,0 +1,144 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes Événements{% endblock %}
+
+{% block body %}
+<section class="content">
+    <div class="card" style="width:100%;">
+
+        <!-- HEADER + ADD BUTTON -->
+        <div class="table-header">
+            <h2>📅 Mes Événements</h2>
+            <a href="{{ path('app_event_new') }}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Ajouter un événement
+            </a>
+        </div>
+
+        <!-- SEARCH BAR -->
+        <form method="get" class="search-bar">
+
+    <input type="text" name="name" placeholder="🔍 Nom">
+
+    <input type="date" name="date">
+
+    <input type="text" name="heure" placeholder="Heure">
+
+    <button type="submit" class="btn-search">Rechercher</button>
+
+    <button type="button" id="resetFilters" class="btn-reset">
+        Réinitialiser
+    </button>
+
+</form>
+
+
+        <!-- TABLE -->
+        <div class="table-wrapper">
+            <table class="pet-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Date</th>
+                        <th>Heure</th>
+                        <th>Adresse</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                {% include 'event/_table.html.twig' %}
+            </table>
+        </div>
+
+    </div>
+</section>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Supprimer l’événement</h3>
+        <p id="deleteMessage"></p>
+
+        <div class="modal-actions">
+            <button id="cancelDelete" class="btn-cancel">Annuler</button>
+            <button id="confirmDelete" class="btn-danger">Supprimer</button>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const searchBar = document.querySelector('.search-bar');
+    const resetBtn = document.getElementById('resetFilters');
+
+    function fetchFilteredData() {
+        const formData = new FormData(searchBar);
+        const params = new URLSearchParams(formData).toString();
+
+        fetch('/event/filter?' + params)
+            .then(response => response.text())
+            .then(html => {
+                document.querySelector('.pet-table tbody').outerHTML = html;
+                bindDeleteButtons();
+            });
+    }
+
+    // Live filtering
+    searchBar.querySelectorAll('input').forEach(input => {
+        input.addEventListener('keyup', fetchFilteredData);
+        input.addEventListener('change', fetchFilteredData);
+    });
+
+    // Reset
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function () {
+            searchBar.querySelectorAll('input').forEach(el => el.value = '');
+            fetchFilteredData();
+        });
+    }
+
+    // DELETE MODAL
+    const modal = document.getElementById('deleteModal');
+    const deleteMessage = document.getElementById('deleteMessage');
+    const confirmBtn = document.getElementById('confirmDelete');
+    const cancelBtn = document.getElementById('cancelDelete');
+
+    let currentForm = null;
+
+    function bindDeleteButtons() {
+        document.querySelectorAll('.open-delete-modal').forEach(button => {
+            button.addEventListener('click', function () {
+                currentForm = this.closest('.delete-form');
+                const eventName = currentForm.dataset.eventName;
+
+                deleteMessage.innerText =
+                    'Voulez-vous vraiment supprimer "' + eventName + '" ?';
+
+                modal.style.display = "flex";
+            });
+        });
+    }
+
+    bindDeleteButtons();
+
+    cancelBtn.addEventListener('click', function () {
+        modal.style.display = "none";
+        currentForm = null;
+    });
+
+    confirmBtn.addEventListener('click', function () {
+        if (currentForm) currentForm.submit();
+    });
+
+    window.addEventListener('click', function (e) {
+        if (e.target === modal) modal.style.display = "none";
+    });
+
+});
+
+</script>
+{% endblock %}
+
+{% endblock %}
