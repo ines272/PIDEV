@@ -3,21 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}SitMyPet – Garde d'animaux{% endblock %}</title>
-    
-    {# CSS du front #}
+
     <link rel="stylesheet" href="{{ asset('css/front-style.css') }}">
-    
     {% block stylesheets %}{% endblock %}
 </head>
+
 <body class="sitmypet-theme">
 
+<!-- ================= HEADER / NAVBAR ================= -->
+<header class="main-header">
+    <div class="nav-container">
 
-<!-- CONTENU DYNAMIQUE -->
-{% block body %}{% endblock %}
+        <div class="nav-left">
+            <a href="{{ path('app_home') }}" class="logo">
+                SitMyPet
+            </a>
+        </div>
 
-<!-- FOOTER -->
+        <div class="nav-right">
+
+            {% if app.user %}
+
+                <a href="{{ path('app_admin_dashboard') }}" class="admin-btn">
+                    Admin Portal
+                </a>
+
+                <div class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+
+                <div class="icon-btn">
+                    <i class="fa-regular fa-moon"></i>
+                </div>
+
+                <!-- USER MENU -->
+                <div class="user-menu">
+                    <div class="user-avatar" id="userMenuBtn">
+                        <img src="https://i.pravatar.cc/40" alt="Utilisateur">
+                    </div>
+
+                    <div class="dropdown-menu-user" id="userDropdown">
+                        <div class="dropdown-header">
+                            <strong>{{ app.user.email }}</strong>
+                        </div>
+
+                        <a href="#" class="dropdown-item">
+                            <i class="fa-solid fa-user"></i>
+                            Mon Profil
+                        </a>
+
+                        <a href="#" class="dropdown-item">
+                            <i class="fa-solid fa-gear"></i>
+                            Paramètres
+                        </a>
+
+                        <a href="#" class="dropdown-item">
+                            <i class="fa-solid fa-heart"></i>
+                            Mes Favoris
+                        </a>
+
+                        <div class="dropdown-item logout" id="logoutBtn">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Déconnexion
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+
+                <a href="{{ path('app_login') }}" class="login-btn">
+                    Se connecter
+                </a>
+
+            {% endif %}
+
+        </div>
+    </div>
+</header>
+
+<!-- ================= LOGOUT MODAL ================= -->
+<div class="modal-overlay" id="logoutModal">
+    <div class="modal-content">
+        <div class="modal-icon">👋</div>
+        <h3 class="modal-title">Déconnexion</h3>
+        <p class="modal-text">
+            Êtes-vous sûr de vouloir vous déconnecter ?<br>
+            À bientôt sur SitMyPet !
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn btn-cancel" id="cancelLogout">
+                Annuler
+            </button>
+            <button class="modal-btn btn-confirm" id="confirmLogout">
+                Se déconnecter
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<main class="{% block main_class %}{% endblock %}">
+    {% block body %}{% endblock %}
+</main>
+
+<!-- ================= FOOTER ================= -->
+{% if block('show_footer') is not defined or block('show_footer') != 'false' %}
 <footer>
     <div class="footer-grid">
+
         <div>
             <strong style="color: white;">SitMyPet</strong>
             <p>Garde d'animaux de compagnie - Comme à la maison, même loin de vous.</p>
@@ -41,12 +134,14 @@
             <strong style="color: white;">Contact</strong>
             <p>support@sitmypet.com<br>1-800-SITMYPET</p>
         </div>
+
     </div>
 
     <p style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
         © 2026 SitMyPet. Tous droits réservés.
     </p>
 </footer>
+{% endif %}
 
 {% block javascripts %}{% endblock %}
 

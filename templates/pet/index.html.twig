@@ -96,49 +96,14 @@
         </div>
     </div>
 </div>
-
 {% block javascripts %}
 <script>
 
-const searchInput = document.querySelector('input[name="name"]');
+document.addEventListener('DOMContentLoaded', function () {
 
-if (searchInput) {
-    searchInput.addEventListener('keyup', function () {
-        fetch('/pet/filter?name=' + this.value)
-            .then(response => response.text())
-            .then(html => {
-                document.querySelector('.pet-table tbody').outerHTML = html;
-            });
-    });
-}
-
-searchInput.addEventListener('keyup', function () {
-    fetch('/pet/filter?name=' + this.value)
-        .then(response => response.text())
-        .then(html => {
-            document.querySelector('.pet-table tbody').outerHTML = html;
-        });
-});
-
-
-const resetBtn = document.getElementById('resetFilters');
-
-if (resetBtn) {
-    resetBtn.addEventListener('click', function () {
-
-        // Clear inputs
-        document.querySelectorAll('.search-bar input, .search-bar select')
-            .forEach(el => el.value = '');
-
-        // Fetch full table again
-        fetch('/pet/filter?name=')
-            .then(response => response.text())
-            .then(html => {
-                document.querySelector('.pet-table tbody').outerHTML = html;
-            });
-    });
-}
-
+    const form = document.querySelector('.search-bar');
+    const table = document.querySelector('.pet-table');
+    const resetBtn = document.getElementById('resetFilters');
 
     const modal = document.getElementById('deleteModal');
     const deleteMessage = document.getElementById('deleteMessage');
@@ -147,33 +112,90 @@ if (resetBtn) {
 
     let currentForm = null;
 
-    document.querySelectorAll('.open-delete-modal').forEach(button => {
-        button.addEventListener('click', function() {
-            currentForm = this.closest('.delete-form');
-            const petName = currentForm.dataset.petName;
+    // ================================
+    // APPLY FILTERS (ALL FIELDS)
+    // ================================
+    function applyFilters() {
+        const params = new URLSearchParams(new FormData(form));
 
-            deleteMessage.innerText = "Voulez-vous vraiment supprimer \"" + petName + "\" ?";
-            modal.style.display = "flex";
+        fetch('/pet/filter?' + params.toString())
+            .then(response => response.text())
+            .then(html => {
+                table.querySelector('tbody').outerHTML = html;
+
+                // Rebind delete buttons after refresh
+                bindDeleteButtons();
+            });
+    }
+
+    // Listen to all inputs
+    form.querySelectorAll('input, select').forEach(element => {
+        element.addEventListener('change', applyFilters);
+    });
+
+    // Live search for name field
+    const nameInput = form.querySelector('input[name="name"]');
+    if (nameInput) {
+        nameInput.addEventListener('keyup', applyFilters);
+    }
+
+    // ================================
+    // RESET FILTERS
+    // ================================
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function () {
+            form.reset();
+            applyFilters();
         });
-    });
+    }
 
-    cancelBtn.addEventListener('click', function() {
-        modal.style.display = "none";
-        currentForm = null;
-    });
+    // ================================
+    // DELETE MODAL LOGIC
+    // ================================
+    function bindDeleteButtons() {
+        document.querySelectorAll('.open-delete-modal').forEach(button => {
+            button.addEventListener('click', function () {
+                currentForm = this.closest('.delete-form');
+                const petName = currentForm.dataset.petName;
 
-    confirmBtn.addEventListener('click', function() {
-        if (currentForm) {
-            currentForm.submit();
-        }
-    });
+                deleteMessage.innerText =
+                    'Voulez-vous vraiment supprimer "' + petName + '" ?';
 
-    window.addEventListener('click', function(e) {
+                modal.style.display = "flex";
+            });
+        });
+    }
+
+    bindDeleteButtons();
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+            modal.style.display = "none";
+            currentForm = null;
+        });
+    }
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function () {
+            if (currentForm) {
+                currentForm.submit();
+            }
+        });
+    }
+
+    window.addEventListener('click', function (e) {
         if (e.target === modal) {
             modal.style.display = "none";
         }
     });
+
+});
 </script>
 {% endblock %}
+
+
+
+
+
 
 {% endblock %}

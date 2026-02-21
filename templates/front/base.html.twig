@@ -245,8 +245,7 @@
 
         {% if app.user %}
             {# ========== MENU PROPRIÉTAIRE ========== #}
-            {% if app.user.role == 'ROLE_PROPRIETAIRE' %}
-                
+            {% if is_granted('ROLE_PROPRIETAIRE') %}                
                 <a href="{{ path('app_announcement') }}" 
                    class="{{ app.request.get('_route') == 'app_announcement' ? 'active' }}">
                     <i class="fa-solid fa-bullhorn"></i> Annonces
@@ -263,7 +262,7 @@
                 </a>
 
             {# ========== MENU GARDIEN ========== #}
-            {% elseif app.user.role == 'ROLE_GARDIEN' %}
+            {% elseif is_granted('ROLE_GARDIEN') %}
                 
                 <a href="{{ path('app_event') }}" 
                    class="{{ app.request.get('_route') == 'app_event' ? 'active' }}">
@@ -284,7 +283,7 @@
     <div class="nav-right">
         {# Bouton Admin Portal - Visible UNIQUEMENT pour l'utilisateur ID 1 #}
         {% if app.user and app.user.id == 1 %}
-            <a href="{{ path('app_user_index') }}" class="admin-btn">Admin Portal</a>
+            <a href="{{ path('app_admin_user_index') }}" class="admin-btn">Admin Portal</a>
         {% endif %}
         
         <div class="icon-btn">
@@ -305,9 +304,8 @@
                     <div class="dropdown-header">
                         <strong>{{ app.user.prenom ~ ' ' ~ app.user.nom }}</strong>
                         <small>
-                            {% if app.user.role == 'ROLE_PROPRIETAIRE' %}
-                                🏠 Propriétaire
-                            {% elseif app.user.role == 'ROLE_GARDIEN' %}
+                            {% if is_granted('ROLE_PROPRIETAIRE') %}                                🏠 Propriétaire
+                            {% elseif is_granted('ROLE_GARDIEN') %}
                                 👥 Gardien
                             {% else %}
                                 👤 Membre
@@ -378,10 +376,9 @@
             <p>
                 <a href="{{ path('app_home') }}">Accueil</a><br>
                 {% if app.user %}
-                    {% if app.user.role == 'ROLE_PROPRIETAIRE' %}
-                        <a href="{{ path('app_announcement') }}">Publier une annonce</a><br>
+                    {% if is_granted('ROLE_PROPRIETAIRE') %}                        <a href="{{ path('app_announcement') }}">Publier une annonce</a><br>
                         <a href="{{ path('app_pet') }}">Voir les animaux</a><br>
-                    {% elseif app.user.role == 'ROLE_GARDIEN' %}
+                    {% elseif is_granted('ROLE_GARDIEN') %}
                         <a href="{{ path('app_event') }}">Événements</a><br>
                     {% endif %}
                 {% endif %}

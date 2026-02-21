@@ -63,6 +63,23 @@ class Announcement
     #[Assert\Positive(message: "La rémunération maximale doit être positive.")]
     private ?float $renumerationMax = null;
 
+
+    // ============ RELATION AVEC USER ============
+#[ORM\ManyToOne(inversedBy: 'announcements')]
+#[ORM\JoinColumn(nullable: false)]
+private ?User $user = null;
+
+public function getUser(): ?User
+{
+    return $this->user;
+}
+
+public function setUser(?User $user): static
+{
+    $this->user = $user;
+    return $this;
+}
+
     /**
      * VALIDATION PERSONNALISÉE
      */

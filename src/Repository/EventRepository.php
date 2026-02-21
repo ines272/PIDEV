@@ -17,12 +17,15 @@ class EventRepository extends ServiceEntityRepository
     }
 
 
-    public function searchByCriteria(
+    public function searchByCriteriaForUser(
+    $user,
     ?string $name,
     ?\DateTime $date,
     ?string $heure
 ): array {
-    $qb = $this->createQueryBuilder('e');
+    $qb = $this->createQueryBuilder('e')
+        ->andWhere('e.user = :user')
+        ->setParameter('user', $user);
 
     if ($name) {
         $qb->andWhere('e.name LIKE :name')
@@ -39,8 +42,11 @@ class EventRepository extends ServiceEntityRepository
            ->setParameter('heure', '%' . $heure . '%');
     }
 
-    return $qb->getQuery()->getResult();
+    return $qb->orderBy('e.date', 'DESC')
+              ->getQuery()
+              ->getResult();
 }
+
 
 
 //    /**

@@ -16,50 +16,41 @@ use Symfony\Component\Mime\Email;
 #[Route('/admin/reponse')]
 final class ReponseController extends AbstractController
 {
-    #[Route('/reclamation/{id}/add', name: 'app_reponse_add', methods: ['GET', 'POST'])]
-    public function add(Request $request, Reclamation $reclamation, EntityManagerInterface $em, MailerInterface $mailer): Response
-    {
-        $reponse = new Reponse();
-        $reponse->setReclamation($reclamation);
-        
-        $form = $this->createForm(ReponseType::class, $reponse);
-        $form->handleRequest($request);
+    #[Route('/reclamation/{id}/add', name: 'app_reponse_add', methods: ['POST'])]
+public function add(
+    Request $request,
+    Reclamation $reclamation,
+    EntityManagerInterface $em,
+    MailerInterface $mailer
+): Response {
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Changer le statut de la réclamation si elle était en attente
-            if ($reclamation->getStatut() === 'en_attente') {
-                $reclamation->setStatut('en_cours');
-            }
+    $reponse = new Reponse();
+    $reponse->setReclamation($reclamation);
+    $reponse->setContenu($request->request->get('contenu'));
+    $reponse->setAuteur($request->request->get('auteur'));
 
-            $em->persist($reponse);
-            $em->flush();
-
-            // 🔥 ENVOI DE L'EMAIL
-            try {
-                $email = (new Email())
-                    ->from('noreply@sitmypet.com')
-                    ->to($reclamation->getEmailClient())
-                    ->subject('🐾 Nouvelle réponse à votre réclamation #' . $reclamation->getId())
-                    ->html($this->renderView('emails/nouvelle_reponse.html.twig', [
-                        'reclamation' => $reclamation,
-                        'reponse' => $reponse,
-                    ]));
-
-                $mailer->send($email);
-                
-                $this->addFlash('success', 'Réponse ajoutée avec succès et email envoyé au client !');
-            } catch (\Exception $e) {
-                $this->addFlash('warning', 'Réponse ajoutée mais l\'email n\'a pas pu être envoyé : ' . $e->getMessage());
-            }
-
-            return $this->redirectToRoute('app_reclamation_show', ['id' => $reclamation->getId()]);
-        }
-
-        return $this->render('reponse_back/add.html.twig', [
-            'reclamation' => $reclamation,
-            'form' => $form,
-        ]);
+    if ($reclamation->getStatut() === 'en_attente') {
+        $reclamation->setStatut('en_cours');
     }
+
+    $em->persist($reponse);
+    $em->flush();
+
+    // EMAIL
+    try {
+        $email = (new Email())
+            ->from('noreply@sitmypet.com')
+            ->to($reclamation->getEmailClient())
+            ->subject('Nouvelle réponse à votre réclamation #' . $reclamation->getId())
+            ->html('<p>Votre réclamation a reçu une réponse.</p><p>' . $reponse->getContenu() . '</p>');
+
+        $mailer->send($email);
+    } catch (\Exception $e) {}
+
+    return $this->redirectToRoute('app_admin_reclamation_index');
+}
+
 
     #[Route('/{id}/edit', name: 'app_reponse_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Reponse $reponse, EntityManagerInterface $em): Response

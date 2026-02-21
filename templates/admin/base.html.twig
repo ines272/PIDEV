@@ -457,35 +457,36 @@
     <nav class="sidebar-nav">
         <div class="sidebar-section">Principal</div>
 
-        <a href="{{ path('app_user_index') }}"
-           class="nav-link {{ app.request.attributes.get('_route') == 'app_user_index' ? 'active' : '' }}">
+        <a href="{{ path('app_admin_user_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') == 'app_admin_user_index' ? 'active' : '' }}">
             <i class="fas fa-chart-pie"></i> Dashboard
         </a>
 
         <div class="sidebar-section">Gestion</div>
 
-        <a href="{{ path('app_user_index') }}"
+        <a href="{{ path('app_admin_user_index') }}"
            class="nav-link {{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">
             <i class="fas fa-users"></i> Utilisateurs
         </a>
 
-        <a href="{{ path('app_pet') }}"
-           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_pet' ? 'active' : '' }}">
-            <i class="fas fa-paw"></i> Animaux
-        </a>
+        <a href="{{ path('app_admin_pet_index') }}"
+   class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_pet' ? 'active' : '' }}">
+    <i class="fas fa-paw"></i> Animaux
+</a>
 
-        <a href="{{ path('app_announcement') }}"
-           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_announcement' ? 'active' : '' }}">
+
+        <a href="{{ path('app_admin_announcement_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_announcement_index' ? 'active' : '' }}">
             <i class="fas fa-bullhorn"></i> Annonces
         </a>
 
-        <a href="{{ path('app_event') }}"
-           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_event' ? 'active' : '' }}">
+        <a href="{{ path('app_admin_event_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_event_index' ? 'active' : '' }}">
             <i class="fas fa-calendar-days"></i> Événements
         </a>
 
-        <a href="{{ path('app_reclamation_index') }}"
-           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_reclamation' ? 'active' : '' }}">
+        <a href="{{ path('app_admin_reclamation_index') }}"
+           class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_reclamation_index' ? 'active' : '' }}">
             <i class="fas fa-envelope-open"></i> Réclamations
         </a>
 

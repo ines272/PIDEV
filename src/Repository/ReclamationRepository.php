@@ -52,4 +52,37 @@ class ReclamationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findWithFiltersForUser(
+    $user,
+    ?string $search,
+    ?string $statut,
+    ?string $priorite,
+    string $orderBy = 'dateReclamation',
+    string $order = 'DESC'
+): array {
+    $qb = $this->createQueryBuilder('r')
+        ->andWhere('r.user = :user')
+        ->setParameter('user', $user);
+
+    if ($search) {
+        $qb->andWhere('r.sujet LIKE :search OR r.description LIKE :search OR r.nomClient LIKE :search')
+           ->setParameter('search', '%' . $search . '%');
+    }
+
+    if ($statut) {
+        $qb->andWhere('r.statut = :statut')
+           ->setParameter('statut', $statut);
+    }
+
+    if ($priorite) {
+        $qb->andWhere('r.priorite = :priorite')
+           ->setParameter('priorite', $priorite);
+    }
+
+    $qb->orderBy('r.' . $orderBy, $order);
+
+    return $qb->getQuery()->getResult();
+}
+
 }

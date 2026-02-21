@@ -105,4 +105,33 @@ class AnnouncementRepository extends ServiceEntityRepository
 
     return $qb->getQuery()->getResult();
 }
+
+public function searchByCriteriaForUser(
+    $user,
+    ?string $address,
+    ?string $dateDebut,
+    ?string $dateFin
+): array {
+
+    $qb = $this->createQueryBuilder('a')
+        ->andWhere('a.user = :user')
+        ->setParameter('user', $user);
+
+    if ($address) {
+        $qb->andWhere('a.address LIKE :address')
+           ->setParameter('address', '%' . $address . '%');
+    }
+
+    if ($dateDebut) {
+        $qb->andWhere('a.dateDebut >= :dateDebut')
+           ->setParameter('dateDebut', new \DateTime($dateDebut));
+    }
+
+    if ($dateFin) {
+        $qb->andWhere('a.dateFin <= :dateFin')
+           ->setParameter('dateFin', new \DateTime($dateFin));
+    }
+
+    return $qb->getQuery()->getResult();
+}
 }

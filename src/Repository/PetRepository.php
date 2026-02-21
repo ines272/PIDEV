@@ -7,6 +7,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Enum\PetType;
 use App\Enum\Gender;
+use App\Entity\User;
+
 
 
 /**
@@ -46,7 +48,7 @@ class PetRepository extends ServiceEntityRepository
     }
 
     if ($vaccinated !== null) {
-        $qb->andWhere('p.isVacinated = :vaccinated')
+        $qb->andWhere('p.isVaccinated = :vaccinated')
            ->setParameter('vaccinated', $vaccinated);
     }
 
@@ -55,8 +57,16 @@ class PetRepository extends ServiceEntityRepository
            ->setParameter('critical', $critical);
     }
 
+    // ✅ OWNER FILTER
+    if ($owner) {
+        $qb->andWhere('p.owner = :owner')
+           ->setParameter('owner', $owner);
+    }
+
     return $qb->getQuery()->getResult();
 }
+
+
 
     //    /**
     //     * @return Pet[] Returns an array of Pet objects
