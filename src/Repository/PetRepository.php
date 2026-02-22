@@ -66,7 +66,15 @@ class PetRepository extends ServiceEntityRepository
     return $qb->getQuery()->getResult();
 }
 
-
+public function findByOwner(User $owner): array
+{
+    return $this->createQueryBuilder('p')
+        ->andWhere('p.owner = :owner')
+        ->setParameter('owner', $owner)
+        ->orderBy('p.name', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
 
     //    /**
     //     * @return Pet[] Returns an array of Pet objects
