@@ -3,7 +3,8 @@
 {% block page_title %}Gestion des Événements{% endblock %}
 
 {% block content %}
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <div class="page-header">
     <h2>Tous les Événements</h2>
     <p>Liste complète des événements enregistrés.</p>
@@ -160,6 +161,22 @@
                                                       rows="3"
                                                       required>{{ event.description }}</textarea>
                                         </div>
+<div class="col-12">
+    <label class="form-label">Localisation (optionnel)</label>
+
+    <div id="map{{ event.id }}"
+         style="height:300px; border-radius:12px;"></div>
+
+    <input type="hidden"
+           name="latitude"
+           id="lat{{ event.id }}"
+           value="{{ event.latitude }}">
+
+    <input type="hidden"
+           name="longitude"
+           id="lng{{ event.id }}"
+           value="{{ event.longitude }}">
+</div>
 
                                     </div>
                                 </div>
@@ -195,4 +212,55 @@
     </div>
 </div>
 
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll("[id^='editModal']").forEach(function (modal) {
+
+        modal.addEventListener("shown.bs.modal", function () {
+
+            const eventId = modal.id.replace("editModal", "");
+
+            const mapContainer = document.getElementById("map" + eventId);
+            const latInput = document.getElementById("lat" + eventId);
+            const lngInput = document.getElementById("lng" + eventId);
+
+            if (!mapContainer.dataset.initialized) {
+
+                let lat = latInput.value ? parseFloat(latInput.value) : 36.8065;
+                let lng = lngInput.value ? parseFloat(lngInput.value) : 10.1815;
+
+                const map = L.map(mapContainer).setView([lat, lng], 13);
+
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "&copy; OpenStreetMap contributors"
+                }).addTo(map);
+
+                const marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+                marker.on("dragend", function (e) {
+                    const position = e.target.getLatLng();
+                    latInput.value = position.lat;
+                    lngInput.value = position.lng;
+                });
+
+                map.on("click", function (e) {
+                    marker.setLatLng(e.latlng);
+                    latInput.value = e.latlng.lat;
+                    lngInput.value = e.latlng.lng;
+                });
+
+                mapContainer.dataset.initialized = "true";
+
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 200);
+            }
+        });
+
+    });
+
+});
+</script>
 {% endblock %}

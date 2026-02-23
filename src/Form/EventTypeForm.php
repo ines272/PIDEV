@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class EventTypeForm extends AbstractType
 {
@@ -20,7 +21,13 @@ class EventTypeForm extends AbstractType
             ])
             ->add('heure')
             ->add('addresse')
-            ->add('description', TextareaType::class);
+            ->add('description', TextareaType::class)
+            ->add('latitude', HiddenType::class, [
+                'required' => false,
+            ])
+            ->add('longitude', HiddenType::class, [
+                'required' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
