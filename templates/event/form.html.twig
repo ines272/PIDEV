@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block body %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <section class="content">
     <div class="pet-form-card">
 
@@ -75,6 +77,16 @@
             </div>
         </div>
 
+        <div class="form-group full-width">
+    <label>Localisation (optionnel)</label>
+
+    <div id="map"
+         style="height: 350px; border-radius: 14px;"></div>
+
+    {{ form_widget(form.latitude) }}
+    {{ form_widget(form.longitude) }}
+</div>
+
         <div class="submit-area">
             <button class="btn-modern">
                 {{ is_edit ? 'Mettre à jour' : 'Enregistrer' }}
@@ -85,4 +97,38 @@
 
     </div>
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const latInput = document.getElementById("{{ form.latitude.vars.id }}");
+    const lngInput = document.getElementById("{{ form.longitude.vars.id }}");
+
+    let lat = latInput.value ? parseFloat(latInput.value) : 36.8065;
+    let lng = lngInput.value ? parseFloat(lngInput.value) : 10.1815;
+
+    const map = L.map("map").setView([lat, lng], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    const marker = L.marker([lat, lng], {
+        draggable: true
+    }).addTo(map);
+
+    marker.on("dragend", function(e) {
+        const position = e.target.getLatLng();
+        latInput.value = position.lat;
+        lngInput.value = position.lng;
+    });
+
+    map.on("click", function(e) {
+        marker.setLatLng(e.latlng);
+        latInput.value = e.latlng.lat;
+        lngInput.value = e.latlng.lng;
+    });
+
+});
+</script>
 {% endblock %}

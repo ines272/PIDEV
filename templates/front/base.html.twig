@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SitMyPet – Garde d'animaux{% endblock %}</title>
     
-    <link rel="stylesheet" href="{{ asset('css/front-style.css') }}">
+{{ importmap('app') }}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     {% if block('use_bootstrap') is defined and block('use_bootstrap') == 'true' %}
@@ -251,6 +251,14 @@
                     <i class="fa-solid fa-bullhorn"></i> Annonces
                 </a>
 
+<a href="{{ path('app_event_public') }}" 
+                   class="{{ app.request.get('_route') == 'app_event_public' ? 'active' }}">
+                    <i class="fa-solid fa-calendar-days"></i> Événements
+                </a>
+                <a href="{{ path('app_event_suggested') }}" 
+                   class="{{ app.request.get('_route') == 'app_event_suggested' ? 'active' }}">
+                    <i class="fa-solid fa-calendar-days"></i> Suggested Événements
+                </a>
                 <a href="{{ path('app_pet') }}" 
                    class="{{ app.request.get('_route') == 'app_pet' ? 'active' }}">
                     <i class="fa-solid fa-paw"></i> Animaux
@@ -266,7 +274,17 @@
                 
                 <a href="{{ path('app_event') }}" 
                    class="{{ app.request.get('_route') == 'app_event' ? 'active' }}">
+                    <i class="fa-solid fa-calendar-days"></i> Mes Événements
+                </a>
+
+                <a href="{{ path('app_event_public') }}" 
+                   class="{{ app.request.get('_route') == 'app_event_public' ? 'active' }}">
                     <i class="fa-solid fa-calendar-days"></i> Événements
+                </a>
+
+                <a href="{{ path('app_event_suggested') }}" 
+                   class="{{ app.request.get('_route') == 'app_event_suggested' ? 'active' }}">
+                    <i class="fa-solid fa-calendar-days"></i> Suggested Événements
                 </a>
 
                 <a href="{{ path('app_reclamation_index') }}" 

@@ -6,10 +6,19 @@ use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Enum\PetType;
+
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
 {
+    public function __construct()
+    {
+        $this->participants = new ArrayCollection();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -59,6 +68,52 @@ class Event
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'participatedEvents')]
+    #[ORM\JoinTable(name: 'event_participants')]
+    private Collection $participants;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $longitude = null;
+
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private ?string $targetPetType = null;
+
+    public function getTargetPetType(): ?string
+    {
+        return $this->targetPetType;
+    }
+
+    public function setTargetPetType(?string $targetPetType): static
+    {
+        $this->targetPetType = $targetPetType;
+        return $this;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): static
+    {
+        $this->latitude = $latitude;
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): static
+    {
+        $this->longitude = $longitude;
+        return $this;
+    }
 
     public function getId(): ?int
     {
@@ -129,6 +184,30 @@ class Event
     public function setUser(?User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getParticipants(): Collection
+    {
+        return $this->participants;
+    }
+
+    public function addParticipant(User $user): static
+    {
+        if (!$this->participants->contains($user)) {
+            $this->participants->add($user);
+        }
+
+        return $this;
+    }
+
+    public function removeParticipant(User $user): static
+    {
+        $this->participants->removeElement($user);
+
         return $this;
     }
 }

@@ -8,6 +8,30 @@
             <td>{{ event.addresse }}</td>
             <td>{{ event.description }}</td>
 
+            <!-- 🔥 PARTICIPATION COLUMN -->
+            <td>
+                {% if event.user != app.user %}
+                    {% if app.user in event.participants %}
+                        <span class="badge bg-success">
+                            ✔ Déjà inscrit
+                        </span>
+
+                        <a href="{{ path('app_event_unregister', {'id': event.id}) }}"
+                           class="btn btn-sm btn-danger">
+                            Annuler
+                        </a>
+                    {% else %}
+                        <a href="{{ path('app_event_register', {'id': event.id}) }}"
+                           class="btn btn-sm btn-success">
+                            Participer
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <span class="text-muted">Votre événement</span>
+                {% endif %}
+            </td>
+
+            <!-- ACTIONS COLUMN -->
             <td class="actions">
                 <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn-edit">
                     <i class="fa-solid fa-pen"></i>
@@ -32,7 +56,7 @@
     {% endfor %}
 {% else %}
     <tr>
-        <td colspan="6" class="empty-row">
+        <td colspan="7" class="empty-row">
             📅 Aucun événement enregistré pour le moment.
         </td>
     </tr>

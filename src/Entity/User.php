@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
 
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'utilisateurs')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -107,7 +108,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $plainPassword = null;
 
     // ============ RELATIONS ============
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Pet::class)]
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class)]
     private Collection $pets;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Announcement::class)]
@@ -116,6 +117,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Event::class)]
     private Collection $events;
 
+    #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'participants')]
+    private Collection $participatedEvents;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -123,6 +127,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->pets = new ArrayCollection();
         $this->announcements = new ArrayCollection();
         $this->events = new ArrayCollection();
+        $this->participatedEvents = new ArrayCollection();
+    }
+
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getParticipatedEvents(): Collection
+    {
+        return $this->participatedEvents;
     }
 
     #[ORM\PreUpdate]
@@ -156,7 +170,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         $roles[] = 'ROLE_USER';
-        
+
         if ($this->role) {
             $roles[] = $this->role;
         }
