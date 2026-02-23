@@ -10,97 +10,100 @@
 
         <div class="form-header">
             <h2>
-                {{ is_edit ? 'Modifier une annonce' : 'Créer une annonce' }}
+                {{ is_edit ? '📢 Modifier une annonce' : '📢 Créer une annonce' }}
             </h2>
             <a href="{{ path('app_announcement') }}" class="back-link">← Retour</a>
         </div>
 
         {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
 
-        {# GLOBAL ERRORS #}
         {% if form_errors(form) %}
             <div class="form-global-error">
                 {{ form_errors(form) }}
             </div>
         {% endif %}
 
-        <div class="form-grid">
+        <!-- 1️⃣ ANIMAL -->
+        <div class="form-group {{ form.pet.vars.errors|length > 0 ? 'has-error' : '' }}">
+            <label>Animal</label>
+            {{ form_widget(form.pet, {'attr': {'class': 'input-modern'}}) }}
+            <div class="error-message">
+                {{ form_errors(form.pet) }}
+            </div>
+        </div>
 
-            <!-- LEFT COLUMN -->
-            <div class="left-column">
+        <!-- 2️⃣ TYPE DE GARDE -->
+        <div class="{{ form.careType.vars.errors|length > 0 ? 'has-error' : '' }}">
+            <label class="section-label">Type de garde</label>
+            <div class="type-grid">
+                {% for child in form.careType %}
+                    <label class="type-card">
+                        {{ form_widget(child, {'attr': {'class': 'care-type-option'}}) }}
+                        {{ child.vars.label }}
+                    </label>
+                {% endfor %}
+            </div>
+            <div class="error-message">
+                {{ form_errors(form.careType) }}
+            </div>
+        </div>
 
-                <div class="form-group {{ form.address.vars.errors|length > 0 ? 'has-error' : '' }}">
-                    <label>Adresse</label>
-                    {{ form_widget(form.address, {'attr': {'class': 'input-modern'}}) }}
-                    <div class="error-message">
-                        {{ form_errors(form.address) }}
-                    </div>
+        <!-- 3️⃣ SECTION CHEZ MOI (DYNAMIQUE) -->
+        <div id="chezMoiSection" style="display:none;">
+
+            <div class="form-group {{ form.visitPerDay.vars.errors|length > 0 ? 'has-error' : '' }}">
+                <label>Visites / jour</label>
+                {{ form_widget(form.visitPerDay, {'attr': {'class': 'input-modern'}}) }}
+                <div class="error-message">
+                    {{ form_errors(form.visitPerDay) }}
                 </div>
-
-                <div class="form-group {{ form.longitude.vars.errors|length > 0 ? 'has-error' : '' }}">
-                    <label>Longitude</label>
-                    {{ form_widget(form.longitude, {'attr': {'class': 'input-modern'}}) }}
-                    <div class="error-message">
-                        {{ form_errors(form.longitude) }}
-                    </div>
-                </div>
-
-                <div class="form-group {{ form.altitude.vars.errors|length > 0 ? 'has-error' : '' }}">
-                    <label>Altitude</label>
-                    {{ form_widget(form.altitude, {'attr': {'class': 'input-modern'}}) }}
-                    <div class="error-message">
-                        {{ form_errors(form.altitude) }}
-                    </div>
-                </div>
-
-                <div class="form-group {{ form.visitPerDay.vars.errors|length > 0 ? 'has-error' : '' }}">
-                    <label>Visites / jour</label>
-                    {{ form_widget(form.visitPerDay, {'attr': {'class': 'input-modern'}}) }}
-                    <div class="error-message">
-                        {{ form_errors(form.visitPerDay) }}
-                    </div>
-                </div>
-
             </div>
 
-            <!-- RIGHT COLUMN -->
-            <div class="right-column">
+            <!-- Horaire dynamique -->
+           <div class="form-group">
+  
 
-                <div class="{{ form.careType.vars.errors|length > 0 ? 'has-error' : '' }}">
-                    <label class="section-label">Type de garde</label>
-                    <div class="type-grid">
-                        {% for child in form.careType %}
-                            <label class="type-card">
-                                {{ form_widget(child) }}
-                                {{ child.vars.label }}
-                            </label>
-                        {% endfor %}
-                    </div>
-                    <div class="error-message">
-                        {{ form_errors(form.careType) }}
-                    </div>
+    <div id="horaireContainer">
+    {% if form.visitHours.vars.data is not empty %}
+        {% for horaire in form.visitHours.vars.data %}
+            <div class="visit-item" style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                <span class="visit-label" style="font-weight:600;">Visite {{ loop.index }}</span>
+                <input type="time" name="{{ form.visitHours.vars.full_name }}[]" class="input-modern" value="{{ horaire|date('H:i') }}">
+                <button type="button" class="delete-btn" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:5px;">✖</button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+    <button type="button" class="btn-modern" id="addHoraireBtn" style="margin-top:10px;">
+        + Ajouter une visite
+    </button>
+</div>
+
+        </div>
+
+        <!-- 4️⃣ DURÉE DE GARDE -->
+        <div class="form-grid">
+
+            <div class="form-group {{ form.dateDebut.vars.errors|length > 0 ? 'has-error' : '' }}">
+                <label>Date début</label>
+                {{ form_widget(form.dateDebut, {'attr': {'class': 'input-modern'}}) }}
+                <div class="error-message">
+                    {{ form_errors(form.dateDebut) }}
                 </div>
+            </div>
 
-                <div class="form-group {{ form.dateDebut.vars.errors|length > 0 ? 'has-error' : '' }}">
-                    <label>Date début</label>
-                    {{ form_widget(form.dateDebut, {'attr': {'class': 'input-modern'}}) }}
-                    <div class="error-message">
-                        {{ form_errors(form.dateDebut) }}
-                    </div>
+            <div class="form-group {{ form.dateFin.vars.errors|length > 0 ? 'has-error' : '' }}">
+                <label>Date fin</label>
+                {{ form_widget(form.dateFin, {'attr': {'class': 'input-modern'}}) }}
+                <div class="error-message">
+                    {{ form_errors(form.dateFin) }}
                 </div>
-
-                <div class="form-group {{ form.dateFin.vars.errors|length > 0 ? 'has-error' : '' }}">
-                    <label>Date fin</label>
-                    {{ form_widget(form.dateFin, {'attr': {'class': 'input-modern'}}) }}
-                    <div class="error-message">
-                        {{ form_errors(form.dateFin) }}
-                    </div>
-                </div>
-
             </div>
 
         </div>
 
+         <!-- 6️⃣ RÉMUNÉRATION -->
         <div class="form-grid" style="margin-top:30px;">
 
             <div class="form-group {{ form.renumerationMin.vars.errors|length > 0 ? 'has-error' : '' }}">
@@ -121,6 +124,24 @@
 
         </div>
 
+        <!-- 5️⃣ ADRESSE -->
+        <div class="form-group {{ form.address.vars.errors|length > 0 ? 'has-error' : '' }}">
+            <label>Adresse</label>
+            {{ form_widget(form.address, {'attr': {'class': 'input-modern'}}) }}
+            <div class="error-message">
+                {{ form_errors(form.address) }}
+            </div>
+        </div>
+       <!-- 5️⃣ sevice -->
+        <div class="form-group {{ form.address.vars.errors|length > 0 ? 'has-error' : '' }}">
+            <label>service</label>
+            {{ form_widget(form.services, {'attr': {'class': 'input-modern'}}) }}
+            <div class="error-message">
+                {{ form_errors(form.services) }}
+            </div>
+        </div>
+       
+
         <div class="submit-area">
             <button class="btn-modern">
                 {{ is_edit ? 'Mettre à jour' : 'Créer' }}
@@ -131,4 +152,112 @@
 
     </div>
 </section>
+
+<!-- SCRIPT -->
+<script>
+document.querySelectorAll('#horaireContainer .delete-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        this.parentElement.remove();
+        updateLabels();
+    });
+});
+document.addEventListener("DOMContentLoaded", function() {
+
+    const chezMoiSection = document.getElementById('chezMoiSection');
+    const careTypeOptions = document.querySelectorAll('.care-type-option');
+    const addHoraireBtn = document.getElementById('addHoraireBtn');
+    const horaireContainer = document.getElementById('horaireContainer');
+
+    // ===============================
+    // Affichage dynamique CHEZ_MOI
+    // ===============================
+    function toggleChezMoi() {
+        let show = false;
+
+        careTypeOptions.forEach(option => {
+            if (option.checked && option.value === "0") {
+                show = true;
+            }
+        });
+
+        chezMoiSection.style.display = show ? "block" : "none";
+    }
+
+    toggleChezMoi();
+
+    careTypeOptions.forEach(option => {
+        option.addEventListener("change", toggleChezMoi);
+    });
+
+    // ===============================
+    // Gestion des horaires dynamiques
+    // ===============================
+
+    function updateLabels() {
+        const allVisits = horaireContainer.querySelectorAll('.visit-item');
+
+        allVisits.forEach((item, index) => {
+            const label = item.querySelector('.visit-label');
+            label.textContent = "Visite " + (index + 1);
+        });
+    }
+
+    function createHoraireInput() {
+
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('visit-item');
+        wrapper.style.display = "flex";
+        wrapper.style.alignItems = "center";
+        wrapper.style.gap = "10px";
+        wrapper.style.marginTop = "10px";
+
+        const label = document.createElement('span');
+        label.classList.add('visit-label');
+        label.style.fontWeight = "600";
+
+        const input = document.createElement('input');
+        input.type = 'time';
+        input.name = '{{ form.visitHours.vars.full_name }}[]';
+        input.classList.add('input-modern');
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = "button";
+        deleteBtn.textContent = "✖";
+        deleteBtn.style.background = "#ff4d4d";
+        deleteBtn.style.color = "white";
+        deleteBtn.style.border = "none";
+        deleteBtn.style.padding = "5px 10px";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.style.borderRadius = "5px";
+
+        deleteBtn.addEventListener('click', function() {
+            wrapper.remove();
+            updateLabels();
+        });
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        wrapper.appendChild(deleteBtn);
+
+        horaireContainer.appendChild(wrapper);
+
+        updateLabels();
+    }
+
+    // Ajouter première visite automatiquement si CHEZ_MOI sélectionné
+    careTypeOptions.forEach(option => {
+        option.addEventListener("change", function() {
+            if (this.checked && this.value === "0") {
+                if (horaireContainer.children.length === 0) {
+                    createHoraireInput();
+                }
+            }
+        });
+    });
+
+    addHoraireBtn.addEventListener('click', createHoraireInput);
+
+});
+</script>
+
 {% endblock %}

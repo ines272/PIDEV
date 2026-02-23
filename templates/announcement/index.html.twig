@@ -17,15 +17,10 @@
         <!-- SEARCH BAR -->
         <form method="get" class="search-bar" id="filterForm">
             <input type="text" name="address" placeholder="🔍 Adresse">
-
             <input type="date" name="dateDebut">
             <input type="date" name="dateFin">
-
             <button type="submit" class="btn-search">Rechercher</button>
-
-            <button type="button" id="resetFilters" class="btn-reset">
-                Réinitialiser
-            </button>
+            <button type="button" id="resetFilters" class="btn-reset">Réinitialiser</button>
         </form>
 
         <!-- TABLE -->
@@ -33,18 +28,99 @@
             <table class="pet-table">
                 <thead>
                     <tr>
-                        <th>Adresse</th>
-                        <th>Type</th>
+                        <th>Animal</th>
+                        <th>Type de garde</th>
+                        <th>Visites</th>
+                        <th>Horaires</th>
                         <th>Date début</th>
                         <th>Date fin</th>
-                        <th>Visites</th>
-                        <th>Min</th>
-                        <th>Max</th>
+                        <th>Rémunération min</th>
+                        <th>Rémunération max</th>
+                        <th>Adresse</th>
+                        <th>Services</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
 
-                {% include 'announcement/_table.html.twig' %}
+                <tbody>
+                {% for announcement in announcements %}
+                    <tr>
+                        {# Animal #}
+                        <td>
+                          {% if announcement.pet %}
+    {{ announcement.pet.name }} ({{ announcement.pet.typePet.value|lower }})
+{% endif %}
+                        </td>
+
+                        {# Type de garde #}
+                       {# Type de garde #}
+<td>
+    {% if announcement.careType %}
+        {% if announcement.careType.value == 'CHEZ_MOI' %}
+            Chez moi
+        {% elseif announcement.careType.value == 'CHENIL' %}
+            Chenil
+        {% else %}
+            {{ announcement.careType.value }}
+        {% endif %}
+    {% else %}
+        ---
+    {% endif %}
+</td>
+
+                        {# Visites par jour #}
+                       
+<td>
+    {% if announcement.careType 
+        and announcement.careType.value == 'CHEZ_MOI' 
+        and announcement.visitPerDay is not empty %}
+        
+        {{ announcement.visitPerDay }} /jour
+    {% else %}
+        ---
+    {% endif %}
+</td>
+                        {# Horaires de visite #}
+                        <td>
+    {% if announcement.careType and announcement.careType.value == 'CHEZ_MOI' and announcement.visitHours %}
+        {% for horaire in announcement.visitHours %}
+            {{ horaire }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    {% else %}
+        ---
+    {% endif %}
+</td>
+
+                        {# Dates #}
+                        <td>{{ announcement.dateDebut ? announcement.dateDebut|date('d/m/Y') : '' }}</td>
+                        <td>{{ announcement.dateFin ? announcement.dateFin|date('d/m/Y') : '' }}</td>
+
+                        {# Rémunération #}
+                        <td>{{ announcement.renumerationMin }} €</td>
+                        <td>{{ announcement.renumerationMax ? announcement.renumerationMax ~ ' €' : '---' }}</td>
+
+                        {# Adresse #}
+                        <td>{{ announcement.address }}</td>
+
+                        {# Services #}
+                        <td>{{ announcement.services ?: '---' }}</td>
+
+                        {# Actions #}
+                        <td>
+                            <a href="{{ path('app_announcement_edit', {'id': announcement.id}) }}" class="btn btn-sm btn-primary">✏️</a>
+                            <form method="post" action="{{ path('app_announcement_delete', {'id': announcement.id}) }}"
+                                  class="delete-form" data-item-name="{{ announcement.pet ? announcement.pet.name : 'cette annonce' }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_announcement_' ~ announcement.id) }}">
+                                <button type="button" class="open-delete-modal btn btn-sm btn-danger">🗑️</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="11">Aucune annonce trouvée.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
             </table>
         </div>
 
@@ -56,7 +132,6 @@
     <div class="modal-box">
         <h3>Supprimer l’annonce</h3>
         <p id="deleteMessage"></p>
-
         <div class="modal-actions">
             <button id="cancelDelete" class="btn-cancel">Annuler</button>
             <button id="confirmDelete" class="btn-danger">Supprimer</button>
@@ -66,20 +141,13 @@
 
 {% block javascripts %}
 <script>
-
 document.addEventListener("DOMContentLoaded", function() {
-
     const form = document.getElementById('filterForm');
     const resetBtn = document.getElementById('resetFilters');
     const tableBodySelector = '.pet-table tbody';
 
-    /* =========================
-       AJAX FILTER FUNCTION
-    ========================== */
     function fetchFilteredData() {
-
         const params = new URLSearchParams(new FormData(form));
-
         fetch('/announcement/filter?' + params.toString())
             .then(response => response.text())
             .then(html => {
@@ -88,45 +156,28 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 
-    /* =========================
-       LIVE FILTER ON INPUT CHANGE
-    ========================== */
     form.querySelectorAll('input').forEach(input => {
         input.addEventListener('change', fetchFilteredData);
         input.addEventListener('keyup', fetchFilteredData);
     });
 
-    /* =========================
-       RESET FILTERS
-    ========================== */
     resetBtn.addEventListener('click', function () {
-
         form.querySelectorAll('input').forEach(el => el.value = '');
-
         fetchFilteredData();
     });
-
-    /* =========================
-       DELETE MODAL LOGIC
-    ========================== */
 
     const modal = document.getElementById('deleteModal');
     const deleteMessage = document.getElementById('deleteMessage');
     const confirmBtn = document.getElementById('confirmDelete');
     const cancelBtn = document.getElementById('cancelDelete');
-
     let currentForm = null;
 
     function attachDeleteEvents() {
         document.querySelectorAll('.open-delete-modal').forEach(button => {
             button.addEventListener('click', function() {
-
                 currentForm = this.closest('.delete-form');
                 const itemName = currentForm.dataset.itemName;
-
-                deleteMessage.innerText =
-                    'Voulez-vous vraiment supprimer "' + itemName + '" ?';
-
+                deleteMessage.innerText = 'Voulez-vous vraiment supprimer "' + itemName + '" ?';
                 modal.style.display = "flex";
             });
         });
@@ -150,7 +201,6 @@ document.addEventListener("DOMContentLoaded", function() {
             modal.style.display = "none";
         }
     });
-
 });
 </script>
 {% endblock %}

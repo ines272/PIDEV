@@ -116,10 +116,7 @@
                     {{ reclamation.reponses|length }}
                 </span>
             </h2>
-            <a href="{{ path('app_reponse_add', {id: reclamation.id}) }}" 
-               style="padding: 12px 20px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);">
-                ➕ Ajouter une réponse
-            </a>
+            
         </div>
 
         {# LISTE DES RÉPONSES #}
@@ -137,10 +134,7 @@
                             </span>
                         </div>
                         <div style="display: flex; gap: 8px;">
-                            <a href="{{ path('app_reponse_edit', {id: reponse.id}) }}" 
-                               style="padding: 6px 12px; background: #f5a623; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600;">
-                                ✏️ Modifier
-                            </a>
+                            
                             <form method="post" action="{{ path('app_reponse_delete', {id: reponse.id}) }}" style="display: inline;">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reponse.id) }}">
                                 <button type="submit" 
