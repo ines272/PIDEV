@@ -1,6 +1,6 @@
 # 🐾 SitMyPet - Plateforme de garde d'animaux
 
-Application web de mise en relation entre propriétaires d'animaux et gardiens de confiance, développée avec Symfony 7.1.
+Application web de mise en relation entre propriétaires d'animaux et gardiens de confiance, développée avec Symfony 6.4.
 
 ## 🎯 À propos du projet
 
