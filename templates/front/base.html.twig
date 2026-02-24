@@ -13,6 +13,117 @@
     {% endif %}
     
     <style>
+
+        /* ============================= */
+/* NOTIFICATION BELL */
+/* ============================= */
+
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ff4d6d;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* ============================= */
+/* DROPDOWN CONTAINER */
+/* ============================= */
+
+.notification-dropdown {
+    position: absolute;
+    top: 60px;
+    right: 70px;
+    width: 320px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    overflow: hidden;
+    display: none;
+    z-index: 2000;
+    animation: slideDownNotif 0.25s ease;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+@keyframes slideDownNotif {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================= */
+/* NOTIFICATION ITEMS */
+/* ============================= */
+
+.notification-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f1f1;
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background: #f8f5ff;
+}
+
+.notification-item strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.notification-item p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+}
+
+/* Unread style */
+.notification-item.unread {
+    background: #f3e8ff;
+}
+
+.notification-item.unread strong {
+    color: #7c3aed;
+}
+
+/* Loading state */
+.notification-loading {
+    padding: 18px;
+    text-align: center;
+    font-size: 14px;
+    color: #7c3aed;
+    font-weight: 500;
+}
         /* Menu dropdown utilisateur */
         .user-menu {
             position: relative;
@@ -228,8 +339,10 @@
         });
     });
 </script>
-<body class="{% block body_class %}{% endblock %}">
-
+<body 
+    class="{% block body_class %}{% endblock %}"
+    data-user-id="{{ app.user ? app.user.id : '' }}"
+>
 {% if block('show_navbar') is not defined or block('show_navbar') != 'false' %}
 <header class="navbar">
     <div class="logo">
@@ -237,27 +350,22 @@
     </div>
 
     <nav class="nav-links">
-        {# HOME - Visible pour TOUS #}
-        <a href="{{ path('app_home') }}" 
-           class="{{ app.request.get('_route') == 'app_home' ? 'active' }}">
-            <i class="fa-solid fa-house"></i> Accueil
-        </a>
+        
 
         {% if app.user %}
             {# ========== MENU PROPRIÉTAIRE ========== #}
-            {% if is_granted('ROLE_PROPRIETAIRE') %}                
+            {% if is_granted('ROLE_PROPRIETAIRE') %}          
+            <a href="{{ path('proprietaire_dashboard') }}">
+    <i class="fa-solid fa-briefcase"></i> Dashboard
+</a>      
                 <a href="{{ path('app_announcement') }}" 
                    class="{{ app.request.get('_route') == 'app_announcement' ? 'active' }}">
                     <i class="fa-solid fa-bullhorn"></i> Annonces
                 </a>
 
-<a href="{{ path('app_event_public') }}" 
-                   class="{{ app.request.get('_route') == 'app_event_public' ? 'active' }}">
-                    <i class="fa-solid fa-calendar-days"></i> Événements
-                </a>
                 <a href="{{ path('app_event_suggested') }}" 
                    class="{{ app.request.get('_route') == 'app_event_suggested' ? 'active' }}">
-                    <i class="fa-solid fa-calendar-days"></i> Suggested Événements
+                    <i class="fa-solid fa-calendar-days"></i> Événements
                 </a>
                 <a href="{{ path('app_pet') }}" 
                    class="{{ app.request.get('_route') == 'app_pet' ? 'active' }}">
@@ -271,20 +379,18 @@
 
             {# ========== MENU GARDIEN ========== #}
             {% elseif is_granted('ROLE_GARDIEN') %}
+            {# HOME - Visible pour TOUS #}
+        <a href="{{ path('app_home') }}" 
+           class="{{ app.request.get('_route') == 'app_home' ? 'active' }}">
+            <i class="fa-solid fa-house"></i> Accueil
+        </a>
+            <a href="{{ path('gardien_dashboard') }}">
+    <i class="fa-solid fa-paper-plane"></i> Mes Postulations
+</a>
                 
                 <a href="{{ path('app_event') }}" 
                    class="{{ app.request.get('_route') == 'app_event' ? 'active' }}">
                     <i class="fa-solid fa-calendar-days"></i> Mes Événements
-                </a>
-
-                <a href="{{ path('app_event_public') }}" 
-                   class="{{ app.request.get('_route') == 'app_event_public' ? 'active' }}">
-                    <i class="fa-solid fa-calendar-days"></i> Événements
-                </a>
-
-                <a href="{{ path('app_event_suggested') }}" 
-                   class="{{ app.request.get('_route') == 'app_event_suggested' ? 'active' }}">
-                    <i class="fa-solid fa-calendar-days"></i> Suggested Événements
                 </a>
 
                 <a href="{{ path('app_reclamation_index') }}" 
@@ -304,9 +410,14 @@
             <a href="{{ path('app_admin_user_index') }}" class="admin-btn">Admin Portal</a>
         {% endif %}
         
-        <div class="icon-btn">
-            <i class="fa-regular fa-bell"></i>
-        </div>
+        <div class="icon-btn notification-bell" id="notificationBtn">
+    <i class="fa-regular fa-bell"></i>
+    <span class="notification-count" id="notificationCount">0</span>
+</div>
+
+<div class="notification-dropdown" id="notificationDropdown">
+    <div class="notification-loading">Chargement...</div>
+</div>
         <div class="icon-btn">
             <i class="fa-regular fa-moon"></i>
         </div>
@@ -477,6 +588,175 @@
             window.location.href = "{{ path('app_logout') }}";
         });
     }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    const notificationCount = document.getElementById('notificationCount');
+
+    if (!notificationBtn || !notificationDropdown || !notificationCount) return;
+
+    // ===============================
+    // REFRESH UNREAD COUNTER
+    // ===============================
+    function refreshCount() {
+        fetch('/notifications/count-unread')
+            .then(response => response.json())
+            .then(data => {
+                notificationCount.textContent = data.count;
+
+                if (data.count > 0) {
+                    notificationCount.style.display = 'flex';
+                } else {
+                    notificationCount.style.display = 'none';
+                }
+            });
+    }
+
+    // ===============================
+    // LOAD NOTIFICATIONS
+    // ===============================
+    function loadNotifications() {
+
+notificationDropdown.innerHTML = `
+    <div class="notification-loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Chargement...
+    </div>
+`;
+
+        fetch('/notifications/latest')
+            .then(response => response.json())
+            .then(data => {
+
+                notificationDropdown.innerHTML = '';
+
+                if (data.length === 0) {
+                    notificationDropdown.innerHTML =
+                        '<div class="notification-item">Aucune notification</div>';
+                    return;
+                }
+
+                data.forEach(notification => {
+
+                    const item = document.createElement('div');
+                    item.classList.add('notification-item');
+
+                    if (!notification.isRead) {
+                        item.classList.add('unread');
+                    }
+
+                    item.innerHTML = `
+                        <strong>${notification.title}</strong>
+                        <p>${notification.message}</p>
+                    `;
+
+                    // CLICK HANDLER
+                    item.addEventListener('click', function () {
+
+                        fetch(`/notifications/${notification.id}/mark-read`, {
+                            method: 'POST'
+                        })
+                        .then(() => {
+
+                            refreshCount();
+
+                            if (notification.actionUrl) {
+                                window.location.href = notification.actionUrl;
+                            } else {
+                                loadNotifications();
+                            }
+
+                        });
+
+                    });
+
+                    notificationDropdown.appendChild(item);
+                });
+            });
+    }
+
+    // ===============================
+    // INITIAL LOAD
+    // ===============================
+    refreshCount();
+
+    // ===============================
+    // TOGGLE DROPDOWN
+    // ===============================
+    notificationBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+
+        notificationDropdown.classList.toggle('show');
+
+        if (notificationDropdown.classList.contains('show')) {
+            loadNotifications();
+        }
+    });
+
+    // ===============================
+    // CLOSE ON OUTSIDE CLICK
+    // ===============================
+    document.addEventListener('click', function (event) {
+        if (!notificationDropdown.contains(event.target) &&
+            !notificationBtn.contains(event.target)) {
+            notificationDropdown.classList.remove('show');
+        }
+    });
+
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const userId = document.body.dataset.userId;
+    if (!userId) return;
+
+    let socket;
+
+    function connectWebSocket() {
+
+        socket = new WebSocket("ws://localhost:8081");
+
+        socket.onopen = function () {
+            console.log("✅ WS Connected");
+
+            socket.send(JSON.stringify({
+                type: 'register',
+                userId: userId
+            }));
+        };
+
+        socket.onmessage = function (event) {
+            console.log("Realtime notification:", event.data);
+
+            fetch('/notifications/count-unread')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationCount = document.getElementById('notificationCount');
+                    notificationCount.textContent = data.count;
+                    notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
+                });
+        };
+
+        socket.onerror = function (error) {
+            console.log("❌ WS Error:", error);
+            socket.close();
+        };
+
+        socket.onclose = function () {
+            console.log("⚠️ WS Disconnected. Reconnecting in 3s...");
+            setTimeout(connectWebSocket, 3000);
+        };
+    }
+
+    connectWebSocket();
+
+});
 </script>
 {% endif %}
 

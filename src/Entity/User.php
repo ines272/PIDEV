@@ -120,6 +120,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'participants')]
     private Collection $participatedEvents;
 
+    #[ORM\OneToMany(mappedBy: 'applicant', targetEntity: Postulation::class)]
+    private Collection $postulations;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Postulation::class)]
+    private Collection $receivedPostulations;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -128,6 +134,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->announcements = new ArrayCollection();
         $this->events = new ArrayCollection();
         $this->participatedEvents = new ArrayCollection();
+        $this->postulations = new ArrayCollection();
+        $this->receivedPostulations = new ArrayCollection();
     }
 
 
@@ -437,4 +445,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->deletedAt !== null;
     }
+
+    /**
+     * @return Collection<int, Postulation>
+     */
+    public function getPostulations(): Collection
+    {
+        return $this->postulations;
+    }
+
+    /**
+     * @return Collection<int, Postulation>
+     */
+    public function getReceivedPostulations(): Collection
+    {
+        return $this->receivedPostulations;
+    }   
 }

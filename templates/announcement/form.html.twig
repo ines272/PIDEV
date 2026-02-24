@@ -147,9 +147,8 @@
                 {{ is_edit ? 'Mettre à jour' : 'Créer' }}
             </button>
         </div>
-
-        {{ form_end(form) }}
-
+{{ form_row(form._token) }}
+{{ form_end(form, { render_rest: false }) }}
     </div>
 </section>
 

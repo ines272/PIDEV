@@ -51,14 +51,14 @@ class AnnouncementType extends AbstractType
 
             // 3️⃣ Adresse
             ->add('address')
-             
-            
+
+
             // 3️⃣ service
             ->add('services', TextType::class, [
-    'required' => true,
-])
+                'required' => true,
+            ])
 
-             ->add('visitPerDay', NumberType::class, [
+            ->add('visitPerDay', NumberType::class, [
                 'required' => false,
                 'label' => 'Visites / jour',
             ])
@@ -70,8 +70,9 @@ class AnnouncementType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,
-              
+
                 'required' => false,
+                'mapped' => true,
             ])
 
             // 5️⃣ Durée de garde
