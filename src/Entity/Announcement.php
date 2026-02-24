@@ -9,14 +9,21 @@ use App\Enum\TypeGuard;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use App\Entity\Pet;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: AnnouncementRepository::class)]
 class Announcement
 {
-   #[ORM\ManyToOne]
-#[ORM\JoinColumn(nullable: false)]
-#[Assert\NotNull(message: "Choisissez un animal.")]
-private ?Pet $pet = null;
+
+    public function __construct()
+    {
+        $this->postulations = new ArrayCollection();
+    }
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Choisissez un animal.")]
+    private ?Pet $pet = null;
 
     public function getPet(): ?Pet
     {
@@ -57,7 +64,7 @@ private ?Pet $pet = null;
     private ?\DateTime $dateFin = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\NotBlank(message: "Le nombre de visites est obligatoire.")]
+    // #[Assert\NotBlank(message: "Le nombre de visites est obligatoire.")]
     private ?int $visitPerDay = null;
 
     #[ORM\Column]
@@ -71,11 +78,12 @@ private ?Pet $pet = null;
     #[Assert\Positive(message: "La rémunération maximale doit être positive.")]
     private ?float $renumerationMax = null;
 
+    #[ORM\OneToMany(mappedBy: 'announcement', targetEntity: Postulation::class, cascade: ['remove'])]
+    private Collection $postulations;
 
-
-#[ORM\Column(length: 255, nullable: true)]
-#[Assert\NotBlank(message: "Le service est obligatoire.")]
-private ?string $services = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank(message: "Le service est obligatoire.")]
+    private ?string $services = null;
 
 
 
@@ -127,11 +135,11 @@ private ?string $services = null;
                     ->addViolation();
             }
 
-            if (empty($this->visitHours)) {
-                $context->buildViolation("Veuillez ajouter au moins un horaire de visite.")
-                    ->atPath('visitHours')
-                    ->addViolation();
-            }
+            // if (empty($this->visitHours)) {
+            //     $context->buildViolation("Veuillez ajouter au moins un horaire de visite.")
+            //         ->atPath('visitHours')
+            //         ->addViolation();
+            // }
         }
     }
 
@@ -202,10 +210,10 @@ private ?string $services = null;
     }
 
     public function setVisitPerDay(?int $visitPerDay): static
-{
-    $this->visitPerDay = $visitPerDay;
-    return $this;
-}
+    {
+        $this->visitPerDay = $visitPerDay;
+        return $this;
+    }
 
     public function getRenumerationMin(): ?float
     {
@@ -229,14 +237,22 @@ private ?string $services = null;
         return $this;
     }
 
-public function getServices(): ?string
-{
-    return $this->services;
-}
+    public function getServices(): ?string
+    {
+        return $this->services;
+    }
 
-public function setServices(?string $services): static
-{
-    $this->services = $services;
-    return $this;
-}
+    public function setServices(?string $services): static
+    {
+        $this->services = $services;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Postulation>
+     */
+    public function getPostulations(): Collection
+    {
+        return $this->postulations;
+    }
 }

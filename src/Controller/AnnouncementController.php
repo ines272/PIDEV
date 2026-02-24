@@ -76,11 +76,7 @@ final class AnnouncementController extends AbstractController
 
         $form->handleRequest($request);
 
-        // Récupérer les horaires
-        $horaires = $request->request->all('horaire');
-        if (!empty($horaires)) {
-            $announcement->setVisitHours($horaires);
-        }
+        
 
         if ($form->isSubmitted() && $form->isValid()) {
             // ✅ Utilisation de l'import (sans backslash)
@@ -117,8 +113,7 @@ final class AnnouncementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $horaires = $request->request->all('horaire');
-            $announcement->setVisitHours($horaires);
+   
 
             // ✅ Utilisation de l'import
             if ($announcement->getCareType() !== TypeGuard::CHEZ_MOI) {
@@ -140,7 +135,7 @@ final class AnnouncementController extends AbstractController
     #[Route('/announcement/{id}/delete', name: 'app_announcement_delete', methods: ['POST'])]
     public function delete(Announcement $announcement, Request $request, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete_announcement_'.$announcement->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete_announcement_' . $announcement->getId(), $request->request->get('_token'))) {
             $em->remove($announcement);
             $em->flush();
         }
@@ -151,7 +146,7 @@ final class AnnouncementController extends AbstractController
     #[Route('/announcement-admin/{id}/delete', name: 'app_announcement_delete_admin', methods: ['POST'])]
     public function deleteAdmin(Announcement $announcement, Request $request, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete_announcement_'.$announcement->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete_announcement_' . $announcement->getId(), $request->request->get('_token'))) {
             $em->remove($announcement);
             $em->flush();
         }
@@ -181,9 +176,9 @@ final class AnnouncementController extends AbstractController
         $announcement->setCareType(TypeGuard::from($request->request->get('careType')));
         $announcement->setDateDebut(new \DateTime($request->request->get('dateDebut')));
         $announcement->setDateFin(new \DateTime($request->request->get('dateFin')));
-        $announcement->setVisitPerDay((int)$request->request->get('visitPerDay'));
-        $announcement->setRenumerationMin((float)$request->request->get('renumerationMin'));
-        $announcement->setRenumerationMax((float)$request->request->get('renumerationMax'));
+        $announcement->setVisitPerDay((int) $request->request->get('visitPerDay'));
+        $announcement->setRenumerationMin((float) $request->request->get('renumerationMin'));
+        $announcement->setRenumerationMax((float) $request->request->get('renumerationMax'));
 
         $horaires = $request->request->all('horaire');
         $announcement->setVisitHours($horaires);

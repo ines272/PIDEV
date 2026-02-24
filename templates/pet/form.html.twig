@@ -125,24 +125,22 @@
                 </div>
             </div>
 
-            <div class="pet-photo">
-                <label for="photo-upload" class="photo-circle">
-                    +
-                </label>
+            {% set imageUrl = null %}
+{% if is_edit and form.vars.data.imageName %}
+    {% set imageUrl = asset('uploads/pets/' ~ form.vars.data.imageName) %}
+{% endif %}
 
-                {{ form_widget(form.image, {
-                    'attr': {
-                        'id': 'photo-upload',
-                        'style': 'display:none'
-                    }
-                }) }}
-
-                <span>Photo de profil</span>
-                <div class="error-message">
-                    {{ form_errors(form.image) }}
-                </div>
-            </div>
-
+<div class="photo-circle"
+     onclick="document.getElementById('{{ form.image.vars.id }}').click();"
+     {% if imageUrl %}
+         style="background-image: url('{{ imageUrl }}'); background-size: cover; background-position: center;"
+     {% endif %}
+>
+    {% if not imageUrl %}
+        +
+    {% endif %}
+</div>
+{{ form_widget(form.image, {'attr': {'style': 'display:none'}}) }}
         </div>
 
         <div class="form-grid">
@@ -258,4 +256,16 @@
 
     </div>
 </section>
+
+<script>
+document.getElementById('photo-upload').addEventListener('change', function(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        document.querySelector('.photo-circle').style.backgroundImage = "url('" + reader.result + "')";
+        document.querySelector('.photo-circle').style.backgroundSize = "cover";
+        document.querySelector('.photo-circle').innerHTML = "";
+    }
+    reader.readAsDataURL(event.target.files[0]);
+});
+</script>
 {% endblock %}

@@ -38,37 +38,108 @@
 <!-- CONTENT -->
 <section class="content">
 
-    <!-- TIMELINE GARDE -->
-    <div class="card timeline">
-        <h2>Annonce : Garde de Luna 🐶</h2>
-        <span class="status">En cours</span>
+    <section class="content">
 
-        <ul>
-            <li class="done">Annonce publiée <small>01 Mars</small></li>
-            <li class="done">Candidatures reçues <small>3 pet-sitters intéressés</small></li>
-            <li class="done">Pet-sitter sélectionné <small>Sara B.</small></li>
-            <li class="pending">Début de la garde <small>05 Mars</small></li>
-            <li class="pending">Fin de la garde <small>10 Mars</small></li>
-        </ul>
-    </div>
-
-    <!-- DETAILS -->
-    <div class="side">
+    {% if announcements is empty %}
         <div class="card">
-            <h3>Détails de la garde</h3>
-            <p><strong>Animal :</strong> Chien - Golden Retriever</p>
-            <p><strong>Nom :</strong> Luna</p>
-            <p><strong>Lieu :</strong> Tunis</p>
-            <p><strong>Propriétaire :</strong> Nour Ben Ali</p>
+            <p>Aucune annonce disponible pour le moment.</p>
+        </div>
+    {% endif %}
+
+    {% for announcement in announcements %}
+    <div class="announcement-card">
+
+        <div class="announcement-top">
+
+            <div class="owner-info">
+                <div class="owner-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+                    <strong>{{ announcement.user.prenom }}</strong>
+                    <span class="owner-label">Owner</span>
+                </div>
+            </div>
+
+            <!-- HEART ICON -->
+            <button class="postuler-btn"
+        data-id="{{ announcement.id }}">
+    Postuler
+</button>
+
         </div>
 
-        <div class="card success">
-            <h3>Période de garde</h3>
-            <p>Du 05 Mars au 10 Mars</p>
+        <div class="announcement-body">
+            <p><strong>Animal :</strong>
+                {{ announcement.pet.name }}
+                ({{ announcement.pet.typePet.value }})
+            </p>
+
+            <p><strong>Type de garde :</strong>
+                {{ announcement.careType.value|replace({'_': ' '})|lower|capitalize }}
+            </p>
+
+            <p><strong>Période :</strong>
+                {{ announcement.dateDebut|date('d/m/Y') }}
+                –
+                {{ announcement.dateFin|date('d/m/Y') }}
+            </p>
+
+            <p><strong>Prix :</strong>
+                €{{ announcement.renumerationMin }}
+                –
+                €{{ announcement.renumerationMax }}
+            </p>
+
+            <p><strong>Adresse :</strong>
+                {{ announcement.address }}
+            </p>
         </div>
 
-        <button class="download-btn">Télécharger la réservation</button>
     </div>
+{% endfor %}
 
 </section>
+
+   
+
+</section>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('.postuler-btn').forEach(btn => {
+
+        btn.addEventListener('click', function () {
+
+            const announcementId = this.dataset.id;
+            const button = this;
+
+            fetch(`/postulation/${announcementId}/postuler`, {
+    method: 'POST',
+    credentials: 'same-origin',   // 🔥 ADD THIS
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+})
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.success) {
+
+                    button.innerText = 'Postulé ✅';
+                    button.disabled = true;
+
+                } else {
+                    alert(data.error || 'Erreur');
+                }
+
+            });
+
+        });
+
+    });
+
+});
+</script>
 {% endblock %}
