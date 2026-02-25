@@ -734,39 +734,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
         socket.onmessage = function (event) {
 
-            const data = JSON.parse(event.data);
+    const data = JSON.parse(event.data);
 
-            // ============================
-            // 🔔 NOTIFICATIONS
-            // ============================
-            if (data.type === "notification") {
+    console.log("📩 Realtime data:", data);
 
-                fetch('/notifications/count-unread')
-                    .then(response => response.json())
-                    .then(data => {
-                        const notificationCount = document.getElementById('notificationCount');
-                        if (!notificationCount) return;
+    // ============================
+    // 💬 CHAT
+    // ============================
+    if (data.type === "chat") {
 
-                        notificationCount.textContent = data.count;
-                        notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
-                    });
+        if (window.currentConversationId &&
+            Number(data.conversationId) === Number(window.currentConversationId)) {
+
+            if (typeof appendMessage === "function") {
+                appendMessage(data.senderName, data.content);
             }
+        }
 
-            // ============================
-            // 💬 CHAT
-            // ============================
-            if (data.type === "chat") {
+        return; // stop here for chat
+    }
 
-                if (window.currentConversationId &&
-                    Number(data.conversationId) === Number(window.currentConversationId)) {
+    // ============================
+    // 🔔 NOTIFICATION (ANY OTHER MESSAGE)
+    // ============================
 
-                    if (typeof appendMessage === "function") {
-                        appendMessage(data.senderName, data.content);
-                    }
-                }
-            }
+    // Immediately increase counter visually
+    const notificationCount = document.getElementById('notificationCount');
+    if (notificationCount) {
 
-        };
+        let current = parseInt(notificationCount.textContent || "0");
+        current += 1;
+
+        notificationCount.textContent = current;
+        notificationCount.style.display = 'flex';
+    }
+
+};
 
         socket.onerror = function (error) {
             console.log("❌ WS Error:", error);
