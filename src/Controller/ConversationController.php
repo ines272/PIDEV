@@ -12,6 +12,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Entity\User;
+
 
 class ConversationController extends AbstractController
 {
@@ -41,7 +43,6 @@ class ConversationController extends AbstractController
             'messages' => $messages
         ]);
     }
-
     #[Route('/conversation/{id}/send', name: 'conversation_send', methods: ['POST'])]
 public function sendMessage(
     Conversation $conversation,
@@ -50,8 +51,10 @@ public function sendMessage(
     HttpClientInterface $httpClient
 ): JsonResponse {
 
+    /** @var User $user */
     $user = $this->getUser();
 
+    // 🔐 Security check
     if (
         $conversation->getOwner() !== $user &&
         $conversation->getGardien() !== $user
@@ -65,30 +68,38 @@ public function sendMessage(
         return $this->json(['error' => 'Empty message'], 400);
     }
 
+    // 📝 Create message
     $message = new Message();
     $message->setConversation($conversation);
     $message->setSender($user);
     $message->setContent($content);
+    // ❌ DO NOT set createdAt — constructor already does it
 
     $em->persist($message);
     $em->flush();
 
-    // 🔥 DETERMINE OTHER USER
-    $otherUser = $conversation->getOwner() === $user
+    // 👤 Determine receiver
+    $receiver = $conversation->getOwner() === $user
         ? $conversation->getGardien()
         : $conversation->getOwner();
 
-    // 🔥 NOTIFY NODE SERVER
-    $httpClient->request('POST', 'http://localhost:8082/notify', [
-        'json' => [
-            'payload' => [
-                'type' => 'chat',
-                'conversationId' => $conversation->getId(),
-                'content' => $content,
-                'senderName' => $user->getPrenom()
-            ]
+    // 🚀 Notify WebSocket bridge
+    try {
+        $httpClient->request('POST', 'http://localhost:8082/notify', [
+    'json' => [
+        'targetUserId' => $receiver->getId(),   // 🔥 THIS IS THE FIX
+        'payload' => [
+            'type' => 'chat',
+            'conversationId' => $conversation->getId(),
+            'senderName' => $user->getPrenom(),
+            'content' => $content,
+            'time' => $message->getCreatedAt()->format('H:i')
         ]
-    ]);
+    ]
+]);
+    } catch (\Exception $e) {
+        // Optional: log error
+    }
 
     return $this->json([
         'success' => true

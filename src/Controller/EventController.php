@@ -14,8 +14,6 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Entity\User;
-use Doctrine\DBAL\ArrayParameterType;
-
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 
@@ -328,7 +326,7 @@ final class EventController extends AbstractController
 
                 $response = $client->request(
                     'POST',
-                    'http://127.0.0.1:8001/recommend',
+                    'http://127.0.0.1:8003/recommend',
                     [
                         'json' => [
                             'user_pet_types' => $userPetTypes,

@@ -1,16 +1,14 @@
 const WebSocket = require('ws');
 const http = require('http');
 
-// ===============================
-// WEBSOCKET SERVER
-// ===============================
 const wss = new WebSocket.Server({ port: 8081 });
 
-let users = {}; // userId -> socket
+let users = {};
 
+// ===============================
+// WEBSOCKET CONNECTION
+// ===============================
 wss.on('connection', function connection(ws) {
-
-    console.log("New WebSocket connection");
 
     ws.on('message', function incoming(message) {
 
@@ -20,7 +18,6 @@ wss.on('connection', function connection(ws) {
             // Register user
             if (data.type === 'register') {
                 users[data.userId] = ws;
-                ws.userId = data.userId; // attach userId to socket
                 console.log("User registered:", data.userId);
             }
 
@@ -30,20 +27,19 @@ wss.on('connection', function connection(ws) {
     });
 
     ws.on('close', () => {
-
-        if (ws.userId && users[ws.userId]) {
-            delete users[ws.userId];
-            console.log("User disconnected:", ws.userId);
+        for (let userId in users) {
+            if (users[userId] === ws) {
+                delete users[userId];
+                console.log("User disconnected:", userId);
+            }
         }
-
     });
-
 });
 
 console.log("WebSocket server running on port 8081");
 
 // ===============================
-// HTTP BRIDGE FOR SYMFONY
+// HTTP SERVER FOR SYMFONY
 // ===============================
 const server = http.createServer((req, res) => {
 
@@ -60,36 +56,32 @@ const server = http.createServer((req, res) => {
             try {
                 const data = JSON.parse(body);
 
-                // 🔥 BROADCAST TO ALL CONNECTED USERS
-                for (let userId in users) {
+                const targetSocket = users[data.targetUserId];
 
-                    const socket = users[userId];
+                if (targetSocket) {
 
-                    if (socket && socket.readyState === WebSocket.OPEN) {
+                    // Forward payload exactly as received
+                    targetSocket.send(JSON.stringify(data.payload));
 
-                        socket.send(JSON.stringify(data.payload));
-                        console.log("Message broadcast to user:", userId);
+                    console.log("Message sent to user:", data.targetUserId);
 
-                    }
-
+                } else {
+                    console.log("User not connected:", data.targetUserId);
                 }
 
                 res.writeHead(200);
                 res.end('OK');
 
             } catch (e) {
-                console.log("Invalid JSON from Symfony");
                 res.writeHead(400);
                 res.end('Invalid JSON');
             }
-
         });
 
     } else {
         res.writeHead(404);
         res.end();
     }
-
 });
 
 server.listen(8082, () => {

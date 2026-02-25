@@ -17,27 +17,27 @@ use App\Entity\User;
 class NotificationController extends AbstractController
 {
 
-#[Route('/test-realtime', name: 'notification_test_realtime', methods: ['GET'])]
-public function testRealtime(
-    NotificationService $notificationService,
-    EntityManagerInterface $em
-): Response {
+    #[Route('/test-realtime', name: 'notification_test_realtime', methods: ['GET'])]
+    public function testRealtime(
+        NotificationService $notificationService,
+        EntityManagerInterface $em
+    ): Response {
 
-    $user = $em->getRepository(User::class)->find(1);
+        $user = $em->getRepository(User::class)->find(1);
 
-    if (!$user) {
-        return new Response('User not found');
+        if (!$user) {
+            return new Response('User not found');
+        }
+
+        $notificationService->create(
+            $user,
+            'Realtime Test 🔔',
+            'This notification is sent instantly!',
+            'info'
+        );
+
+        return new Response('Notification sent');
     }
-
-    $notificationService->create(
-        $user,
-        'Realtime Test 🔔',
-        'This notification is sent instantly!',
-        'info'
-    );
-
-    return new Response('Notification sent');
-}
 
     #[Route('/latest', name: 'notification_latest', methods: ['GET'])]
     public function latest(NotificationRepository $repository): JsonResponse

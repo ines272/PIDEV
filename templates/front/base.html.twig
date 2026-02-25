@@ -720,7 +720,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function connectWebSocket() {
 
-        socket = new WebSocket("ws://localhost:8081");
+        const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+        socket = new WebSocket(protocol + window.location.hostname + ":8081");
 
         socket.onopen = function () {
             console.log("✅ WS Connected");
@@ -732,15 +733,39 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         socket.onmessage = function (event) {
-            console.log("Realtime notification:", event.data);
 
-            fetch('/notifications/count-unread')
-                .then(response => response.json())
-                .then(data => {
-                    const notificationCount = document.getElementById('notificationCount');
-                    notificationCount.textContent = data.count;
-                    notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
-                });
+            const data = JSON.parse(event.data);
+
+            // ============================
+            // 🔔 NOTIFICATIONS
+            // ============================
+            if (data.type === "notification") {
+
+                fetch('/notifications/count-unread')
+                    .then(response => response.json())
+                    .then(data => {
+                        const notificationCount = document.getElementById('notificationCount');
+                        if (!notificationCount) return;
+
+                        notificationCount.textContent = data.count;
+                        notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
+                    });
+            }
+
+            // ============================
+            // 💬 CHAT
+            // ============================
+            if (data.type === "chat") {
+
+                if (window.currentConversationId &&
+                    Number(data.conversationId) === Number(window.currentConversationId)) {
+
+                    if (typeof appendMessage === "function") {
+                        appendMessage(data.senderName, data.content);
+                    }
+                }
+            }
+
         };
 
         socket.onerror = function (error) {
