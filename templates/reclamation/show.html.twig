@@ -132,15 +132,15 @@
                     
                     {# EN-TÊTE RÉPONSE #}
                     {# EN-TÊTE RÉPONSE #}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <div>
-        <strong style="color: #667eea; font-size: 16px;">👨‍💼 {{ reponse.auteur }}</strong>
-        <span style="color: #999; font-size: 13px; margin-left: 10px;">
-            {{ reponse.dateReponse|date('d/m/Y à H:i') }}
-        </span>
-    </div>
-    {# Pas de boutons modifier/supprimer côté front #}
-</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <strong style="color: #667eea; font-size: 16px;">👨‍💼 {{ reponse.auteur }}</strong>
+                            <span style="color: #999; font-size: 13px; margin-left: 10px;">
+                                {{ reponse.dateReponse|date('d/m/Y à H:i') }}
+                            </span>
+                        </div>
+                        {# Pas de boutons modifier/supprimer côté front #}
+                    </div>
 
                     {# CONTENU RÉPONSE #}
                     <p style="color: #333; font-size: 15px; line-height: 1.6; margin: 0;">

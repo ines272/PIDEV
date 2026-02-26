@@ -1,0 +1,81 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Tous les Événements{% endblock %}
+
+{% block body %}
+<section class="content">
+    <div class="card" style="width:100%;">
+
+        <div class="table-header">
+            <h2>🌍 Tous les Événements</h2>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="pet-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Date</th>
+                        <th>Heure</th>
+                        <th>Adresse</th>
+                        <th>Description</th>
+                        <th>Participation</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% if events|length > 0 %}
+                    {% for event in events %}
+                        <tr>
+                            <td>{{ event.name }}</td>
+                            <td>{{ event.date ? event.date|date('d/m/Y') : '-' }}</td>
+                            <td>{{ event.heure }}</td>
+                            <td>{{ event.addresse }}</td>
+                            <td>{{ event.description }}</td>
+
+                            {# PARTICIPATION INFO ONLY #}
+                            <td>
+                                {% if app.user in event.participants %}
+                                    <span class="status registered">
+                                        ✔ Inscrit
+                                    </span>
+                                {% else %}
+                                    <span class="status not-registered">
+                                        ❌ Non inscrit
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            {# ACTION BUTTONS #}
+                            <td>
+                                {% if app.user in event.participants %}
+                                    <a href="{{ path('app_event_unregister', {'id': event.id}) }}"
+                                       class="btn-action btn-cancel">
+                                        Annuler
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('app_event_register', {'id': event.id}) }}"
+                                       class="btn-action btn-join">
+                                        Participer
+                                    </a>
+                                {% endif %}
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="empty-row">
+                            📅 Aucun événement disponible.
+                        </td>
+                    </tr>
+                {% endif %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

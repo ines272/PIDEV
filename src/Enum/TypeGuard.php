@@ -4,5 +4,6 @@ namespace App\Enum;
 
 enum TypeGuard: string
 {
-    case CHEZ_PROPRIETAIRE = 'CHEZ_PROPRIETAIRE';
+    case CHEZ_MOI = 'CHEZ_MOI';
+    case CHENIL = 'CHENIL';
 }

@@ -217,7 +217,54 @@
             <span class="badge-soon">Bientôt disponible</span>
         </div>
     </div>
+{# ===== MES POSTULATIONS ===== #}
+<div class="profile-card">
+    <h3>
+        <i class="fas fa-paper-plane" style="color:#0ea5e9;"></i>
+        Mes postulations
+    </h3>
 
+    {% if postulations is empty %}
+        <p style="color:#6b7280;">Vous n'avez encore postulé à aucune annonce.</p>
+    {% endif %}
+
+    {% for postulation in postulations %}
+        <div style="padding:15px; background:#f9fafb; border-radius:10px; margin-bottom:12px;">
+
+            <strong>🐶 {{ postulation.announcement.pet.name }}</strong><br>
+
+            <small>
+                👤 Propriétaire :
+                {{ postulation.owner.prenom }} {{ postulation.owner.nom }}
+            </small><br>
+
+            <small>
+                📅 {{ postulation.announcement.dateDebut|date('d/m/Y') }}
+                - {{ postulation.announcement.dateFin|date('d/m/Y') }}
+            </small><br>
+
+            <small>
+    📌 Statut :
+    <strong>{{ postulation.status }}</strong>
+</small>
+
+{% if postulation.status == 'ACCEPTED' and postulation.conversation %}
+    <div style="margin-top:10px;">
+        <a href="{{ path('conversation_show', {id: postulation.conversation.id}) }}"
+           style="background:#0ea5e9;
+                  color:white;
+                  padding:8px 14px;
+                  border-radius:6px;
+                  text-decoration:none;
+                  font-size:0.85rem;">
+            💬 Ouvrir le chat
+        </a>
+    </div>
+{% endif %}
+
+        </div>
+    {% endfor %}
+</div>
     {# ===== PROFIL ===== #}
     <div class="profile-card">
         <h3>

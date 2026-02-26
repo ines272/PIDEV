@@ -1,0 +1,151 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Tous les Événements{% endblock %}
+
+{% block body %}
+<section class="content">
+
+    {% set recommendedEvents = recommendedEvents|default([]) %}
+    {% set events = events|default([]) %}
+
+    <div style="width:100%; max-width:1200px;">
+
+        {# ========================= RECOMMENDED EVENTS ========================= #}
+        {% if recommendedEvents|length > 0 %}
+            <div class="card recommended-card" style="margin-bottom:40px;">
+
+                <div class="table-header">
+                    <h2>🎯 Événements Recommandés Pour Vous</h2>
+                </div>
+
+                <div class="recommended-grid">
+                    {% for event in recommendedEvents %}
+                        <div class="recommended-item">
+
+                            <h4 style="margin-bottom:8px;">
+                                {{ event.name }}
+                            </h4>
+
+                            <p class="rec-date">
+                                📅 {{ event.date ? event.date|date('d/m/Y') : '-' }}
+                                &nbsp;&nbsp;
+                                ⏰ {{ event.heure }}
+                            </p>
+
+                            <p style="margin:10px 0 12px 0;">
+                                {{ event.description }}
+                            </p>
+
+                            {% if event.targetPetType %}
+                                <span class="pet-badge">
+                                    🐾 Pour: {{ event.targetPetType }}
+                                </span>
+                            {% endif %}
+
+                            <div class="rec-actions">
+                                {% if app.user and app.user in event.participants %}
+                                    <span class="status registered">
+                                        ✔ Inscrit
+                                    </span>
+                                {% else %}
+                                    <a href="{{ path('app_event_register', {'id': event.id}) }}"
+                                       class="btn-action btn-join">
+                                        Participer
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        {% endif %}
+
+        {# ========================= ALL EVENTS ========================= #}
+        <div class="card">
+
+            <div class="table-header">
+                <h2>🌍 Tous les Événements</h2>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="pet-table">
+
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date</th>
+                            <th>Heure</th>
+                            <th>Adresse</th>
+                            <th>Description</th>
+                            <th class="center">Participation</th>
+                            <th class="center">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% set recommendedIds = [] %}
+                    {% for rec in recommendedEvents %}
+                        {% set recommendedIds = recommendedIds|merge([rec.id]) %}
+                    {% endfor %}
+
+                    {% if events|length > 0 %}
+                        {% for event in events %}
+                            {% if event.id not in recommendedIds %}
+                                <tr>
+                                    <td>{{ event.name }}</td>
+                                    <td>{{ event.date ? event.date|date('d/m/Y') : '-' }}</td>
+                                    <td>{{ event.heure }}</td>
+                                    <td>{{ event.addresse }}</td>
+                                    <td style="max-width:250px;">
+                                        {{ event.description }}
+                                    </td>
+
+                                    <td class="center">
+                                        {% if app.user and app.user in event.participants %}
+                                            <span class="status registered">
+                                                ✔ Inscrit
+                                            </span>
+                                        {% else %}
+                                            <span class="status not-registered">
+                                                ❌ Non inscrit
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="center">
+                                        {% if app.user and app.user in event.participants %}
+                                            <a href="{{ path('app_event_unregister', {'id': event.id}) }}"
+                                               class="btn-action btn-cancel">
+                                                Annuler
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ path('app_event_register', {'id': event.id}) }}"
+                                               class="btn-action btn-join">
+                                                Participer
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="empty-row">
+                                📅 Aucun événement disponible.
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+{% endblock %}

@@ -199,6 +199,76 @@
             <span class="badge-soon">🕐 Bientôt disponible</span>
         </div>
     </div>
+{# ===================== POSTULATIONS REÇUES ===================== #}
+<div class="profil-card">
+    <h3>
+        <i class="fas fa-inbox" style="color:#7c3aed;"></i>
+        Postulations reçues
+    </h3>
+
+    {% if postulations is empty %}
+        <p style="color:#6b7280;">Aucune postulation reçue pour le moment.</p>
+    {% endif %}
+
+    {% for postulation in postulations %}
+        <div style="padding:15px; background:#f9fafb; border-radius:10px; margin-bottom:15px;">
+
+            <strong>🐶 {{ postulation.announcement.pet.name }}</strong><br>
+
+            <small>
+                👤 Gardien :
+                {{ postulation.applicant.prenom }} {{ postulation.applicant.nom }}
+            </small><br>
+
+            <small>
+                📅 {{ postulation.announcement.dateDebut|date('d/m/Y') }}
+                - {{ postulation.announcement.dateFin|date('d/m/Y') }}
+            </small><br>
+
+            <small>
+                💰 €{{ postulation.announcement.renumerationMin }}
+                - €{{ postulation.announcement.renumerationMax }}
+            </small><br>
+
+            <small>
+              <div style="margin-top:10px;">
+    <small>
+        📌 Statut :
+        <strong class="status-text">{{ postulation.status }}</strong>
+    </small>
+</div>
+
+{% if postulation.status == 'PENDING' %}
+    <div style="margin-top:10px;">
+        <button class="accept-btn"
+                data-id="{{ postulation.id }}">
+            ✅ Accepter
+        </button>
+
+        <button class="reject-btn"
+                data-id="{{ postulation.id }}">
+            ❌ Refuser
+        </button>
+    </div>
+
+{% elseif postulation.status == 'ACCEPTED' and postulation.conversation %}
+    <div style="margin-top:10px;">
+        <a href="{{ path('conversation_show', {id: postulation.conversation.id}) }}"
+           style="background:#7c3aed;
+                  color:white;
+                  padding:8px 14px;
+                  border-radius:6px;
+                  text-decoration:none;
+                  font-size:0.85rem;">
+            💬 Ouvrir le chat
+        </a>
+    </div>
+{% endif %}
+            </small>
+
+        </div>
+    {% endfor %}
+</div>
 
     {# PROFIL #}
     <div class="profil-card">
@@ -236,4 +306,50 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    function updateStatus(postulationId, status, buttonElement) {
+
+        fetch(`/proprietaire/postulation/${postulationId}/status`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `status=${status}`
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.success) {
+
+                const container = buttonElement.closest('div').parentElement;
+
+                container.querySelector('.status-text').innerText = data.status;
+
+                // Remove buttons
+                buttonElement.parentElement.remove();
+
+            } else {
+                alert(data.error);
+            }
+        });
+    }
+
+    document.querySelectorAll('.accept-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            updateStatus(this.dataset.id, 'ACCEPTED', this);
+        });
+    });
+
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            updateStatus(this.dataset.id, 'REJECTED', this);
+        });
+    });
+
+});
+</script>
 {% endblock %}

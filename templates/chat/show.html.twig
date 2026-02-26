@@ -1,0 +1,162 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Conversation{% endblock %}
+
+{% block body %}
+<div style="max-width:900px;margin:40px auto;">
+
+    <h2>💬 Conversation</h2>
+
+    <div id="chatBox"
+         style="border:1px solid #ddd;
+                height:400px;
+                overflow-y:auto;
+                padding:15px;
+                margin-bottom:15px;
+                background:#fafafa;">
+
+        {% for message in messages %}
+            <div style="margin-bottom:10px;">
+                <strong>{{ message.sender.prenom }}</strong> :
+                {{ message.content }}
+                <small style="color:gray;font-size:11px;">
+                    {{ message.createdAt|date('H:i') }}
+                </small>
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <div style="display:flex;gap:10px;">
+        <input type="text"
+               id="msgInput"
+               placeholder="Tapez votre message..."
+               style="flex:1;padding:10px;border:1px solid #ccc;border-radius:6px;">
+
+        <button id="sendBtn"
+                style="padding:10px 20px;background:#7c3aed;color:white;border:none;border-radius:6px;">
+            Envoyer
+        </button>
+    </div>
+
+</div>
+
+{# ===============================
+   SAFE TWIG VARIABLES
+================================ #}
+
+{% set otherUserId =
+    conversation.owner.id == app.user.id
+        ? conversation.gardien.id
+        : conversation.owner.id
+%}
+
+<script>
+
+// ===============================
+// BASIC VARIABLES
+// ===============================
+const userId = {{ app.user.id|default(0) }};
+const conversationId = {{ conversation.id|default(0) }};
+const otherUserId = {{ otherUserId|default(0) }};
+
+// ===============================
+// WEBSOCKET CONNECTION
+// ===============================
+const ws = new WebSocket("ws://localhost:8081");
+
+ws.onopen = function() {
+    ws.send(JSON.stringify({
+        type: "register",
+        userId: userId
+    }));
+};
+
+ws.onmessage = function(event) {
+
+    console.log("WS raw message:", event.data);
+
+    const data = JSON.parse(event.data);
+
+    console.log("Parsed:", data);
+    console.log("Current conversationId:", conversationId);
+    console.log("Incoming conversationId:", data.conversationId);
+
+    if (data.type === "chat" && Number(data.conversationId) === Number(conversationId)) {
+        console.log("Message accepted");
+        appendMessage(data.senderName, data.content);
+    } else {
+        console.log("Message ignored");
+    }
+};
+
+// ===============================
+// SEND MESSAGE
+// ===============================
+document.getElementById("sendBtn").addEventListener("click", sendMessage);
+
+function sendMessage() {
+
+    
+    const input = document.getElementById("msgInput");
+    const content = input.value.trim();
+
+    if (!content) return;
+
+    fetch("{{ path('conversation_send', {id: conversation.id}) }}", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "content=" + encodeURIComponent(content)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+
+            // Show instantly
+            appendMessage("{{ app.user.prenom }}", content);
+
+            
+
+            input.value = "";
+        }
+    });
+}
+
+// ===============================
+// APPEND MESSAGE FUNCTION
+// ===============================
+function appendMessage(sender, content) {
+
+    const chatBox = document.getElementById("chatBox");
+
+    const div = document.createElement("div");
+    div.style.marginBottom = "10px";
+
+    div.innerHTML =
+        "<strong>" + sender + "</strong> : " +
+        escapeHtml(content);
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ===============================
+// SIMPLE ESCAPE
+// ===============================
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.innerText = text;
+    return div.innerHTML;
+}
+
+// Scroll to bottom on load
+document.getElementById("chatBox").scrollTop =
+    document.getElementById("chatBox").scrollHeight;
+
+</script>
+
+{% endblock %}

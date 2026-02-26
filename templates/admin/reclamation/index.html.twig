@@ -17,6 +17,18 @@
     </div>
 
     <div class="table-responsive">
+    <script>
+        // Désactiver la validation HTML5 sur TOUS les formulaires
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form').forEach(form => {
+                form.setAttribute('novalidate', 'novalidate');
+            });
+        });
+    </script>
+
+    {% block javascripts %}{% endblock %}
+</body>
+</html>
         <table class="table align-middle">
             <thead>
                 <tr>

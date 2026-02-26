@@ -58,6 +58,7 @@ security:
         - { path: ^/proprietaire, roles: ROLE_PROPRIETAIRE }
         - { path: ^/pet, roles: ROLE_PROPRIETAIRE }
         - { path: ^/announcement, roles: ROLE_PROPRIETAIRE }
+        - { path: ^/announcement/.*/postuler, roles: ROLE_GARDIEN }
 
 
 
