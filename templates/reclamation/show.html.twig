@@ -21,10 +21,16 @@
                 </p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <a href="{{ path('app_reclamation_edit', {id: reclamation.id}) }}" 
-                   style="padding: 12px 20px; background: #f5a623; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                    ✏️ Modifier
-                </a>
+                {% if reclamation.reponses|length == 0 %}
+    <a href="{{ path('app_reclamation_edit', {id: reclamation.id}) }}" 
+       style="padding: 12px 20px; background: #f5a623; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+        ✏️ Modifier
+    </a>
+{% else %}
+    <span style="padding: 12px 20px; background: #e0e0e0; color: #999; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; cursor: not-allowed;">
+        🔒 Modification impossible
+    </span>
+{% endif %}
                 <form method="post" action="{{ path('app_reclamation_delete', {id: reclamation.id}) }}" style="display: inline;">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
                     <button type="submit" 
@@ -116,10 +122,6 @@
                     {{ reclamation.reponses|length }}
                 </span>
             </h2>
-            <a href="{{ path('app_reponse_add', {id: reclamation.id}) }}" 
-               style="padding: 12px 20px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);">
-                ➕ Ajouter une réponse
-            </a>
         </div>
 
         {# LISTE DES RÉPONSES #}
@@ -129,28 +131,16 @@
                 <div style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #667eea;">
                     
                     {# EN-TÊTE RÉPONSE #}
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <div>
-                            <strong style="color: #667eea; font-size: 16px;">👨‍💼 {{ reponse.auteur }}</strong>
-                            <span style="color: #999; font-size: 13px; margin-left: 10px;">
-                                {{ reponse.dateReponse|date('d/m/Y à H:i') }}
-                            </span>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <a href="{{ path('app_reponse_edit', {id: reponse.id}) }}" 
-                               style="padding: 6px 12px; background: #f5a623; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600;">
-                                ✏️ Modifier
-                            </a>
-                            <form method="post" action="{{ path('app_reponse_delete', {id: reponse.id}) }}" style="display: inline;">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reponse.id) }}">
-                                <button type="submit" 
-                                        onclick="return confirm('Supprimer cette réponse ?')"
-                                        style="padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                                    🗑️ Supprimer
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    {# EN-TÊTE RÉPONSE #}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <div>
+        <strong style="color: #667eea; font-size: 16px;">👨‍💼 {{ reponse.auteur }}</strong>
+        <span style="color: #999; font-size: 13px; margin-left: 10px;">
+            {{ reponse.dateReponse|date('d/m/Y à H:i') }}
+        </span>
+    </div>
+    {# Pas de boutons modifier/supprimer côté front #}
+</div>
 
                     {# CONTENU RÉPONSE #}
                     <p style="color: #333; font-size: 15px; line-height: 1.6; margin: 0;">
@@ -165,10 +155,6 @@
                 <div style="font-size: 64px; margin-bottom: 20px;">💬</div>
                 <h3 style="font-size: 20px; font-weight: 600; color: #555; margin-bottom: 10px;">Aucune réponse pour le moment</h3>
                 <p style="color: #999; font-size: 15px; margin-bottom: 25px;">Soyez le premier à répondre à cette réclamation</p>
-                <a href="{{ path('app_reponse_add', {id: reclamation.id}) }}" 
-                   style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                    ➕ Ajouter la première réponse
-                </a>
             </div>
         {% endif %}
     </div>

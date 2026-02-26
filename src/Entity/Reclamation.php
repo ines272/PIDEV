@@ -34,8 +34,7 @@ class Reclamation
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $statut = null; 
 
-    #[ORM\Column(length: 50)]
-    #[Assert\NotBlank(message: "La priorité est obligatoire")]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $priorite = null;
 
     #[ORM\Column(length: 100)]

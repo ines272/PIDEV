@@ -40,36 +40,30 @@ public function add(
     // EMAIL
     try {
         $email = (new Email())
-            ->from('noreply@sitmypet.com')
+            ->from('your.actual.email@gmail.com')   // ← must match your Gmail
             ->to($reclamation->getEmailClient())
             ->subject('Nouvelle réponse à votre réclamation #' . $reclamation->getId())
-            ->html('<p>Votre réclamation a reçu une réponse.</p><p>' . $reponse->getContenu() . '</p>');
+            ->html('
+                <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;">
+                    <h2 style="color:#6f42c1;">SitMyPet — Réponse à votre réclamation</h2>
+                    <p>Bonjour <strong>' . $reclamation->getNomClient() . '</strong>,</p>
+                    <p>Votre réclamation <strong>' . $reclamation->getSujet() . '</strong> a reçu une réponse :</p>
+                    <div style="background:#f8f4ff;border-left:4px solid #6f42c1;padding:15px;border-radius:4px;">
+                        ' . $reponse->getContenu() . '
+                    </div>
+                    <p style="color:#888;margin-top:20px;">L\'équipe SitMyPet</p>
+                </div>
+            ');
 
         $mailer->send($email);
-    } catch (\Exception $e) {}
+        $this->addFlash('success', 'Réponse enregistrée et client notifié par email.');
+
+    } catch (\Exception $e) {
+        $this->addFlash('warning', 'Réponse enregistrée, mais email non envoyé : ' . $e->getMessage());
+    }
 
     return $this->redirectToRoute('app_admin_reclamation_index');
 }
-
-
-    #[Route('/{id}/edit', name: 'app_reponse_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Reponse $reponse, EntityManagerInterface $em): Response
-    {
-        $form = $this->createForm(ReponseType::class, $reponse);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
-
-            $this->addFlash('success', 'Réponse modifiée avec succès.');
-            return $this->redirectToRoute('app_reclamation_show', ['id' => $reponse->getReclamation()->getId()]);
-        }
-
-        return $this->render('reponse_back/edit.html.twig', [
-            'reponse' => $reponse,
-            'form' => $form,
-        ]);
-    }
 
     #[Route('/{id}', name: 'app_reponse_delete', methods: ['POST'])]
     public function delete(Request $request, Reponse $reponse, EntityManagerInterface $em): Response

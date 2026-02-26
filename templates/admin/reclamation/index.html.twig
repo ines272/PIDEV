@@ -44,9 +44,19 @@
                     <td>{{ reclamation.emailClient }}</td>
 
                     <td>
-                        <span class="badge bg-warning text-dark">
-                            {{ reclamation.priorite }}
-                        </span>
+                        {% if reclamation.priorite == 'haute' %}
+                            <span class="badge bg-danger">
+                                 Haute <small style="font-size:9px;"></small>
+                            </span>
+                        {% elseif reclamation.priorite == 'moyenne' %}
+                            <span class="badge bg-warning text-dark">
+                                 Moyenne <small style="font-size:9px;"></small>
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                 Basse <small style="font-size:9px;"></small>
+                            </span>
+                        {% endif %}
                     </td>
 
                     <td>
@@ -63,28 +73,173 @@
 
                     <td class="text-center d-flex justify-content-center gap-2">
 
-                        <!-- RESPONSE BUTTON -->
-                        <button class="btn-action btn-edit"
+                        {# BOUTON VOIR #}
+                        <button class="btn-action"
+                                style="background:linear-gradient(135deg,#0dcaf0,#0a9dc4);color:white;"
                                 data-bs-toggle="modal"
-                                data-bs-target="#responseModal{{ reclamation.id }}">
-                            <i class="fas {{ hasResponse ? 'fa-eye' : 'fa-reply' }}"></i>
+                                data-bs-target="#viewModal{{ reclamation.id }}"
+                                title="Voir les détails">
+                            <i class="fas fa-eye"></i>
                         </button>
 
-                        <!-- DELETE -->
+                        {# BOUTON RÉPONDRE #}
+                        <button class="btn-action btn-edit"
+                                data-bs-toggle="modal"
+                                data-bs-target="#responseModal{{ reclamation.id }}"
+                                title="{{ hasResponse ? 'Voir la réponse' : 'Répondre' }}">
+                            <i class="fas {{ hasResponse ? 'fa-check-circle' : 'fa-reply' }}"></i>
+                        </button>
+
+                        {# BOUTON SUPPRIMER #}
                         <button class="btn-action btn-delete"
                                 data-bs-toggle="modal"
-                                data-bs-target="#deleteModal{{ reclamation.id }}">
+                                data-bs-target="#deleteModal{{ reclamation.id }}"
+                                title="Supprimer">
                             <i class="fas fa-trash"></i>
                         </button>
 
                     </td>
                 </tr>
 
+                {# ================= VIEW MODAL ================= #}
+                <div class="modal fade" id="viewModal{{ reclamation.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content" style="border-radius:16px;">
+
+                            <div class="modal-header border-0"
+                                 style="background:linear-gradient(135deg,#6f42c1,#a855f7);border-radius:16px 16px 0 0;">
+                                <h5 class="modal-title fw-bold text-white">
+                                    <i class="fas fa-file-alt me-2"></i>
+                                    Détails de la Réclamation #{{ reclamation.id }}
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body p-4">
+                                <div class="row g-3">
+
+                                    {# BADGES #}
+                                    <div class="col-12 d-flex gap-2 mb-2">
+                                        {% if reclamation.priorite == 'haute' %}
+                                            <span class="badge bg-danger px-3 py-2">🔴 Priorité Haute — IA</span>
+                                        {% elseif reclamation.priorite == 'moyenne' %}
+                                            <span class="badge bg-warning text-dark px-3 py-2">🟡 Priorité Moyenne — IA</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary px-3 py-2">⚪ Priorité Basse — IA</span>
+                                        {% endif %}
+
+                                        {% if reclamation.statut == 'resolu' %}
+                                            <span class="badge bg-success px-3 py-2">✅ Résolu</span>
+                                        {% elseif reclamation.statut == 'en_cours' %}
+                                            <span class="badge bg-info px-3 py-2">🔄 En cours</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary px-3 py-2">⏳ En attente</span>
+                                        {% endif %}
+                                    </div>
+
+                                    {# SUJET #}
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-tag me-1"></i> Sujet
+                                        </label>
+                                        <p class="fw-bold fs-5 mb-0">{{ reclamation.sujet }}</p>
+                                    </div>
+
+                                    <hr class="my-1">
+
+                                    {# DESCRIPTION #}
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-align-left me-1"></i> Description
+                                        </label>
+                                        <div style="background:#f8f4ff;border-left:4px solid #6f42c1;padding:15px;border-radius:8px;line-height:1.7;">
+                                            {{ reclamation.description }}
+                                        </div>
+                                    </div>
+
+                                    <hr class="my-1">
+
+                                    {# INFOS CLIENT #}
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-user me-1"></i> Client
+                                        </label>
+                                        <p class="fw-bold mb-0">{{ reclamation.nomClient }}</p>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-envelope me-1"></i> Email
+                                        </label>
+                                        <p class="mb-0">
+                                            <a href="mailto:{{ reclamation.emailClient }}" style="color:#6f42c1;font-weight:600;">
+                                                {{ reclamation.emailClient }}
+                                            </a>
+                                        </p>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-calendar me-1"></i> Date de soumission
+                                        </label>
+                                        <p class="mb-0">{{ reclamation.dateReclamation|date('d/m/Y à H:i') }}</p>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-comments me-1"></i> Réponses
+                                        </label>
+                                        <p class="mb-0">
+                                            <span class="badge" style="background:#6f42c1;font-size:14px;">
+                                                {{ reclamation.reponses|length }} réponse(s)
+                                            </span>
+                                        </p>
+                                    </div>
+
+                                    {# RÉPONSE ADMIN SI EXISTE #}
+                                    {% if hasResponse %}
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-reply me-1"></i> Réponse Admin
+                                        </label>
+                                        <div style="background:#e8f5e9;border-left:4px solid #28a745;padding:15px;border-radius:8px;line-height:1.7;">
+                                            {{ reponse.contenu }}
+                                        </div>
+                                        <small class="text-muted mt-1 d-block">
+                                            Par <strong>{{ reponse.auteur }}</strong>
+                                            le {{ reponse.dateReponse|date('d/m/Y à H:i') }}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                                    Fermer
+                                </button>
+                                {% if not hasResponse %}
+                                <button type="button"
+                                        class="btn-save"
+                                        data-bs-dismiss="modal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#responseModal{{ reclamation.id }}">
+                                    <i class="fas fa-reply me-1"></i> Répondre
+                                </button>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {# ================= END VIEW MODAL ================= #}
+
+
                 {# ================= DELETE MODAL ================= #}
                 <div class="modal fade" id="deleteModal{{ reclamation.id }}" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content" style="border-radius:16px;">
-
                             <div class="modal-header border-0 pb-0">
                                 <h5 class="modal-title fw-bold text-danger">
                                     <i class="fas fa-exclamation-triangle me-2"></i>
@@ -92,34 +247,20 @@
                                 </h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
-
                             <div class="modal-body pt-2">
                                 Êtes-vous sûr de vouloir supprimer :
                                 <br><br>
                                 <strong>{{ reclamation.sujet }}</strong>
                             </div>
-
                             <div class="modal-footer border-0">
-                                <button type="button"
-                                        class="btn-cancel"
-                                        data-bs-dismiss="modal">
-                                    Annuler
-                                </button>
-
-                                <form method="post"
-                                      action="{{ path('app_reclamation_delete_admin', {id: reclamation.id}) }}">
-
-                                    <input type="hidden"
-                                           name="_token"
-                                           value="{{ csrf_token('delete' ~ reclamation.id) }}">
-
-                                    <button class="btn-save"
-                                            style="background:linear-gradient(135deg,#e53935,#c62828);">
+                                <button type="button" class="btn-cancel" data-bs-dismiss="modal">Annuler</button>
+                                <form method="post" action="{{ path('app_reclamation_delete_admin', {id: reclamation.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                                    <button class="btn-save" style="background:linear-gradient(135deg,#e53935,#c62828);">
                                         Supprimer
                                     </button>
                                 </form>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -130,94 +271,64 @@
                 <div class="modal fade" id="responseModal{{ reclamation.id }}" tabindex="-1">
                     <div class="modal-dialog modal-lg modal-dialog-centered">
                         <div class="modal-content" style="border-radius:16px;">
-
                             <div class="modal-header border-0">
                                 <h5 class="modal-title fw-bold text-primary">
-                                    <i class="fas {{ hasResponse ? 'fa-eye' : 'fa-reply' }} me-2"></i>
+                                    <i class="fas {{ hasResponse ? 'fa-check-circle' : 'fa-reply' }} me-2"></i>
                                     {{ hasResponse ? 'Réponse envoyée' : 'Répondre à la Réclamation' }}
                                 </h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
-
                             <div class="modal-body">
-
                                 <div class="row g-3">
 
                                     <div class="col-12">
                                         <label class="form-label">Sujet</label>
-                                        <input type="text"
-                                               value="{{ reclamation.sujet }}"
-                                               class="form-control"
-                                               disabled>
+                                        <input type="text" value="{{ reclamation.sujet }}" class="form-control" disabled>
                                     </div>
 
                                     {% if hasResponse %}
-
                                         <div class="col-12">
                                             <label class="form-label">Réponse</label>
-                                            <textarea class="form-control"
-                                                      rows="4"
-                                                      disabled>{{ reponse.contenu }}</textarea>
+                                            <textarea class="form-control" rows="4" disabled>{{ reponse.contenu }}</textarea>
                                         </div>
-
                                         <div class="col-md-6">
                                             <label class="form-label">Auteur</label>
-                                            <input type="text"
-                                                   class="form-control"
-                                                   value="{{ reponse.auteur }}"
-                                                   disabled>
+                                            <input type="text" class="form-control" value="{{ reponse.auteur }}" disabled>
                                         </div>
-
                                         <div class="col-md-6">
                                             <label class="form-label">Date Réponse</label>
-                                            <input type="text"
-                                                   class="form-control"
-                                                   value="{{ reponse.dateReponse|date('d/m/Y H:i') }}"
-                                                   disabled>
+                                            <input type="text" class="form-control" value="{{ reponse.dateReponse|date('d/m/Y H:i') }}" disabled>
                                         </div>
-
                                     {% else %}
-
                                         <form method="post"
-                                              action="{{ path('app_reponse_add', {id: reclamation.id}) }}">
-
-                                            <div class="col-12">
+                                              action="{{ path('app_reponse_add', {id: reclamation.id}) }}"
+                                              class="col-12">
+                                            <div class="col-12 mb-3">
                                                 <label class="form-label">Contenu de la réponse</label>
+                                                <button type="button"
+                                                        class="btn btn-sm mb-2 d-block"
+                                                        style="background:linear-gradient(135deg,#6f42c1,#a855f7);color:white;border-radius:8px;"
+                                                        onclick="generateAiSuggestion({{ reclamation.id }}, this)">
+                                                    <i class="fas fa-robot me-1"></i> Générer avec IA
+                                                </button>
                                                 <textarea name="contenu"
-                                                          class="form-control"
+                                                          class="form-control ai-textarea"
                                                           rows="4"
                                                           required></textarea>
                                             </div>
-
-                                            <div class="col-md-6">
+                                            <div class="col-md-6 mb-3">
                                                 <label class="form-label">Auteur</label>
-                                                <input type="text"
-                                                       name="auteur"
-                                                       class="form-control"
-                                                       value="Admin"
-                                                       required>
+                                                <input type="text" name="auteur" class="form-control" value="Admin" required>
                                             </div>
-
                                             <div class="modal-footer border-0 mt-3">
-                                                <button type="button"
-                                                        class="btn-cancel"
-                                                        data-bs-dismiss="modal">
-                                                    Annuler
-                                                </button>
-
-                                                <button class="btn-save">
-                                                    Envoyer la réponse
-                                                </button>
+                                                <button type="button" class="btn-cancel" data-bs-dismiss="modal">Annuler</button>
+                                                <button type="submit" class="btn-save">Envoyer la réponse</button>
                                             </div>
-
                                         </form>
-
                                     {% endif %}
 
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -225,9 +336,7 @@
 
             {% else %}
                 <tr>
-                    <td colspan="7" class="text-center py-4">
-                        Aucune réclamation trouvée.
-                    </td>
+                    <td colspan="7" class="text-center py-4">Aucune réclamation trouvée.</td>
                 </tr>
             {% endfor %}
 
@@ -235,5 +344,51 @@
         </table>
     </div>
 </div>
+
+<script>
+function generateAiSuggestion(reclamationId, button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Génération...';
+
+    const textarea = button.closest('.col-12').querySelector('textarea.ai-textarea');
+
+    fetch(`/admin/ai/suggest/${reclamationId}`, {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('HTTP error: ' + res.status);
+        return res.json();
+    })
+    .then(data => {
+        if (data.suggestion) {
+            textarea.value = '';
+            let i = 0;
+            const text = data.suggestion;
+            const interval = setInterval(() => {
+                textarea.value += text[i];
+                i++;
+                if (i >= text.length) {
+                    clearInterval(interval);
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-robot me-1"></i> Régénérer';
+                }
+            }, 20);
+        } else {
+            alert('Erreur IA : ' + data.error);
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-robot me-1"></i> Générer avec IA';
+        }
+    })
+    .catch(err => {
+        console.error('Détail erreur:', err);
+        alert('Erreur : ' + err.message);
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-robot me-1"></i> Générer avec IA';
+    });
+}
+</script>
 
 {% endblock %}

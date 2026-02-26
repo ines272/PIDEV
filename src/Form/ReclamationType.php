@@ -24,24 +24,8 @@ class ReclamationType extends AbstractType
                 'label' => 'Description',
                 'attr' => ['class' => 'form-control', 'rows' => 5, 'placeholder' => 'Décrivez votre réclamation en détail']
             ])
-            ->add('statut', ChoiceType::class, [
-                'label' => 'Statut',
-                'choices' => [
-                    'En attente' => 'en_attente',
-                    'En cours' => 'en_cours',
-                    'Résolue' => 'resolue',
-                ],
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('priorite', ChoiceType::class, [
-                'label' => 'Priorité',
-                'choices' => [
-                    'Basse' => 'basse',
-                    'Moyenne' => 'moyenne',
-                    'Haute' => 'haute',
-                ],
-                'attr' => ['class' => 'form-control']
-            ])
+            
+        
             ->add('nomClient', TextType::class, [
                 'label' => 'Nom',
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Votre nom complet']
