@@ -33,6 +33,23 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    public function findNearbyGuardians(float $lat, float $lng, float $radius): array
+{
+    return $this->createQueryBuilder('u')
+        ->where('u.roles LIKE :role')           // filtre les gardiens
+        ->andWhere('u.latitude IS NOT NULL')     // a une position GPS
+        ->andWhere('u.longitude IS NOT NULL')
+        ->andWhere("(6371 * acos(cos(radians(:lat)) * cos(radians(u.latitude)) *
+                   cos(radians(u.longitude) - radians(:lng)) +
+                   sin(radians(:lat)) * sin(radians(u.latitude)))) < :radius")
+        ->setParameter('role', '%ROLE_GARDIEN%')
+        ->setParameter('lat', $lat)
+        ->setParameter('lng', $lng)
+        ->setParameter('radius', $radius)
+        ->getQuery()
+        ->getResult();
+}
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */

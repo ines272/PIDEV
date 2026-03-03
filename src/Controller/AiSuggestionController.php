@@ -21,22 +21,22 @@ public function suggest(Reclamation $reclamation): JsonResponse
     $apiKey = $_ENV['HF_API_KEY'];
 
     $prompt = "Tu es un agent de support client pour SitMyPet, une plateforme de pet sitting.
-Un client nommé {$reclamation->getNomClient()} a soumis une réclamation.
-Sujet : {$reclamation->getSujet()}
-Rédige une réponse professionnelle et empathique en français, 3-4 phrases max.
-Commence obligatoirement par : Bonjour {$reclamation->getNomClient()},";
+    Un client nommé {$reclamation->getNomClient()} a soumis une réclamation.
+    Sujet : {$reclamation->getSujet()}
+    Rédige une réponse professionnelle et empathique en français, 3-4 phrases max.
+    Commence obligatoirement par : Bonjour {$reclamation->getNomClient()},";
 
     try {
         $response = $this->httpClient->request(
             'POST',
-            'https://router.huggingface.co/v1/chat/completions', // ← URL corrigée
+            'https://router.huggingface.co/v1/chat/completions', 
             [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $apiKey,
                     'Content-Type'  => 'application/json',
                 ],
                 'json' => [
-                    'model'    => 'meta-llama/Llama-3.2-3B-Instruct', // ← modèle gratuit et fiable
+                    'model'    => 'meta-llama/Llama-3.2-3B-Instruct',
                     'messages' => [
                         ['role' => 'user', 'content' => $prompt]
                     ],
@@ -86,7 +86,7 @@ Réponds avec UN SEUL MOT (haute, moyenne ou basse) :";
                     'messages' => [
                         ['role' => 'user', 'content' => $prompt]
                     ],
-                    'max_tokens' => 10, // on veut juste un mot
+                    'max_tokens' => 10, 
                 ],
                 'timeout' => 30,
             ]
@@ -95,7 +95,7 @@ Réponds avec UN SEUL MOT (haute, moyenne ou basse) :";
         $data     = $response->toArray();
         $result   = strtolower(trim($data['choices'][0]['message']['content']));
 
-        // Sécurité : forcer une valeur valide
+        
         if (!in_array($result, ['haute', 'moyenne', 'basse'])) {
             $result = 'moyenne';
         }

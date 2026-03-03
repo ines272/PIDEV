@@ -22,6 +22,12 @@ use Symfony\Component\HttpFoundation\File\File;
 #[Vich\Uploadable]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+      #[ORM\Column(type: 'float', nullable: true)]
+private ?float $latitude = null;
+
+#[ORM\Column(type: 'float', nullable: true)]
+private ?float $longitude = null;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -317,6 +323,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->plainPassword = $plainPassword;
         return $this;
     }
+    
+    public function getLatitude(): ?float { return $this->latitude; }
+public function setLatitude(?float $latitude): self { $this->latitude = $latitude; return $this; }
+
+public function getLongitude(): ?float { return $this->longitude; }
+public function setLongitude(?float $longitude): self { $this->longitude = $longitude; return $this; }
+
 
     // ============ MÉTHODES POUR IMAGE ============
     public function setImageFile(?File $imageFile = null): void

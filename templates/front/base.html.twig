@@ -4,140 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SitMyPet – Garde d'animaux{% endblock %}</title>
-    
-{{ importmap('app') }}
+
+    {{ importmap('app') }}
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
+
     {% if block('use_bootstrap') is defined and block('use_bootstrap') == 'true' %}
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     {% endif %}
-    
+
+    <!-- ✅ Leaflet CSS dans le HEAD -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
     <style>
+        /* ============================= */
+        /* NOTIFICATION BELL */
+        /* ============================= */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ff4d6d;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
 
         /* ============================= */
-/* NOTIFICATION BELL */
-/* ============================= */
-
-.notification-bell {
-    position: relative;
-    cursor: pointer;
-}
-
-.notification-count {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: #ff4d6d;
-    color: white;
-    font-size: 12px;
-    font-weight: 600;
-    min-width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 0 5px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
-
-/* ============================= */
-/* DROPDOWN CONTAINER */
-/* ============================= */
-
-.notification-dropdown {
-    position: absolute;
-    top: 60px;
-    right: 70px;
-    width: 320px;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    overflow: hidden;
-    display: none;
-    z-index: 2000;
-    animation: slideDownNotif 0.25s ease;
-}
-
-.notification-dropdown.show {
-    display: block;
-}
-
-@keyframes slideDownNotif {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ============================= */
-/* NOTIFICATION ITEMS */
-/* ============================= */
-
-.notification-item {
-    padding: 14px 16px;
-    border-bottom: 1px solid #f1f1f1;
-    transition: background 0.2s ease;
-    cursor: pointer;
-}
-
-.notification-item:last-child {
-    border-bottom: none;
-}
-
-.notification-item:hover {
-    background: #f8f5ff;
-}
-
-.notification-item strong {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 4px;
-}
-
-.notification-item p {
-    font-size: 13px;
-    color: #666;
-    margin: 0;
-}
-
-/* Unread style */
-.notification-item.unread {
-    background: #f3e8ff;
-}
-
-.notification-item.unread strong {
-    color: #7c3aed;
-}
-
-/* Loading state */
-.notification-loading {
-    padding: 18px;
-    text-align: center;
-    font-size: 14px;
-    color: #7c3aed;
-    font-weight: 500;
-}
-        /* Menu dropdown utilisateur */
-        .user-menu {
-            position: relative;
+        /* DROPDOWN NOTIFICATIONS */
+        /* ============================= */
+        .notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 70px;
+            width: 320px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+            display: none;
+            z-index: 2000;
+            animation: slideDownNotif 0.25s ease;
         }
-        
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        @keyframes slideDownNotif {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .notification-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f1f1;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .notification-item:last-child { border-bottom: none; }
+        .notification-item:hover { background: #f8f5ff; }
+
+        .notification-item strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .notification-item p {
+            font-size: 13px;
+            color: #666;
+            margin: 0;
+        }
+
+        .notification-item.unread { background: #f3e8ff; }
+        .notification-item.unread strong { color: #7c3aed; }
+
+        .notification-loading {
+            padding: 18px;
+            text-align: center;
+            font-size: 14px;
+            color: #7c3aed;
+            font-weight: 500;
+        }
+
+        /* ============================= */
+        /* USER MENU DROPDOWN */
+        /* ============================= */
+        .user-menu { position: relative; }
+
         .user-avatar {
             cursor: pointer;
             transition: transform 0.2s;
         }
-        
-        .user-avatar:hover {
-            transform: scale(1.05);
-        }
-        
+
+        .user-avatar:hover { transform: scale(1.05); }
+
         .dropdown-menu-user {
             position: absolute;
             top: 60px;
@@ -150,40 +128,34 @@
             z-index: 1000;
             overflow: hidden;
         }
-        
+
         .dropdown-menu-user.show {
             display: block;
             animation: slideDown 0.3s ease;
         }
-        
+
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        
+
         .dropdown-header {
             padding: 15px;
             border-bottom: 1px solid #f0f0f0;
             background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
             color: white;
         }
-        
+
         .dropdown-header strong {
             display: block;
             font-size: 16px;
         }
-        
+
         .dropdown-header small {
             opacity: 0.9;
             font-size: 13px;
         }
-        
+
         .dropdown-item {
             padding: 12px 15px;
             display: flex;
@@ -194,96 +166,64 @@
             transition: background 0.2s;
             cursor: pointer;
         }
-        
-        .dropdown-item:hover {
-            background: #f8f9fa;
-        }
-        
+
+        .dropdown-item:hover { background: #f8f9fa; }
+
         .dropdown-item i {
             width: 20px;
             color: #8B5CF6;
         }
-        
+
         .dropdown-item.logout {
             color: #dc3545;
             border-top: 1px solid #f0f0f0;
         }
-        
-        .dropdown-item.logout i {
-            color: #dc3545;
-        }
-        
-        /* Modal de confirmation */
+
+        .dropdown-item.logout i { color: #dc3545; }
+
+        /* ============================= */
+        /* MODAL DECONNEXION */
+        /* ============================= */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
             z-index: 9999;
             align-items: center;
             justify-content: center;
         }
-        
+
         .modal-overlay.show {
             display: flex;
             animation: fadeIn 0.3s ease;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; }
-            to { opacity: 1; }
+            to   { opacity: 1; }
         }
-        
+
         .modal-content {
             background: white;
             border-radius: 16px;
             padding: 30px;
             max-width: 400px;
             width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: slideUp 0.3s ease;
         }
-        
+
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        
-        .modal-icon {
-            text-align: center;
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-        
-        .modal-title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .modal-text {
-            text-align: center;
-            color: #666;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
+
+        .modal-icon   { text-align: center; font-size: 48px; margin-bottom: 20px; }
+        .modal-title  { text-align: center; font-size: 24px; font-weight: 600; color: #333; margin-bottom: 10px; }
+        .modal-text   { text-align: center; color: #666; margin-bottom: 25px; line-height: 1.6; }
+        .modal-actions{ display: flex; gap: 10px; }
+
         .modal-btn {
             flex: 1;
             padding: 12px 24px;
@@ -294,55 +234,70 @@
             transition: all 0.2s;
             font-size: 15px;
         }
-        
-        .btn-cancel {
-            background: #f1f3f5;
-            color: #495057;
-        }
-        
-        .btn-cancel:hover {
-            background: #e9ecef;
-        }
-        
+
+        .btn-cancel { background: #f1f3f5; color: #495057; }
+        .btn-cancel:hover { background: #e9ecef; }
+
         .btn-confirm {
             background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
             color: white;
         }
-        
+
         .btn-confirm:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 4px 12px rgba(139,92,246,0.4);
         }
+
+        /* ============================= */
+        /* BODY */
+        /* ============================= */
         body {
             background: #f8f5ff !important;
             min-height: 100vh;
         }
-        
-        /* Alternative avec dégradé subtil */
-        /* body {
-            background: linear-gradient(135deg, #f8f5ff 0%, #faf6ff 50%, #f3ebff 100%) !important;
-            min-height: 100vh;
-        } */
-        
-        /* Menu dropdown utilisateur */
-        .user-menu {
-            position: relative;
+
+        /* ============================= */
+        /* CHATBOT BULLES */
+        /* ============================= */
+        .bot-bubble {
+            background: #f3f0ff;
+            border-radius: 16px 16px 16px 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            max-width: 85%;
+            color: #374151;
+            animation: fadeInMsg 0.3s ease;
+        }
+
+        .user-bubble {
+            background: #8B5CF6;
+            color: white;
+            border-radius: 16px 16px 4px 16px;
+            padding: 10px 14px;
+            font-size: 14px;
+            max-width: 85%;
+            align-self: flex-end;
+        }
+
+        .typing { opacity: 0.6; font-style: italic; }
+
+        @keyframes fadeInMsg {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
     </style>
-    
+
     {% block stylesheets %}{% endblock %}
 </head>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('form').forEach(form => {
-            form.setAttribute('novalidate', 'novalidate');
-        });
-    });
-</script>
-<body 
+
+<body
     class="{% block body_class %}{% endblock %}"
     data-user-id="{{ app.user ? app.user.id : '' }}"
 >
+
+{# ============================== #}
+{# NAVBAR                         #}
+{# ============================== #}
 {% if block('show_navbar') is not defined or block('show_navbar') != 'false' %}
 <header class="navbar">
     <div class="logo">
@@ -350,90 +305,87 @@
     </div>
 
     <nav class="nav-links">
-        
-
         {% if app.user %}
-            {# ========== MENU PROPRIÉTAIRE ========== #}
-            {% if is_granted('ROLE_PROPRIETAIRE') %}          
-            <a href="{{ path('proprietaire_dashboard') }}">
-    <i class="fa-solid fa-briefcase"></i> Dashboard
-</a>      
-                <a href="{{ path('app_announcement') }}" 
+
+            {# === MENU PROPRIÉTAIRE === #}
+            {% if is_granted('ROLE_PROPRIETAIRE') %}
+                <a href="{{ path('proprietaire_dashboard') }}">
+                    <i class="fa-solid fa-briefcase"></i> Dashboard
+                </a>
+                <a href="{{ path('app_announcement') }}"
                    class="{{ app.request.get('_route') == 'app_announcement' ? 'active' }}">
                     <i class="fa-solid fa-bullhorn"></i> Annonces
                 </a>
-
-                <a href="{{ path('app_event_suggested') }}" 
+                <a href="{{ path('app_event_suggested') }}"
                    class="{{ app.request.get('_route') == 'app_event_suggested' ? 'active' }}">
                     <i class="fa-solid fa-calendar-days"></i> Événements
                 </a>
-                <a href="{{ path('app_pet') }}" 
+                <a href="{{ path('app_pet') }}"
                    class="{{ app.request.get('_route') == 'app_pet' ? 'active' }}">
                     <i class="fa-solid fa-paw"></i> Animaux
                 </a>
-
-                <a href="{{ path('app_reclamation_index') }}" 
+                <a href="{{ path('app_reclamation_index') }}"
                    class="{{ app.request.get('_route') starts with 'app_reclamation' ? 'active' }}">
                     <i class="fa-solid fa-envelope-open"></i> Réclamations
                 </a>
 
-            {# ========== MENU GARDIEN ========== #}
+            {# === MENU GARDIEN === #}
             {% elseif is_granted('ROLE_GARDIEN') %}
-            {# HOME - Visible pour TOUS #}
-        <a href="{{ path('app_home') }}" 
-           class="{{ app.request.get('_route') == 'app_home' ? 'active' }}">
-            <i class="fa-solid fa-house"></i> Accueil
-        </a>
-            <a href="{{ path('gardien_dashboard') }}">
-    <i class="fa-solid fa-paper-plane"></i> Mes Postulations
-</a>
-                
-                <a href="{{ path('app_event') }}" 
+                <a href="{{ path('app_home') }}"
+                   class="{{ app.request.get('_route') == 'app_home' ? 'active' }}">
+                    <i class="fa-solid fa-house"></i> Accueil
+                </a>
+                <a href="{{ path('gardien_dashboard') }}">
+                    <i class="fa-solid fa-paper-plane"></i> Mes Postulations
+                </a>
+                <a href="{{ path('app_event') }}"
                    class="{{ app.request.get('_route') == 'app_event' ? 'active' }}">
                     <i class="fa-solid fa-calendar-days"></i> Mes Événements
                 </a>
-
-                <a href="{{ path('app_reclamation_index') }}" 
+                <a href="{{ path('app_reclamation_index') }}"
                    class="{{ app.request.get('_route') starts with 'app_reclamation' ? 'active' }}">
                     <i class="fa-solid fa-envelope-open"></i> Réclamations
                 </a>
-
             {% endif %}
+
         {% endif %}
 
         {% block extra_nav_links %}{% endblock %}
     </nav>
 
     <div class="nav-right">
-        {# Bouton Admin Portal - Visible UNIQUEMENT pour l'utilisateur ID 1 #}
+
         {% if app.user and app.user.id == 1 %}
             <a href="{{ path('app_admin_user_index') }}" class="admin-btn">Admin Portal</a>
         {% endif %}
-        
-        <div class="icon-btn notification-bell" id="notificationBtn">
-    <i class="fa-regular fa-bell"></i>
-    <span class="notification-count" id="notificationCount">0</span>
-</div>
 
-<div class="notification-dropdown" id="notificationDropdown">
-    <div class="notification-loading">Chargement...</div>
-</div>
+        <!-- Cloche notifications -->
+        <div class="icon-btn notification-bell" id="notificationBtn">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-count" id="notificationCount">0</span>
+        </div>
+
+        <div class="notification-dropdown" id="notificationDropdown">
+            <div class="notification-loading">Chargement...</div>
+        </div>
+
         <div class="icon-btn">
             <i class="fa-regular fa-moon"></i>
         </div>
-        
-        <!-- Menu utilisateur avec dropdown -->
+
+        <!-- Menu utilisateur -->
         {% if app.user %}
             <div class="user-menu">
                 <div class="user-avatar" id="userMenuBtn">
                     <img src="https://i.pravatar.cc/40" alt="Utilisateur">
                 </div>
-                
+
                 <div class="dropdown-menu-user" id="userDropdown">
                     <div class="dropdown-header">
                         <strong>{{ app.user.prenom ~ ' ' ~ app.user.nom }}</strong>
                         <small>
-                            {% if is_granted('ROLE_PROPRIETAIRE') %}                                🏠 Propriétaire
+                            {% if is_granted('ROLE_PROPRIETAIRE') %}
+                                🏠 Propriétaire
                             {% elseif is_granted('ROLE_GARDIEN') %}
                                 👥 Gardien
                             {% else %}
@@ -442,31 +394,27 @@
                         </small>
                     </div>
                     <a href="#" class="dropdown-item">
-                        <i class="fa-solid fa-user"></i>
-                        Mon Profil
+                        <i class="fa-solid fa-user"></i> Mon Profil
                     </a>
                     <a href="#" class="dropdown-item">
-                        <i class="fa-solid fa-gear"></i>
-                        Paramètres
+                        <i class="fa-solid fa-gear"></i> Paramètres
                     </a>
                     <a href="#" class="dropdown-item">
-                        <i class="fa-solid fa-heart"></i>
-                        Mes Favoris
+                        <i class="fa-solid fa-heart"></i> Mes Favoris
                     </a>
                     <div class="dropdown-item logout" id="logoutBtn">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        Déconnexion
+                        <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
                     </div>
                 </div>
             </div>
         {% else %}
-            {# Si pas connecté, afficher bouton de connexion #}
             <a href="{{ path('app_login') }}" class="admin-btn">Connexion</a>
         {% endif %}
+
     </div>
 </header>
 
-<!-- Modal de confirmation de déconnexion -->
+{# Modal déconnexion #}
 {% if app.user %}
 <div class="modal-overlay" id="logoutModal">
     <div class="modal-content">
@@ -477,22 +425,25 @@
             À bientôt sur SitMyPet !
         </p>
         <div class="modal-actions">
-            <button class="modal-btn btn-cancel" id="cancelLogout">
-                Annuler
-            </button>
-            <button class="modal-btn btn-confirm" id="confirmLogout">
-                Se déconnecter
-            </button>
+            <button class="modal-btn btn-cancel" id="cancelLogout">Annuler</button>
+            <button class="modal-btn btn-confirm" id="confirmLogout">Se déconnecter</button>
         </div>
     </div>
 </div>
 {% endif %}
-{% endif %}
 
+{% endif %}{# fin show_navbar #}
+
+{# ============================== #}
+{# CONTENU PRINCIPAL              #}
+{# ============================== #}
 <main class="{% block main_class %}{% endblock %}">
     {% block body %}{% endblock %}
 </main>
 
+{# ============================== #}
+{# FOOTER                         #}
+{# ============================== #}
 {% if block('show_footer') is not defined or block('show_footer') != 'false' %}
 <footer>
     <div class="footer-grid">
@@ -505,7 +456,8 @@
             <p>
                 <a href="{{ path('app_home') }}">Accueil</a><br>
                 {% if app.user %}
-                    {% if is_granted('ROLE_PROPRIETAIRE') %}                        <a href="{{ path('app_announcement') }}">Publier une annonce</a><br>
+                    {% if is_granted('ROLE_PROPRIETAIRE') %}
+                        <a href="{{ path('app_announcement') }}">Publier une annonce</a><br>
                         <a href="{{ path('app_pet') }}">Voir les animaux</a><br>
                     {% elseif is_granted('ROLE_GARDIEN') %}
                         <a href="{{ path('app_event') }}">Événements</a><br>
@@ -534,28 +486,40 @@
 </footer>
 {% endif %}
 
+{# ============================== #}
+{# SCRIPTS                        #}
+{# ============================== #}
+
+<!-- Bootstrap JS -->
 {% if block('use_bootstrap') is defined and block('use_bootstrap') == 'true' %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 {% endif %}
 
+<!-- ✅ Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 {% if app.user %}
+
+<!-- Script dropdown + modal déconnexion -->
 <script>
-    // Gestion du menu dropdown
-    const userMenuBtn = document.getElementById('userMenuBtn');
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('form').forEach(form => {
+        form.setAttribute('novalidate', 'novalidate');
+    });
+
+    const userMenuBtn  = document.getElementById('userMenuBtn');
     const userDropdown = document.getElementById('userDropdown');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const logoutModal = document.getElementById('logoutModal');
+    const logoutBtn    = document.getElementById('logoutBtn');
+    const logoutModal  = document.getElementById('logoutModal');
     const cancelLogout = document.getElementById('cancelLogout');
-    const confirmLogout = document.getElementById('confirmLogout');
+    const confirmLogout= document.getElementById('confirmLogout');
 
     if (userMenuBtn && userDropdown) {
-        // Toggle dropdown
         userMenuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             userDropdown.classList.toggle('show');
         });
 
-        // Fermer dropdown si on clique ailleurs
         document.addEventListener('click', (e) => {
             if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
                 userDropdown.classList.remove('show');
@@ -564,113 +528,82 @@
     }
 
     if (logoutBtn && logoutModal) {
-        // Ouvrir modal de déconnexion
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             userDropdown.classList.remove('show');
             logoutModal.classList.add('show');
         });
 
-        // Annuler la déconnexion
         cancelLogout.addEventListener('click', () => {
             logoutModal.classList.remove('show');
         });
 
-        // Fermer modal en cliquant sur l'overlay
         logoutModal.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                logoutModal.classList.remove('show');
-            }
+            if (e.target === logoutModal) logoutModal.classList.remove('show');
         });
 
-        // Confirmer la déconnexion
         confirmLogout.addEventListener('click', () => {
             window.location.href = "{{ path('app_logout') }}";
         });
     }
+});
 </script>
+
+<!-- Script notifications -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationBtn      = document.getElementById('notificationBtn');
     const notificationDropdown = document.getElementById('notificationDropdown');
-    const notificationCount = document.getElementById('notificationCount');
+    const notificationCount    = document.getElementById('notificationCount');
 
     if (!notificationBtn || !notificationDropdown || !notificationCount) return;
 
-    // ===============================
-    // REFRESH UNREAD COUNTER
-    // ===============================
     function refreshCount() {
         fetch('/notifications/count-unread')
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
                 notificationCount.textContent = data.count;
-
-                if (data.count > 0) {
-                    notificationCount.style.display = 'flex';
-                } else {
-                    notificationCount.style.display = 'none';
-                }
+                notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
             });
     }
 
-    // ===============================
-    // LOAD NOTIFICATIONS
-    // ===============================
     function loadNotifications() {
-
-notificationDropdown.innerHTML = `
-    <div class="notification-loading">
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        Chargement...
-    </div>
-`;
+        notificationDropdown.innerHTML = `
+            <div class="notification-loading">
+                <i class="fa-solid fa-spinner fa-spin"></i> Chargement...
+            </div>`;
 
         fetch('/notifications/latest')
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
-
                 notificationDropdown.innerHTML = '';
 
                 if (data.length === 0) {
-                    notificationDropdown.innerHTML =
-                        '<div class="notification-item">Aucune notification</div>';
+                    notificationDropdown.innerHTML = '<div class="notification-item">Aucune notification</div>';
                     return;
                 }
 
                 data.forEach(notification => {
-
                     const item = document.createElement('div');
                     item.classList.add('notification-item');
-
-                    if (!notification.isRead) {
-                        item.classList.add('unread');
-                    }
+                    if (!notification.isRead) item.classList.add('unread');
 
                     item.innerHTML = `
                         <strong>${notification.title}</strong>
                         <p>${notification.message}</p>
                     `;
 
-                    // CLICK HANDLER
                     item.addEventListener('click', function () {
-
-                        fetch(`/notifications/${notification.id}/mark-read`, {
-                            method: 'POST'
-                        })
-                        .then(() => {
-
-                            refreshCount();
-
-                            if (notification.actionUrl) {
-                                window.location.href = notification.actionUrl;
-                            } else {
-                                loadNotifications();
-                            }
-
-                        });
-
+                        fetch(`/notifications/${notification.id}/mark-read`, { method: 'POST' })
+                            .then(() => {
+                                refreshCount();
+                                if (notification.actionUrl) {
+                                    window.location.href = notification.actionUrl;
+                                } else {
+                                    loadNotifications();
+                                }
+                            });
                     });
 
                     notificationDropdown.appendChild(item);
@@ -678,38 +611,23 @@ notificationDropdown.innerHTML = `
             });
     }
 
-    // ===============================
-    // INITIAL LOAD
-    // ===============================
     refreshCount();
 
-    // ===============================
-    // TOGGLE DROPDOWN
-    // ===============================
-    notificationBtn.addEventListener('click', function (event) {
-        event.stopPropagation();
-
+    notificationBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
         notificationDropdown.classList.toggle('show');
-
-        if (notificationDropdown.classList.contains('show')) {
-            loadNotifications();
-        }
+        if (notificationDropdown.classList.contains('show')) loadNotifications();
     });
 
-    // ===============================
-    // CLOSE ON OUTSIDE CLICK
-    // ===============================
-    document.addEventListener('click', function (event) {
-        if (!notificationDropdown.contains(event.target) &&
-            !notificationBtn.contains(event.target)) {
+    document.addEventListener('click', function (e) {
+        if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
             notificationDropdown.classList.remove('show');
         }
     });
-
 });
 </script>
 
-
+<!-- Script WebSocket temps réel -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -719,23 +637,17 @@ document.addEventListener('DOMContentLoaded', function () {
     let socket;
 
     function connectWebSocket() {
-
         socket = new WebSocket("ws://localhost:8081");
 
         socket.onopen = function () {
             console.log("✅ WS Connected");
-
-            socket.send(JSON.stringify({
-                type: 'register',
-                userId: userId
-            }));
+            socket.send(JSON.stringify({ type: 'register', userId: userId }));
         };
 
         socket.onmessage = function (event) {
             console.log("Realtime notification:", event.data);
-
             fetch('/notifications/count-unread')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
                     const notificationCount = document.getElementById('notificationCount');
                     notificationCount.textContent = data.count;
@@ -743,24 +655,184 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         };
 
-        socket.onerror = function (error) {
-            console.log("❌ WS Error:", error);
-            socket.close();
-        };
-
-        socket.onclose = function () {
+        socket.onerror  = function () { socket.close(); };
+        socket.onclose  = function () {
             console.log("⚠️ WS Disconnected. Reconnecting in 3s...");
             setTimeout(connectWebSocket, 3000);
         };
     }
 
     connectWebSocket();
-
 });
 </script>
-{% endif %}
+
+{% endif %}{# fin app.user #}
+
+{# ============================== #}
+{# ✅ CHATBOT SITMYPET + OSM      #}
+{# ============================== #}
+
+<!-- Bouton flottant chatbot -->
+<button id="chatbot-toggle"
+    style="position:fixed;bottom:20px;right:20px;z-index:9999;
+           background:#8B5CF6;color:white;border:none;border-radius:50%;
+           width:60px;height:60px;font-size:24px;cursor:pointer;
+           box-shadow:0 4px 15px rgba(139,92,246,0.4)">
+    🐾
+</button>
+
+<!-- Fenêtre chatbot -->
+<div id="chatbot-window"
+    style="position:fixed;bottom:90px;right:20px;width:370px;height:520px;
+           background:white;border-radius:16px;z-index:9999;
+           box-shadow:0 10px 40px rgba(0,0,0,0.2);
+           display:none;flex-direction:column;overflow:hidden;">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);padding:16px;
+                color:white;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px">🐾</span>
+        <div>
+            <div style="font-weight:700;font-size:16px;">Assistant SitMyPet</div>
+            <div style="font-size:12px;opacity:0.8;">● En ligne</div>
+        </div>
+        <button id="chatbot-close"
+            style="margin-left:auto;background:none;border:none;
+                   color:white;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+
+    <!-- Zone messages -->
+    <div id="chatbot-messages"
+        style="flex:1;overflow-y:auto;padding:16px;
+               display:flex;flex-direction:column;gap:10px;">
+        <div class="bot-bubble">
+            👋 Bonjour ! Je suis l'assistant SitMyPet.<br>
+            Je peux vous aider à naviguer sur notre plateforme, comprendre les rôles (propriétaire / gardien), ou trouver un gardien près de chez vous !
+        </div>
+    </div>
+
+    <!-- Carte OSM (cachée par défaut) -->
+    <div id="chatbot-map" style="height:180px;display:none;"></div>
+
+    <!-- Zone saisie -->
+    <div style="padding:12px;border-top:1px solid #f0f0f0;display:flex;gap:8px;">
+        <input id="chatbot-input" type="text"
+            placeholder="Posez votre question..."
+            style="flex:1;padding:10px 14px;border:2px solid #e5e7eb;
+                   border-radius:25px;outline:none;font-size:14px;">
+        <button onclick="sendChatMessage()"
+            style="background:#8B5CF6;color:white;border:none;border-radius:50%;
+                   width:40px;height:40px;cursor:pointer;font-size:18px;">➤</button>
+    </div>
+</div>
+
+<!-- Script chatbot -->
+<script>
+(function () {
+
+    let map = null;
+
+    // === Toggle ouverture/fermeture ===
+    document.getElementById('chatbot-toggle').addEventListener('click', () => {
+        const win = document.getElementById('chatbot-window');
+        win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    document.getElementById('chatbot-close').addEventListener('click', () => {
+        document.getElementById('chatbot-window').style.display = 'none';
+    });
+
+    // === Envoi message ===
+    document.getElementById('chatbot-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') sendChatMessage();
+    });
+
+    window.sendChatMessage = async function () {
+        const input   = document.getElementById('chatbot-input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        appendChatMessage(message, 'user');
+        input.value = '';
+
+        const typingEl = appendChatMessage('...', 'bot', true);
+
+        try {
+            const res  = await fetch('/api/chatbot', {
+                method : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body   : JSON.stringify({ message })
+            });
+            const data = await res.json();
+
+            typingEl.remove();
+            appendChatMessage(data.reply, 'bot');
+
+            if (data.show_map) showOSMMap();
+
+        } catch (e) {
+            typingEl.remove();
+            appendChatMessage("Erreur de connexion, réessayez.", 'bot');
+        }
+    };
+
+    function appendChatMessage(text, sender, isTyping = false) {
+        const container = document.getElementById('chatbot-messages');
+        const el = document.createElement('div');
+        el.className = sender === 'user'
+            ? 'user-bubble'
+            : ('bot-bubble' + (isTyping ? ' typing' : ''));
+        el.textContent = text;
+        container.appendChild(el);
+        container.scrollTop = container.scrollHeight;
+        return el;
+    }
+
+    function showOSMMap() {
+        const mapDiv = document.getElementById('chatbot-map');
+        mapDiv.style.display = 'block';
+
+        if (map) { map.invalidateSize(); return; }
+
+        map = L.map('chatbot-map').setView([36.8065, 10.1815], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const { latitude: lat, longitude: lng } = pos.coords;
+                map.setView([lat, lng], 13);
+                L.marker([lat, lng])
+                    .addTo(map)
+                    .bindPopup('📍 Vous êtes ici')
+                    .openPopup();
+                loadNearbyGuardians(lat, lng);
+            });
+        }
+    }
+
+    async function loadNearbyGuardians(lat, lng) {
+        try {
+            const res     = await fetch(`/api/gardiens/nearby?lat=${lat}&lng=${lng}&radius=10`);
+            const gardiens= await res.json();
+
+            gardiens.forEach(g => {
+                L.marker([g.latitude, g.longitude], {
+                    icon: L.divIcon({ className: '', html: '🐕', iconSize: [30, 30] })
+                }).addTo(map)
+                  .bindPopup(`<b>${g.nom}</b><br>⭐ ${g.rating}<br><a href="/gardien/${g.id}">Voir profil</a>`);
+            });
+        } catch (e) {
+            console.warn('Impossible de charger les gardiens proches.');
+        }
+    }
+
+})();
+</script>
 
 {% block javascripts %}{% endblock %}
+
 
 </body>
 </html>

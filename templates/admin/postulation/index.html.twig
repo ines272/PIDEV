@@ -1,0 +1,250 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block page_title %}Gestion des Postulations{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>Toutes les Postulations</h2>
+    <p>Liste complète des postulations enregistrées.</p>
+</div>
+
+{# FLASH MESSAGES #}
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>{{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+{% endfor %}
+
+{# STATISTIQUES #}
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="data-card text-center p-3">
+            <div style="font-size:32px;font-weight:700;color:#6f42c1;">{{ stats.total }}</div>
+            <div style="color:#888;font-size:14px;">Total</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="data-card text-center p-3">
+            <div style="font-size:32px;font-weight:700;color:#f5a623;">{{ stats.pending }}</div>
+            <div style="color:#888;font-size:14px;">En attente</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="data-card text-center p-3">
+            <div style="font-size:32px;font-weight:700;color:#28a745;">{{ stats.accepted }}</div>
+            <div style="color:#888;font-size:14px;">Acceptées</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="data-card text-center p-3">
+            <div style="font-size:32px;font-weight:700;color:#e53935;">{{ stats.rejected }}</div>
+            <div style="color:#888;font-size:14px;">Refusées</div>
+        </div>
+    </div>
+</div>
+
+{# TABLEAU #}
+<div class="data-card">
+    <div class="data-card-header">
+        <div class="data-card-title">
+            <i class="fas fa-file-alt me-2"></i>Liste des postulations
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Candidat (Gardien)</th>
+                    <th>Propriétaire</th>
+                    <th>Annonce</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for postulation in postulations %}
+                <tr>
+                    <td><strong>#{{ postulation.id }}</strong></td>
+
+                    <td>
+                        <div style="font-weight:600;">{{ postulation.applicant.nom ?? postulation.applicant.email }}</div>
+                        <small style="color:#888;">{{ postulation.applicant.email }}</small>
+                    </td>
+
+                    <td>
+                        <div style="font-weight:600;">{{ postulation.owner.nom ?? postulation.owner.email }}</div>
+                        <small style="color:#888;">{{ postulation.owner.email }}</small>
+                    </td>
+
+                    <td>{{ postulation.announcement.titre ?? postulation.announcement.id }}</td>
+
+                    <td>
+                        {% if postulation.status == 'ACCEPTED' %}
+                            <span class="badge bg-success px-3 py-2">✅ Acceptée</span>
+                        {% elseif postulation.status == 'REJECTED' %}
+                            <span class="badge bg-danger px-3 py-2">❌ Refusée</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark px-3 py-2">⏳ En attente</span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ postulation.createdAt|date('d/m/Y H:i') }}</td>
+
+                    <td class="text-center d-flex justify-content-center gap-2">
+
+                        {# BOUTON VOIR #}
+                        <button class="btn-action"
+                                style="background:linear-gradient(135deg,#0dcaf0,#0a9dc4);color:white;"
+                                data-bs-toggle="modal"
+                                data-bs-target="#viewModal{{ postulation.id }}"
+                                title="Voir les détails">
+                            <i class="fas fa-eye"></i>
+                        </button>
+
+                        {# BOUTON ACCEPTER #}
+                        {% if postulation.status == 'PENDING' %}
+                        <form method="post" action="{{ path('admin_postulation_accept', {id: postulation.id}) }}">
+                            <button class="btn-action"
+                                    style="background:linear-gradient(135deg,#28a745,#1e7e34);color:white;"
+                                    title="Accepter"
+                                    onclick="return confirm('Accepter cette postulation ?')">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+
+                        {# BOUTON REFUSER #}
+                        <form method="post" action="{{ path('admin_postulation_reject', {id: postulation.id}) }}">
+                            <button class="btn-action"
+                                    style="background:linear-gradient(135deg,#f5a623,#e5941a);color:white;"
+                                    title="Refuser"
+                                    onclick="return confirm('Refuser cette postulation ?')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        {# BOUTON SUPPRIMER #}
+                        <form method="post" action="{{ path('admin_postulation_delete', {id: postulation.id}) }}">
+                            <button class="btn-action btn-delete"
+                                    title="Supprimer"
+                                    onclick="return confirm('Supprimer cette postulation ?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+
+                {# ================= VIEW MODAL ================= #}
+                <div class="modal fade" id="viewModal{{ postulation.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content" style="border-radius:16px;">
+
+                            <div class="modal-header border-0"
+                                 style="background:linear-gradient(135deg,#6f42c1,#a855f7);border-radius:16px 16px 0 0;">
+                                <h5 class="modal-title fw-bold text-white">
+                                    <i class="fas fa-file-alt me-2"></i>
+                                    Détails Postulation #{{ postulation.id }}
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body p-4">
+                                <div class="row g-3">
+
+                                    {# BADGE STATUT #}
+                                    <div class="col-12">
+                                        {% if postulation.status == 'ACCEPTED' %}
+                                            <span class="badge bg-success px-3 py-2 fs-6">✅ Acceptée</span>
+                                        {% elseif postulation.status == 'REJECTED' %}
+                                            <span class="badge bg-danger px-3 py-2 fs-6">❌ Refusée</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark px-3 py-2 fs-6">⏳ En attente</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <hr>
+
+                                    {# CANDIDAT #}
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-user me-1"></i> Candidat (Gardien)
+                                        </label>
+                                        <p class="fw-bold mb-0">{{ postulation.applicant.nom ?? postulation.applicant.email }}</p>
+                                        <small style="color:#6f42c1;">{{ postulation.applicant.email }}</small>
+                                    </div>
+
+                                    {# PROPRIÉTAIRE #}
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-home me-1"></i> Propriétaire
+                                        </label>
+                                        <p class="fw-bold mb-0">{{ postulation.owner.nom ?? postulation.owner.email }}</p>
+                                        <small style="color:#6f42c1;">{{ postulation.owner.email }}</small>
+                                    </div>
+
+                                    {# ANNONCE #}
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-bullhorn me-1"></i> Annonce
+                                        </label>
+                                        <p class="fw-bold mb-0">{{ postulation.announcement.titre ?? 'Annonce #' ~ postulation.announcement.id }}</p>
+                                    </div>
+
+                                    {# DATE #}
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-calendar me-1"></i> Date de postulation
+                                        </label>
+                                        <p class="mb-0">{{ postulation.createdAt|date('d/m/Y à H:i') }}</p>
+                                    </div>
+
+                                    {# CONVERSATION #}
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted" style="font-size:12px;text-transform:uppercase;">
+                                            <i class="fas fa-comments me-1"></i> Conversation
+                                        </label>
+                                        <p class="mb-0">
+                                            {% if postulation.conversation %}
+                                                <span class="badge bg-success">✅ Créée</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">❌ Aucune</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn-cancel" data-bs-dismiss="modal">Fermer</button>
+                                {% if postulation.status == 'PENDING' %}
+                                <form method="post" action="{{ path('admin_postulation_accept', {id: postulation.id}) }}" style="display:inline;">
+                                    <button class="btn-save" onclick="return confirm('Accepter ?')">
+                                        <i class="fas fa-check me-1"></i> Accepter
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {# ================= END VIEW MODAL ================= #}
+
+            {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-4">Aucune postulation trouvée.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

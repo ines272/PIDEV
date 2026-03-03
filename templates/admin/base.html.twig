@@ -484,6 +484,10 @@
            class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_event_index' ? 'active' : '' }}">
             <i class="fas fa-calendar-days"></i> Événements
         </a>
+        <a href="{{ path('admin_postulation_index') }}"
+            class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_postulation_index' ? 'active' : '' }}">
+                <i class="fas fa-file-alt"></i> Postulations
+        </a>
 
         <a href="{{ path('app_admin_reclamation_index') }}"
            class="nav-link {{ app.request.attributes.get('_route') starts with 'app_admin_reclamation_index' ? 'active' : '' }}">
