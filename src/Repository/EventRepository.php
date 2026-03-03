@@ -18,38 +18,38 @@ class EventRepository extends ServiceEntityRepository
 
 
     public function searchByCriteriaForUser(
-    $user,
-    ?string $name,
-    ?\DateTime $date,
-    ?string $heure
-): array {
-    $qb = $this->createQueryBuilder('e')
-        ->andWhere('e.user = :user')
-        ->setParameter('user', $user);
+        $user,
+        ?string $name,
+        ?\DateTime $date,
+        ?string $heure
+    ): array {
+        $qb = $this->createQueryBuilder('e')
+            ->andWhere('e.user = :user')
+            ->setParameter('user', $user);
 
-    if ($name) {
-        $qb->andWhere('e.name LIKE :name')
-           ->setParameter('name', '%' . $name . '%');
+        if ($name) {
+            $qb->andWhere('e.name LIKE :name')
+                ->setParameter('name', '%' . $name . '%');
+        }
+
+        if ($date) {
+            $qb->andWhere('e.date = :date')
+                ->setParameter('date', $date);
+        }
+
+        if ($heure) {
+            $qb->andWhere('e.heure LIKE :heure')
+                ->setParameter('heure', '%' . $heure . '%');
+        }
+
+        return $qb->orderBy('e.date', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
-    if ($date) {
-        $qb->andWhere('e.date = :date')
-           ->setParameter('date', $date);
-    }
-
-    if ($heure) {
-        $qb->andWhere('e.heure LIKE :heure')
-           ->setParameter('heure', '%' . $heure . '%');
-    }
-
-    return $qb->orderBy('e.date', 'DESC')
-              ->getQuery()
-              ->getResult();
-}
 
 
-
-//    /**
+    //    /**
 //     * @return Event[] Returns an array of Event objects
 //     */
 //    public function findByExampleField($value): array
@@ -64,7 +64,7 @@ class EventRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Event
+    //    public function findOneBySomeField($value): ?Event
 //    {
 //        return $this->createQueryBuilder('e')
 //            ->andWhere('e.exampleField = :val')
