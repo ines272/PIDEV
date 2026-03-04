@@ -47,24 +47,24 @@ class ChatbotController extends AbstractController
             ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             $response = $this->httpClient->request('POST',
-                'https://router.huggingface.co/hf-inference/v1/chat/completions',
-                [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $apiKey,
-                        'Content-Type'  => 'application/json',
-                    ],
-                    'body' => json_encode([
-                        'model'    => 'meta-llama/Llama-3.2-3B-Instruct',
-                        'messages' => [
-                            ['role' => 'system', 'content' => $systemPrompt],
-                            ['role' => 'user',   'content' => $userMessage],
-                        ],
-                        'max_tokens'  => 300,
-                        'temperature' => 0.7,
-                    ], JSON_UNESCAPED_UNICODE),
-                    'timeout' => 30,
-                ]
-            );
+    'https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta/v1/chat/completions',
+    [
+        'headers' => [
+            'Authorization' => 'Bearer ' . $apiKey,
+        ],
+        'json' => [
+            'messages' => [
+                ['role' => 'system', 'content' => $systemPrompt],
+                ['role' => 'user',   'content' => $userMessage],
+            ],
+            'max_tokens'  => 300,
+            'temperature' => 0.7,
+        ],
+        'verify_peer' => false,
+        'verify_host' => false,
+        'timeout'     => 30,
+    ]
+);
 
             $statusCode = $response->getStatusCode();
 
